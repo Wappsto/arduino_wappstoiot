@@ -64,54 +64,6 @@ uint8_t WappstoRpc::_awaitResponse()
     }
 }
 
-uint8_t WappstoRpc::_awaitResponseControl(void)
-{
-    while (_client->connected()) {
-        int ret;
-        memset(rspBuffer, 0x00, sizeof(rspBuffer));
-        ret = _client->read(rspBuffer, sizeof(rspBuffer));
-        if (ret > 0) {
-            if(_jsonDebug){
-                Serial.println("Init received:");
-                String rcvData((char*)&rspBuffer);
-                Serial.println(rcvData);
-            }
-            //StaticJsonDocument<JSON_CHAR_BUFFER> root;
-            DynamicJsonDocument root(JSON_CHAR_BUFFER);
-            DeserializationError err = deserializeJson(root, rspBuffer);
-
-            if(err) {
-                Serial.println("RPC Response Not parsable Json");
-                return(0);
-            }
-            JsonObject result = root["result"];
-            JsonObject value = result["value"];
-            const char* dataStr = root["result"]["value"]["data"];
-            const char* uuidStr = root["result"]["value"]["meta"]["id"];
-
-            Serial.println("TEST");
-            Serial.println(dataStr);
-            Serial.println(uuidStr);
-#if 0
-
-            breaks stuff!!!
-            /*
-            if(strlen(dataStr) > 0) {
-                for(int i=1; i<=20; i++) {
-                    if(strcmp(uuidStr, _values[i-1].controlUuid) == 0) {
-                        Serial.println("FOUND STUFF");
-                        strcpy(_values[i-1].ctrlData, dataStr);
-                        return i;
-                    }
-                }
-            }
-            */
-#endif
-        }
-    }
-    return 0;
-}
-
 
 void WappstoRpc::_sendSuccessResponse(const char *id)
 {
@@ -252,24 +204,27 @@ int WappstoRpc::postValue(Value *value)
     }
 
     JsonArray stateArray = data.createNestedArray("state");
+    if(value->permission == READ || value->permission == READ_WRITE) {
+        JsonObject report = stateArray.createNestedObject();
+        JsonObject metaValReport = report.createNestedObject("meta");
+        metaValReport["version"] = "2.0";
+        metaValReport["type"] = "state";
+        metaValReport["id"] = value->reportState->uuid;
+        report["type"] = "Report";
+        report["timestamp"] = getUtcTime();
+        report["data"] = "";
+    }
 
-    JsonObject report = stateArray.createNestedObject();
-    JsonObject metaValReport = report.createNestedObject("meta");
-    metaValReport["version"] = "2.0";
-    metaValReport["type"] = "state";
-    metaValReport["id"] = value->reportState->uuid;
-    report["type"] = "Report";
-    report["timestamp"] = getUtcTime();
-    report["data"] = "";
-
-    JsonObject control = stateArray.createNestedObject();
-    JsonObject metaValControl = control.createNestedObject("meta");
-    metaValControl["version"] = "2.0";
-    metaValControl["type"] = "state";
-    metaValControl["id"] = value->controlState->uuid;
-    control["type"] = "Control";
-    control["timestamp"] = getUtcTime();
-    control["data"] = "";
+    if(value->permission == WRITE || value->permission == READ_WRITE) {
+        JsonObject control = stateArray.createNestedObject();
+        JsonObject metaValControl = control.createNestedObject("meta");
+        metaValControl["version"] = "2.0";
+        metaValControl["type"] = "state";
+        metaValControl["id"] = value->controlState->uuid;
+        control["type"] = "Control";
+        control["timestamp"] = getUtcTime();
+        control["data"] = "";
+    }
 
     serializeJson(root, _jsonTxBufferChar);
     if(_jsonDebug) {
@@ -460,6 +415,20 @@ RequestType_e WappstoRpc::readData(char* uuid, char *dataPtr)
                 }
                 _sendSuccessResponse(msgId);
                 return REQUEST_PUT;
+            } else if(strcmp(method, "DELETE") == 0) {
+                const char* urlStr = params["url"];
+                String url(urlStr);
+                char getId[UUID_LENGTH] = {0,};
+                int lastSlash = url.lastIndexOf('/');
+                url.substring(lastSlash+1).toCharArray(getId, UUID_LENGTH);
+
+                if(_jsonDebug) {
+                    Serial.print("DELETE: ");
+                    Serial.println(getId);
+                }
+                strcpy(uuid, getId);
+                _sendSuccessResponse(msgId);
+                return REQUEST_DELETE;
             } else {
                 if(_jsonDebug) {
                     Serial.println("Unknown method");

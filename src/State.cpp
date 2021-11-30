@@ -24,6 +24,7 @@ State::State(Value *value, WappstoRpc &wappstoRpc, StateType_e stateType) : _wap
         strcpy(this->uuid, readUuid(readId));
     } else {
         generateNewUuid(this->uuid);
+        writeUuid(readId, this->uuid);
     }
 
     this->_onChangeCb = NULL;

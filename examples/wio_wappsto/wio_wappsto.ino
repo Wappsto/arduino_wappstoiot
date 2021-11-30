@@ -43,7 +43,7 @@ ValueString_t myStringValueParameters;
 int myNumberCounter = 0;
 
 #define UUID_COUNT 7
-uint32_t deviceIndex[] = {
+uint32_t deviceIndex[UUID_COUNT] = {
     0x0000FFFF,
     0x000000FF,
     0x00000001,
@@ -62,6 +62,15 @@ const char uuidList[UUID_COUNT][UUID_LENGTH] {
     "afefd0b7-d207-4cff-9caa-e99a029c887c",
     "6947f6d8-5ccc-4c5e-8e50-66469a37fe04",
 };
+
+bool writeUuid(uint32_t storeId, const char* uuid)
+{
+    Serial.print("Need to save this UUID: 0x");
+    Serial.print(storeId, HEX);
+    Serial.print(" - uuid: ");
+    Serial.println(uuid);
+    return true;
+}
 
 const char* readUuid(uint32_t storeId)
 {

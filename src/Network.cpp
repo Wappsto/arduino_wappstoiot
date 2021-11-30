@@ -92,18 +92,24 @@ bool Network::dataAvailable(void)
     }
     RequestType_e req = _wappstoRpc.readData(tmpUuid, tmpData);
 
+    Serial.print(" type: ");
+    Serial.println(req);
+
     if(tmpUuid && strlen(tmpUuid) > 0) {
         Serial.print("UUID: ");
         Serial.print(tmpUuid);
+    } else {
+        Serial.println("Invalid or no uuid");
+        return false;
     }
-    /*
-    if(tmpData && strlen(tmpData) > 0) {
-        Serial.print(" data: ");
-        Serial.print(tmpData);
+
+    if(req == REQUEST_DELETE) {
+        Serial.println("Delete not handled yet");
+        return false;
+    } else if(req == REQUEST_UNKNOWN) {
+        Serial.println("Unknown request - not handled");
+        return false;
     }
-    */
-    Serial.print(" type: ");
-    Serial.println(req);
 
     for(int devs=0; devs<currentNumberOfDevices; devs++) {
 
@@ -119,12 +125,12 @@ bool Network::dataAvailable(void)
             }
             if(strcmp(devices[devs]->values[vals]->uuid, tmpUuid) == 0) {
                 Serial.println("Found value requested UUID");
+                return true;
             }
             if(strcmp(devices[devs]->values[vals]->reportState->uuid, tmpUuid) == 0) {
                 Serial.println("Found state report requested UUID");
                 if(req == REQUEST_GET) {
                     if(devices[devs]->values[vals]->_onRefreshCb) {
-                        Serial.println("Calling callback refresh");
                         devices[devs]->values[vals]->_onRefreshCb(devices[devs]->values[vals], tmpData);
                         return true;
                     }
@@ -133,7 +139,6 @@ bool Network::dataAvailable(void)
                 Serial.println("Found state control requested UUID");
                 if(req == REQUEST_PUT) {
                     if(devices[devs]->values[vals]->_onControlCb) {
-                        Serial.println("Calling callback control");
                         devices[devs]->values[vals]->_onControlCb(devices[devs]->values[vals], tmpData);
                         return true;
                     }
@@ -147,12 +152,12 @@ bool Network::dataAvailable(void)
 
 bool Network::change(void)
 {
-    return true;
+    return false;
 }
 
 bool Network::deleteReq(void)
 {
-    return true;
+    return false;
 }
 
 Device* Network::createDevice(String name, String product, String manufacturer, String description, String protocol, String communication)

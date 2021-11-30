@@ -36,6 +36,7 @@ void Value::_init(void)
         strcpy(this->uuid, readUuid(readId));
     } else {
         generateNewUuid(this->uuid);
+        writeUuid(readId, this->uuid);
     }
 
     switch(permission) {
@@ -60,7 +61,7 @@ void Value::post(void)
 
 bool Value::change(void)
 {
-    return true;
+    return false;
 }
 
 bool Value::report(const String &data)
@@ -75,17 +76,17 @@ bool Value::report(const String &data)
 
 bool Value::control(String &data)
 {
-    return true;
+    return false;
 }
 
 bool Value::request(String &data)
 {
-    return true;
+    return false;
 }
 
 bool Value::deleteReq(void)
 {
-    return true;
+    return false;
 }
 
 void Value::onControl(WappstoIoTCallback cb)

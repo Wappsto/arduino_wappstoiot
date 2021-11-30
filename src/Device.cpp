@@ -2,14 +2,6 @@
 
 
 
-/**
-Device model
-Device::Device(void)
-{
-
-}
-*/
-
 Device::Device(Network *network, WappstoRpc &wappstoRpc, uint8_t id, String name, String product, String manufacturer, String description, String protocol, String communication) : _wappstoRpc(wappstoRpc)
 {
     this->parent = network;
@@ -39,6 +31,7 @@ Device::Device(Network *network, WappstoRpc &wappstoRpc, uint8_t id, String name
         strcpy(this->uuid, readUuid(readId));
     } else {
         generateNewUuid(this->uuid);
+        writeUuid(readId, this->uuid);
     }
 }
 
@@ -49,12 +42,12 @@ void Device::post(void)
 
 bool Device::change(void)
 {
-    return true;
+    return false;
 }
 
 bool Device::deleteReq(void)
 {
-    return true;
+    return false;
 }
 
 Value* Device::createValueNumber(String name, String type, PERMISSION_e permission, ValueNumber_t *valNumber)

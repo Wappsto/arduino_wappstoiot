@@ -32,7 +32,6 @@ class WappstoRpc
         uint8_t rspBuffer[JSON_STATIC_BUFFER_SIZE];
         char _jsonTxBufferChar[JSON_TX_BUFFER_SIZE];
         uint8_t _awaitResponse(void);
-        uint8_t _awaitResponseControl(void);
         void _sendSuccessResponse(const char *id);
         const char* _getUtcTime(void);
 };
