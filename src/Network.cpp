@@ -139,6 +139,7 @@ bool Network::dataAvailable(void)
                 Serial.println("Found state control requested UUID");
                 if(req == REQUEST_PUT) {
                     if(devices[devs]->values[vals]->_onControlCb) {
+                        devices[devs]->values[vals]->controlState->data = tmpData;
                         devices[devs]->values[vals]->_onControlCb(devices[devs]->values[vals], tmpData);
                         return true;
                     }

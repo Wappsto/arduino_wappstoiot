@@ -1,7 +1,6 @@
 #pragma once
 #include <Arduino.h>
 #include <WiFiClientSecure.h>
-#include <Vector.h>
 
 #define MAX_DEVICES 5
 #define MAX_VALUES 10

@@ -1,3 +1,25 @@
+/** Getting started with Wio terminal
+Important step for new hardware - wifi firmware upgrade:
+https://wiki.seeedstudio.com/Wio-Terminal-Network-Overview/
+
+
+https://wiki.seeedstudio.com/Wio-Terminal-Getting-Started/
+- Add to preferences, additional boards manager urls: https://files.seeedstudio.com/arduino/package_seeeduino_boards_index.json
+- Board manager, search for wio, install Seeed SAMD Boards
+
+Libraries
+Seeed_Arduino_RTC
+Seeed_Arduino_rpcWiFi - search for "seeed rpcwifi"
+Seeed_Arduino_rpcUnified - search for "seeed rpcunified"
+Seeed_Arduino_mbedtls - search for "seeed mbedtls"
+Seeed_Arduino_FS - search for "seeed fs"
+Seeed_Arduino_SFUD - search for "seeed sfud"
+
+WappstoIoT Libraries requirements
+ArduinoJson
+WiFiClientSecure
+**/
+
 #include <ArduinoJson.h>
 #include "rpcWiFi.h"
 #include <WiFiMulti.h>
