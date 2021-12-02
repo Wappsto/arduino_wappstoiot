@@ -151,6 +151,11 @@ void refreshStringCallback(void *object, String data)
     val->report(String("Refresh"));
 }
 
+void deleteNetworkCallback(void *object, String data)
+{
+    Serial.println("Network deleted, need to restart device, and claim network again");
+}
+
 void initializeWifi(void)
 {
     Serial.println("Initializing WiFi");
@@ -188,6 +193,8 @@ void setup() {
 
     myStringValueParameters.max = 200;
     myStringValueParameters.encoding = "";
+
+    wappsto.onDelete(&deleteNetworkCallback);
 
     myDevice = wappsto.createDevice("My Device", "", "", "", "", "");
 

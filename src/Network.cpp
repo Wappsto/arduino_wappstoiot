@@ -104,6 +104,10 @@ bool Network::dataAvailable(void)
     }
 
     if(req == REQUEST_DELETE) {
+        if(strcmp(this->uuid, tmpUuid) == 0 && this->_onDeleteCb) {
+            this->_onDeleteCb(this, "");
+            return true;
+        }
         Serial.println("Delete not handled yet");
         return false;
     } else if(req == REQUEST_UNKNOWN) {
