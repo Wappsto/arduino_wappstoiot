@@ -11,7 +11,7 @@ public:
     Value(Device *device, WappstoRpc &wappstoRpc, uint8_t id, String name, String type, PERMISSION_e permission, ValueString_t *valString);
     bool change(void);
     bool report(const String &data);
-    bool control(String &data);
+    bool control(const String &data);
     bool request(String &data);
     bool deleteReq(void);
     void onControl(WappstoIoTCallback cb);

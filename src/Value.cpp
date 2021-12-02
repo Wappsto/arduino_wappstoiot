@@ -74,7 +74,7 @@ bool Value::report(const String &data)
     return true;
 }
 
-bool Value::control(String &data)
+bool Value::control(const String &data)
 {
     return false;
 }
