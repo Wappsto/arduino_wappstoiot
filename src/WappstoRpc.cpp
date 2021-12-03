@@ -8,6 +8,8 @@
 #define JSON_CHAR_BUFFER 500
 #define JSON_POST_BUFFER 2072
 
+//#define DISABLE_FAST_SENDING 1
+
 WappstoRpc::WappstoRpc(WiFiClientSecure *client)
 {
     _client = client;
@@ -22,13 +24,15 @@ void WappstoRpc::setDebug(bool jsonDebug)
 
 uint8_t WappstoRpc::_awaitResponse()
 {
+    uint16_t timeoutCounter = 0;
     while (_client->connected()) {
         int ret;
         memset(rspBuffer, 0x00, sizeof(rspBuffer));
         ret = _client->read(rspBuffer, sizeof(rspBuffer));
         if (ret > 0) {
             if(_jsonDebug){
-                Serial.println("Init received:");
+                Serial.print("Init received: ");
+                Serial.println(ret);
                 String rcvData((char*)&rspBuffer);
                 Serial.println(rcvData);
             }
@@ -60,6 +64,12 @@ uint8_t WappstoRpc::_awaitResponse()
                 root.~BasicJsonDocument();
                 return(0);
             }
+        }
+        delay(10);
+        timeoutCounter++;
+        if(timeoutCounter > 100) {
+            Serial.println("Timeout waiting for reply");
+            return(0);
         }
     }
 }
@@ -336,6 +346,11 @@ int WappstoRpc::putState(State *state)
     sprintf(url, "/network/%s/device/%s/value/%s/state/%s", state->parent->parent->parent->uuid, state->parent->parent->uuid, state->parent->uuid, state->uuid);
     params["url"] = url;
 
+#ifndef DISABLE_FAST_SENDING
+    JsonObject metaFast = params.createNestedObject("meta");
+    metaFast["fast"] = true;
+#endif
+
     JsonObject data = params.createNestedObject("data");
     JsonObject meta = data.createNestedObject("meta");
     meta["id"] = state->uuid;
@@ -355,7 +370,6 @@ int WappstoRpc::putState(State *state)
         serializeJsonPretty(root, Serial);
     }
     _client->print(_jsonTxBufferChar);
-
     return(_awaitResponse());
 }
 
