@@ -36,15 +36,11 @@ uint8_t WappstoRpc::_awaitResponse()
                 String rcvData((char*)&rspBuffer);
                 Serial.println(rcvData);
             }
-            //StaticJsonDocument<JSON_CHAR_BUFFER> root;
-            DynamicJsonDocument root(JSON_CHAR_BUFFER);
+            StaticJsonDocument<JSON_CHAR_BUFFER> root;
             DeserializationError err = deserializeJson(root, rspBuffer);
 
             if(err) {
                 Serial.println("RPC Response Not parsable Json");
-                root.clear();
-                //root.delete();
-                root.~BasicJsonDocument();
                 return(0);
             }
 
@@ -53,15 +49,9 @@ uint8_t WappstoRpc::_awaitResponse()
                 if(_jsonDebug) {
                     Serial.println("RPC Response Success");
                 }
-                root.clear();
-                //root.delete();
-                root.~BasicJsonDocument();
                 return(1);
             } else {
                 Serial.println("RPC Response Error");
-                root.clear();
-                //root.delete();
-                root.~BasicJsonDocument();
                 return(0);
             }
         }
@@ -74,13 +64,10 @@ uint8_t WappstoRpc::_awaitResponse()
     }
 }
 
-
 void WappstoRpc::_sendSuccessResponse(const char *id)
 {
-    //StaticJsonDocument<JSON_CHAR_BUFFER> root;
-DynamicJsonDocument root(JSON_CHAR_BUFFER);
+    StaticJsonDocument<JSON_CHAR_BUFFER> root;
     memset(_jsonTxBufferChar, 0x00, JSON_CHAR_BUFFER);
-    //char _jsonTxBufferChar[JSON_TX_BUFFER_SIZE];
 
     root["jsonrpc"] = "2.0";
     root["id"] = id;
@@ -92,19 +79,14 @@ DynamicJsonDocument root(JSON_CHAR_BUFFER);
         serializeJsonPretty(root, Serial);
     }
     _client->print(_jsonTxBufferChar);
-    root.clear();
-    //root.delete();
-    root.~BasicJsonDocument();
 }
 
 
 int WappstoRpc::postNetwork(const char *networkId, String &networkName)
 {
-    //StaticJsonDocument<JSON_POST_BUFFER> root;
-    DynamicJsonDocument root(JSON_CHAR_BUFFER);
+    StaticJsonDocument<JSON_POST_BUFFER> root;
     memset(_jsonTxBufferChar, 0x00, JSON_TX_BUFFER_SIZE);
-    //char _jsonTxBufferChar[JSON_TX_BUFFER_SIZE];
-
+    
     root["jsonrpc"] = "2.0";
     root["id"] = _msgId;
     _msgId++;
@@ -123,9 +105,6 @@ int WappstoRpc::postNetwork(const char *networkId, String &networkName)
         serializeJsonPretty(root, Serial);
     }
     _client->print(_jsonTxBufferChar);
-    root.clear();
-    //root.delete();
-    root.~BasicJsonDocument();
 
     return(_awaitResponse());
 }
@@ -133,10 +112,8 @@ int WappstoRpc::postNetwork(const char *networkId, String &networkName)
 int WappstoRpc::postDevice(Device *device)
 {
     char url[200] = {0,};
-    //StaticJsonDocument<JSON_POST_BUFFER> root;
-    DynamicJsonDocument root(JSON_CHAR_BUFFER);
+    StaticJsonDocument<JSON_POST_BUFFER> root;
     memset(_jsonTxBufferChar, 0x00, JSON_TX_BUFFER_SIZE);
-    //char _jsonTxBufferChar[JSON_TX_BUFFER_SIZE];
 
     root["jsonrpc"] = "2.0";
     root["id"] = _msgId;
@@ -167,9 +144,6 @@ int WappstoRpc::postDevice(Device *device)
         serializeJsonPretty(root, Serial);
     }
     _client->print(_jsonTxBufferChar);
-    root.clear();
-    //root.delete();
-    root.~BasicJsonDocument();
 
     return(_awaitResponse());
 }
@@ -178,7 +152,6 @@ int WappstoRpc::postValue(Value *value)
 {
     char url[200] = {0,};
     sprintf(url, "/network/%s/device/%s/value", &value->parent->parent->uuid, &value->parent->uuid);
-    Serial.println(url);
     StaticJsonDocument<JSON_POST_BUFFER> root;
     memset(_jsonTxBufferChar, 0x00, JSON_TX_BUFFER_SIZE);
 
@@ -389,7 +362,9 @@ RequestType_e WappstoRpc::readData(char* uuid, char *dataPtr)
         DeserializationError err = deserializeJson(root, readBuffer);
 
         if (err) {
-            Serial.println("Not parsable Json receive");
+            if(_jsonDebug) {
+                Serial.println("Not parsable Json receive");
+            }
             return REQUEST_UNKNOWN;
         }
 
