@@ -66,8 +66,6 @@ bool Value::change(void)
 
 bool Value::report(const String &data)
 {
-    Serial.print("TEST REPORT: ");
-    Serial.println(data);
     this->reportState->timestamp = getUtcTime();
     this->reportState->data = data;
     _wappstoRpc.putState(this->reportState);
@@ -76,7 +74,10 @@ bool Value::report(const String &data)
 
 bool Value::control(const String &data)
 {
-    return false;
+    this->controlState->timestamp = getUtcTime();
+    this->controlState->data = data;
+    _wappstoRpc.putState(this->controlState);
+    return true;
 }
 
 bool Value::request(String &data)
