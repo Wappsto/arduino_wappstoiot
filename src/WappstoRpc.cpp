@@ -10,6 +10,13 @@
 
 //#define DISABLE_FAST_SENDING 1
 
+#define PRINT(s)    { if(_jsonDebug) \
+                            Serial.println(F(s)); }
+#define PRINTV(s,v) {  if(_jsonDebug) \
+                            Serial.print(F(s)); Serial.println(v); }
+#define PRINTX(s,v) { if(_jsonDebug) \
+                            Serial.print(F(s)); Serial.print(F("0x")); Serial.println(v, HEX); }
+
 WappstoRpc::WappstoRpc(WiFiClientSecure *client)
 {
     _client = client;
@@ -30,35 +37,30 @@ uint8_t WappstoRpc::_awaitResponse()
         memset(rspBuffer, 0x00, sizeof(rspBuffer));
         ret = _client->read(rspBuffer, sizeof(rspBuffer));
         if (ret > 0) {
-            if(_jsonDebug){
-                Serial.print("Init received: ");
-                Serial.println(ret);
-                String rcvData((char*)&rspBuffer);
-                Serial.println(rcvData);
-            }
+            PRINTV("Init received: ", ret);
+            PRINT(rspBuffer);
+
             StaticJsonDocument<JSON_CHAR_BUFFER> root;
             DeserializationError err = deserializeJson(root, rspBuffer);
 
             if(err) {
-                Serial.println("RPC Response Not parsable Json");
+                PRINT("RPC Response Not parsable Json");
                 return(0);
             }
 
             bool result = root["result"]["value"];
             if(result == true) {
-                if(_jsonDebug) {
-                    Serial.println("RPC Response Success");
-                }
+                PRINT("RPC Response Success");
                 return(1);
             } else {
-                Serial.println("RPC Response Error");
+                PRINT("RPC Response Error");
                 return(0);
             }
         }
         delay(10);
         timeoutCounter++;
         if(timeoutCounter > 100) {
-            Serial.println("Timeout waiting for reply");
+            PRINT("Timeout waiting for reply");
             return(0);
         }
     }
@@ -352,19 +354,14 @@ RequestType_e WappstoRpc::readData(char* uuid, char *dataPtr)
     memset(readBuffer, 0x00, sizeof(readBuffer));
     ret = _client->read(readBuffer, sizeof(readBuffer));
     if(ret > 0) {
-        if(_jsonDebug) {
-            Serial.println("Reading received:");
-            String readData((char*)&readBuffer);
-            Serial.println(readData);
-        }
+        PRINT("Reading received:");
+        PRINT(readBuffer);
 
         StaticJsonDocument<JSON_STATIC_BUFFER_SIZE> root;
         DeserializationError err = deserializeJson(root, readBuffer);
 
         if (err) {
-            if(_jsonDebug) {
-                Serial.println("Not parsable Json receive");
-            }
+            PRINT("Not parsable Json receive");
             return REQUEST_UNKNOWN;
         }
 
@@ -384,10 +381,7 @@ RequestType_e WappstoRpc::readData(char* uuid, char *dataPtr)
                 int lastSlash = url.lastIndexOf('/');
                 url.substring(lastSlash+1).toCharArray(getId, UUID_LENGTH);
 
-                if(_jsonDebug) {
-                    Serial.print("GET: ");
-                    Serial.println(getId);
-                }
+                PRINTV("GET: ", getId);
                 strcpy(uuid, getId);
                 _sendSuccessResponse(msgId);
                 return REQUEST_GET;
@@ -396,12 +390,9 @@ RequestType_e WappstoRpc::readData(char* uuid, char *dataPtr)
                 strcpy(dataPtr, data["data"]);
                 strcpy(uuid, data["meta"]["id"]);
 
-                if(_jsonDebug) {
-                    Serial.print("PUT: ");
-                    Serial.print(uuid);
-                    Serial.print(" - ");
-                    Serial.println(dataPtr);
-                }
+                PRINTV("PUT: ",uuid);
+                PRINT(dataPtr);
+
                 _sendSuccessResponse(msgId);
                 return REQUEST_PUT;
             } else if(strcmp(method, "DELETE") == 0) {
@@ -411,39 +402,26 @@ RequestType_e WappstoRpc::readData(char* uuid, char *dataPtr)
                 int lastSlash = url.lastIndexOf('/');
                 url.substring(lastSlash+1).toCharArray(getId, UUID_LENGTH);
 
-                if(_jsonDebug) {
-                    Serial.print("DELETE: ");
-                    Serial.println(getId);
-                }
+                PRINTV("DELETE: ", getId);
                 strcpy(uuid, getId);
                 _sendSuccessResponse(msgId);
                 return REQUEST_DELETE;
             } else {
-                if(_jsonDebug) {
-                    Serial.println("Unknown method");
-                }
+                PRINT("method");
             }
         } else if(root.containsKey("result")) {
             bool result = root["result"]["value"];
             if(result == true) {
-                if(_jsonDebug) {
-                    Serial.println("Return success");
-                    return REQUEST_SUCCESS;
-                }
+                PRINT("Return success");
+                return REQUEST_SUCCESS;
             } else {
-                if(_jsonDebug) {
-                    Serial.println("Return Error");
-                }
+                PRINT("Return Error");
             }
         } else {
-            if(_jsonDebug) {
-                Serial.println("Received msg not handled");
-            }
+            PRINT("Received msg not handled");
         }
     } else {
-        if(_jsonDebug) {
-            Serial.println("No data read");
-        }
+        PRINT("No data read");
     }
     return REQUEST_UNKNOWN;
 }
