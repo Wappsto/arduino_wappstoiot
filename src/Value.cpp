@@ -84,6 +84,42 @@ bool Value::deleteReq(void)
     return false;
 }
 
+String Value::getControlData(void)
+{
+    if(this->controlState) {
+        return this->controlState->data;
+    } else {
+        return "";
+    }
+}
+
+String Value::getControlTimestamp(void)
+{
+    if(this->controlState) {
+        return this->controlState->timestamp;
+    } else {
+        return "";
+    }
+}
+
+String Value::getReportData(void)
+{
+    if(this->reportState) {
+        return this->reportState->data;
+    }  else {
+        return "";
+    }
+}
+
+String Value::getReportTimestamp(void)
+{
+    if(this->reportState) {
+        return this->reportState->timestamp;
+    } else {
+        return "";
+    }
+}
+
 void Value::onControl(WappstoValueControlCallback cb)
 {
     this->_onControlCb = cb;

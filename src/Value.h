@@ -37,6 +37,11 @@ public:
     WappstoValueRefreshCallback _onRefreshCb;
     WappstoCallback _onDeleteCb;
 
+    String getControlData(void);
+    String getControlTimestamp(void);
+    String getReportData(void);
+    String getReportTimestamp(void);
+
 private:
     WappstoRpc &_wappstoRpc;
     void _init(void);
