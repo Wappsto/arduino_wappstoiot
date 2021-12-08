@@ -21,7 +21,6 @@ class WappstoRpc
         int putValue(Value *value);
         int putState(State *state);
         int deleteValue(const char* networkId, const char* deviceId, int valueId);
-        int deleteAllValues(const char* networkId, const char* deviceId);
         RequestType_e readData(char* uuid, char* data);
 
     private:

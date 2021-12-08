@@ -13,10 +13,8 @@ public:
     bool deleteReq(void);
     Value* createValueNumber(String name, String type, PERMISSION_e permission, ValueNumber_t *valNumber);
     Value* createValueString(String name, String type, PERMISSION_e permission, ValueString_t *valString);
-    void onChange(WappstoIoTCallback cb);
-    void onRefresh(WappstoIoTCallback cb);
-    void onRequest(WappstoIoTCallback cb);
-    void onDelete(WappstoIoTCallback cb);
+    void onChange(WappstoCallback cb);
+    void onDelete(WappstoCallback cb);
     void post(void);
 
     Network *parent;
@@ -30,8 +28,6 @@ public:
 
 private:
     WappstoRpc &_wappstoRpc;
-    WappstoIoTCallback _onChangeCb;
-    WappstoIoTCallback _onRefreshCb;
-    WappstoIoTCallback _onRequestCb;
-    WappstoIoTCallback _onDeleteCb;
+    WappstoCallback _onChangeCb;
+    WappstoCallback _onDeleteCb;
 };

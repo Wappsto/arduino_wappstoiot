@@ -16,8 +16,6 @@ Device::Device(Network *network, WappstoRpc &wappstoRpc, uint8_t id, String name
     this->deviceInfo.serial = "1";
 
     this->_onChangeCb = NULL;
-    this->_onRefreshCb = NULL;
-    this->_onRequestCb = NULL;
     this->_onDeleteCb = NULL;
 
     currentNumberOfValues = 0;
@@ -74,22 +72,12 @@ Value* Device::createValueString(String name, String type, PERMISSION_e permissi
     return values[currentNumberOfValues-1];
 }
 
-void Device::onChange(WappstoIoTCallback cb)
+void Device::onChange(WappstoCallback cb)
 {
     this->_onChangeCb = cb;
 }
 
-void Device::onRefresh(WappstoIoTCallback cb)
-{
-    this->_onRefreshCb = cb;
-}
-
-void Device::onRequest(WappstoIoTCallback cb)
-{
-    this->_onRequestCb = cb;
-}
-
-void Device::onDelete(WappstoIoTCallback cb)
+void Device::onDelete(WappstoCallback cb)
 {
     this->_onDeleteCb = cb;
 }

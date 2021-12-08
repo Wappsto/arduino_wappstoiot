@@ -28,11 +28,12 @@ WiFiClientSecure
 #include "RTC_SAMD51.h" // arduino lib: Seeed_Arduino_RTC
 #include "DateTime.h"
 
-#include "WappstoIoT.h"
+#include "Wappsto.h"
+
 
 WiFiMulti WiFiMulti;
 WiFiClientSecure client;
-Network wappsto(&client);
+Wappsto wappsto(&client);
 
 unsigned int localPort = 2390;      // local port to listen for UDP packets
 char timeServer[] = "time.nist.gov"; // extenral NTP server e.g. time.nist.gov
@@ -55,7 +56,7 @@ const char* ca = "-----BEGIN CERTIFICATE-----\n    \n-----END CERTIFICATE-----\n
 const char* client_crt = "-----BEGIN CERTIFICATE-----\n  \n-----END CERTIFICATE-----\n";
 const char* client_key = "-----BEGIN RSA PRIVATE KEY-----\n  \n-----END RSA PRIVATE KEY-----\n";
 
-
+Network *myNetwork;
 Device *myDevice;
 Value *myNumberValue;
 Value *myStringValue;
@@ -180,7 +181,7 @@ void setup() {
 
     initializeNtp();
 
-    if(wappsto.connect("test", network_id, ca, client_crt, client_key)) {
+    if(wappsto.connect(network_id, ca, client_crt, client_key)) {
         Serial.println("Connected to Wappsto");
     } else {
         Serial.println("Could not connect");
@@ -194,9 +195,9 @@ void setup() {
     myStringValueParameters.max = 200;
     myStringValueParameters.encoding = "";
 
-    wappsto.onDelete(&deleteNetworkCallback);
+    myNetwork = wappsto.createNetwork("test");
 
-    myDevice = wappsto.createDevice("My Device", "", "", "", "", "");
+    myDevice = myNetwork->createDevice("My Device", "", "", "", "", "");
 
     myNumberValue = myDevice->createValueNumber("My number", "test number", READ_WRITE, &myNumberValueParameters);
     myNumberValue->onControl(&controlNumberCallback);

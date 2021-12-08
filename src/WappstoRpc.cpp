@@ -88,7 +88,7 @@ int WappstoRpc::postNetwork(const char *networkId, String &networkName)
 {
     StaticJsonDocument<JSON_POST_BUFFER> root;
     memset(_jsonTxBufferChar, 0x00, JSON_TX_BUFFER_SIZE);
-    
+
     root["jsonrpc"] = "2.0";
     root["id"] = _msgId;
     _msgId++;
@@ -139,7 +139,6 @@ int WappstoRpc::postDevice(Device *device)
     data["description"] = device->deviceInfo.description;
     data["protocol"] = device->deviceInfo.protocol;
     data["communication"] = device->deviceInfo.communication;
-    data["included"] = "1";
 
     serializeJson(root, _jsonTxBufferChar);
     if(_jsonDebug) {
@@ -232,32 +231,6 @@ int WappstoRpc::deleteValue(const char* networkId, const char* deviceId, int val
     root["method"] = "DELETE";
     JsonObject params = root.createNestedObject("params");
     sprintf(url, "/network/%s/device/%s/value/%s", networkId, deviceId, _values[valueId-1].valueUuid);
-    params["url"] = url;
-
-    serializeJson(root, _jsonTxBufferChar);
-    if(_jsonDebug) {
-        serializeJsonPretty(root, Serial);
-    }
-    _client->print(_jsonTxBufferChar);
-
-    return(_awaitResponse());
-    */
-    return 0;
-}
-
-int WappstoRpc::deleteAllValues(const char* networkId, const char* deviceId)
-{
-    /*
-    char url[200] = {0,};
-    StaticJsonDocument<JSON_POST_BUFFER> root;
-    memset(_jsonTxBufferChar, 0x00, JSON_TX_BUFFER_SIZE);
-
-    root["jsonrpc"] = "2.0";
-    root["id"] = _msgId;
-    _msgId++;
-    root["method"] = "DELETE";
-    JsonObject params = root.createNestedObject("params");
-    sprintf(url, "/network/%s/device/%s/value", networkId, deviceId);
     params["url"] = url;
 
     serializeJson(root, _jsonTxBufferChar);

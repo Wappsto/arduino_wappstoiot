@@ -12,10 +12,8 @@ public:
     void report(String data);
     void deleteReq(void);
 
-    void onChange(WappstoIoTCallback cb);
-    void onRefresh(WappstoIoTCallback cb);
-    void onRequest(WappstoIoTCallback cb);
-    void onDelete(WappstoIoTCallback cb);
+    void onChange(WappstoCallback cb);
+    void onDelete(WappstoCallback cb);
 
     Value *parent;
     StateType_e stateType;
@@ -25,9 +23,7 @@ public:
 
 private:
     WappstoRpc &_wappstoRpc;
-    WappstoIoTCallback _onChangeCb;
-    WappstoIoTCallback _onRefreshCb;
-    WappstoIoTCallback _onRequestCb;
-    WappstoIoTCallback _onDeleteCb;
+    WappstoCallback _onChangeCb;
+    WappstoCallback _onDeleteCb;
 };
 

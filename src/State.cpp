@@ -28,8 +28,6 @@ State::State(Value *value, WappstoRpc &wappstoRpc, StateType_e stateType) : _wap
     }
 
     this->_onChangeCb = NULL;
-    this->_onRefreshCb = NULL;
-    this->_onRequestCb = NULL;
     this->_onDeleteCb = NULL;
 }
 

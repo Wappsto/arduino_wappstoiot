@@ -1,7 +1,6 @@
 #pragma once
 
 #include <Arduino.h>
-#include <vector>
 #include <WiFiClientSecure.h>
 
 #include "WappstoIoT.h"
@@ -10,33 +9,27 @@
 class Network
 {
 public:
-    Network(WiFiClientSecure *client);
-    bool connect(String name, const char* network_id, const char* ca, const char* client_crt, const char* client_key);
-    bool disconnect(void);
-    bool dataAvailable();
+    Network(WappstoRpc &wappstoRpc, const char* uuid, String name, String description);
+
+    void post(void);
 
     bool change(void);
     bool deleteReq(void);
     Device* createDevice(String name, String product, String manufacturer, String description, String protocol, String communication);
 
-    void onChange(WappstoIoTCallback cb);
-    void onRefresh(WappstoIoTCallback cb);
-    void onRequest(WappstoIoTCallback cb);
-    void onDelete(WappstoIoTCallback cb);
+    void onChange(WappstoCallback cb);
+    void onDelete(WappstoNetworkDeleteCallback cb);
 
     char uuid[UUID_LENGTH];
     String name;
+    String description;
     int currentNumberOfDevices;
     Device* devices[MAX_DEVICES];
-    void *_findObjectFromUuid(const String &uuid);
 
+    WappstoNetworkDeleteCallback _onDeleteCb;
 
 private:
     WappstoRpc _wappstoRpc;
-    WiFiClientSecure *_client;
 
-    WappstoIoTCallback _onChangeCb;
-    WappstoIoTCallback _onRefreshCb;
-    WappstoIoTCallback _onRequestCb;
-    WappstoIoTCallback _onDeleteCb;
+    WappstoCallback _onChangeCb;
 };

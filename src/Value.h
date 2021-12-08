@@ -14,11 +14,10 @@ public:
     bool control(const String &data);
     bool request(String &data);
     bool deleteReq(void);
-    void onControl(WappstoIoTCallback cb);
-    void onChange(WappstoIoTCallback cb);
-    void onRefresh(WappstoIoTCallback cb);
-    void onRequest(WappstoIoTCallback cb);
-    void onDelete(WappstoIoTCallback cb);
+    void onControl(WappstoValueControlCallback cb);
+    void onChange(WappstoCallback cb);
+    void onRefresh(WappstoValueRefreshCallback cb);
+    void onDelete(WappstoCallback cb);
     void post(void);
 
     Device *parent;
@@ -33,11 +32,10 @@ public:
 
     State* reportState;
     State* controlState;
-    WappstoIoTCallback _onControlCb;
-    WappstoIoTCallback _onChangeCb;
-    WappstoIoTCallback _onRefreshCb;
-    WappstoIoTCallback _onRequestCb;
-    WappstoIoTCallback _onDeleteCb;
+    WappstoValueControlCallback _onControlCb;
+    WappstoCallback _onChangeCb;
+    WappstoValueRefreshCallback _onRefreshCb;
+    WappstoCallback _onDeleteCb;
 
 private:
     WappstoRpc &_wappstoRpc;

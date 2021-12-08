@@ -24,7 +24,6 @@ void Value::_init(void)
     this->_onControlCb = NULL;;
     this->_onChangeCb = NULL;;
     this->_onRefreshCb = NULL;;
-    this->_onRequestCb = NULL;;
     this->_onDeleteCb = NULL;;
 
     uint32_t readId  = (uint32_t) (((uint32_t)0x00 << 24) |
@@ -80,37 +79,27 @@ bool Value::control(const String &data)
     return true;
 }
 
-bool Value::request(String &data)
-{
-    return false;
-}
-
 bool Value::deleteReq(void)
 {
     return false;
 }
 
-void Value::onControl(WappstoIoTCallback cb)
+void Value::onControl(WappstoValueControlCallback cb)
 {
     this->_onControlCb = cb;
 }
 
-void Value::onChange(WappstoIoTCallback cb)
+void Value::onChange(WappstoCallback cb)
 {
     this->_onChangeCb = cb;
 }
 
-void Value::onRefresh(WappstoIoTCallback cb)
+void Value::onRefresh(WappstoValueRefreshCallback cb)
 {
     this->_onRefreshCb = cb;
 }
 
-void Value::onRequest(WappstoIoTCallback cb)
-{
-    this->_onRequestCb = cb;
-}
-
-void Value::onDelete(WappstoIoTCallback cb)
+void Value::onDelete(WappstoCallback cb)
 {
     this->_onDeleteCb = cb;
 }
