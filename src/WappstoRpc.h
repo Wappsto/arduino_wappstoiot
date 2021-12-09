@@ -21,6 +21,10 @@ class WappstoRpc
         int putValue(Value *value);
         int putState(State *state);
         int deleteValue(const char* networkId, const char* deviceId, int valueId);
+        int getDeviceUuidFromName(Network *network, String &name, char *uuid);
+        int getValueUuidFromName(Device *device, String name, char *uuid);
+        int getStateUuidFromName(Value *value, StateType_e stateType, char *uuid);
+
         RequestType_e readData(char* uuid, char* data);
 
     private:
@@ -31,6 +35,7 @@ class WappstoRpc
         uint8_t rspBuffer[JSON_STATIC_BUFFER_SIZE];
         char _jsonTxBufferChar[JSON_TX_BUFFER_SIZE];
         uint8_t _awaitResponse(void);
+        uint8_t _awaitUuidResponse(char *uuid);
         void _sendSuccessResponse(const char *id);
         const char* _getUtcTime(void);
 };

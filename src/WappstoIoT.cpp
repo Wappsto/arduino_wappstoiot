@@ -1,20 +1,6 @@
 
 #include "WappstoIoT.h"
 
-//user app required
-
-/*
-uint32_t getRandomUint32();
-
-getUtcTime()
-
-
-// Store ID = 0x00  0xdevId 0xvalId 0xstateId - 0xFF is invalid
-bool writeUuid(uint32_t storeId, const char* uuid);
-const char* readUuid(uint32_t storeId);
-
-*/
-
 void generateNewUuid(char *str)
 {
 #if defined(ESP32)

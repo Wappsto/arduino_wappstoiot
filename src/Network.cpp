@@ -32,6 +32,11 @@ Device* Network::createDevice(String name, String product, String manufacturer, 
     }
     currentNumberOfDevices++;
     devices[currentNumberOfDevices-1] = new Device(this, _wappstoRpc, currentNumberOfDevices-1, name, product, manufacturer, description, protocol, communication);
+
+    if(!_wappstoRpc.getDeviceUuidFromName(this, name, devices[currentNumberOfDevices-1]->uuid)) {
+            generateNewUuid(devices[currentNumberOfDevices-1]->uuid);
+    }
+
     devices[currentNumberOfDevices-1]->post();
     return devices[currentNumberOfDevices-1];
 }

@@ -20,7 +20,6 @@ ArduinoJson
 WiFiClientSecure
 **/
 
-#include <ArduinoJson.h>
 #include "rpcWiFi.h"
 #include <WiFiMulti.h>
 #include <WiFiClientSecure.h>
@@ -45,8 +44,6 @@ WiFiUDP udp;
 unsigned long devicetime;
 RTC_SAMD51 rtc;
 
-static char strfTimeBuffer[21];
-
 const char* ssid = "";
 const char* password = "";
 
@@ -60,65 +57,10 @@ Network *myNetwork;
 Device *myDevice;
 Value *myNumberValue;
 Value *myStringValue;
-ValueNumber_t myNumberValueParameters;
-ValueString_t myStringValueParameters;
+ValueNumber_t myNumberValueParameters = {.min = 100, .max = 4000, .step = 1, .unit = "", .si_conversion = ""};
+ValueString_t myStringValueParameters = {.max = 200, .encoding = ""};
 
 int myNumberCounter = 0;
-
-#define UUID_COUNT 7
-uint32_t deviceIndex[UUID_COUNT] = {
-    0x0000FFFF,
-    0x000000FF,
-    0x00000001,
-    0x00000002,
-    0x000001FF,
-    0x00000101,
-    0x00000102,
-};
-
-const char uuidList[UUID_COUNT][UUID_LENGTH] {
-    "07b3f6ca-b24a-4ba7-bcf3-a39030482eaf",
-    "3f985158-ec31-4025-b6ee-8081366ceba1",
-    "1a3fd4a1-7172-44fa-2de2-af68688e126b",
-    "5851c976-b200-4ae0-3d02-b93f0f974c7a",
-    "fbb2a8ea-7c48-440c-b453-4fa6a316f120",
-    "afefd0b7-d207-4cff-9caa-e99a029c887c",
-    "6947f6d8-5ccc-4c5e-8e50-66469a37fe04",
-};
-
-bool writeUuid(uint32_t storeId, const char* uuid)
-{
-    Serial.print("Need to save this UUID: 0x");
-    Serial.print(storeId, HEX);
-    Serial.print(" - uuid: ");
-    Serial.println(uuid);
-    return true;
-}
-
-const char* readUuid(uint32_t storeId)
-{
-    for(int i=0; i<UUID_COUNT; i++) {
-        if(storeId == deviceIndex[i]) {
-            Serial.print("Found UUID: ");
-            Serial.println(storeId, HEX);
-            return uuidList[i];
-        }
-    }
-    Serial.print("Did not find UUID: ");
-    Serial.println(storeId, HEX);
-    return NULL;
-}
-
-
-const char* getUtcTime(void)
-{
-    now = rtc.now();
-    time_t t = now.unixtime();
-    struct tm *timeinfo = localtime(&t);
-    strftime(strfTimeBuffer, sizeof(strfTimeBuffer), "%FT%TZ", timeinfo);
-    Serial.println(strfTimeBuffer);
-    return strfTimeBuffer;
-}
 
 void controlNumberCallback(void *object, String data)
 {
@@ -173,9 +115,6 @@ void initializeWifi(void)
 
 void setup() {
     Serial.begin(115200);
-    while (!Serial) {
-        ; // wait for serial port to connect.
-    }
     randomSeed(analogRead(0));
     initializeWifi();
 
@@ -186,23 +125,19 @@ void setup() {
     } else {
         Serial.println("Could not connect");
     }
-    myNumberValueParameters.min = 0;
-    myNumberValueParameters.max = 100;
-    myNumberValueParameters.step = 1;
-    myNumberValueParameters.unit = "";
-    myNumberValueParameters.si_conversion = "";
 
-    myStringValueParameters.max = 200;
-    myStringValueParameters.encoding = "";
-
+    // Create network
     myNetwork = wappsto.createNetwork("test");
 
+    // Create device
     myDevice = myNetwork->createDevice("My Device", "", "", "", "", "");
 
+    // Create r/w value, number
     myNumberValue = myDevice->createValueNumber("My number", "test number", READ_WRITE, &myNumberValueParameters);
     myNumberValue->onControl(&controlNumberCallback);
     myNumberValue->onRefresh(&refreshNumberCallback);
 
+    // Create r/w value, string
     myStringValue = myDevice->createValueString("My string", "test string", READ_WRITE, &myStringValueParameters);
     myStringValue->onControl(&controlStringCallback);
     myStringValue->onRefresh(&refreshStringCallback);

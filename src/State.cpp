@@ -20,13 +20,10 @@ State::State(Value *value, WappstoRpc &wappstoRpc, StateType_e stateType) : _wap
 
     }
 
-    if(readUuid(readId) != NULL) {
-        strcpy(this->uuid, readUuid(readId));
-    } else {
+    if(!_wappstoRpc.getStateUuidFromName(value, stateType, this->uuid)) {
+        Serial.println("generateNewUuid STATE");
         generateNewUuid(this->uuid);
-        writeUuid(readId, this->uuid);
     }
-
     this->_onChangeCb = NULL;
     this->_onDeleteCb = NULL;
 }

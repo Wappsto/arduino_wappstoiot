@@ -19,18 +19,6 @@ Device::Device(Network *network, WappstoRpc &wappstoRpc, uint8_t id, String name
     this->_onDeleteCb = NULL;
 
     currentNumberOfValues = 0;
-
-    uint32_t readId  = (uint32_t) (((uint32_t)0x00 << 24) |
-                                   ((uint32_t)id << 16) |
-                                   ((uint32_t)0xFF << 8) |
-                                   ((uint32_t)0xFF));
-
-    if(readUuid(readId) != NULL) {
-        strcpy(this->uuid, readUuid(readId));
-    } else {
-        generateNewUuid(this->uuid);
-        writeUuid(readId, this->uuid);
-    }
 }
 
 void Device::post(void)
@@ -56,6 +44,11 @@ Value* Device::createValueNumber(String name, String type, PERMISSION_e permissi
     }
     currentNumberOfValues++;
     values[currentNumberOfValues-1] = new Value(this, _wappstoRpc, currentNumberOfValues-1, name, type, permission, valNumber);
+
+    if(!_wappstoRpc.getValueUuidFromName(this, name, values[currentNumberOfValues-1]->uuid)) {
+        generateNewUuid(values[currentNumberOfValues-1]->uuid);
+    }
+
     values[currentNumberOfValues-1]->post();
     return values[currentNumberOfValues-1];
 }
@@ -68,6 +61,11 @@ Value* Device::createValueString(String name, String type, PERMISSION_e permissi
     }
     currentNumberOfValues++;
     values[currentNumberOfValues-1] = new Value(this, _wappstoRpc, currentNumberOfValues-1, name, type, permission, valString);
+
+    if(!_wappstoRpc.getValueUuidFromName(this, name, values[currentNumberOfValues-1]->uuid)) {
+        generateNewUuid(values[currentNumberOfValues-1]->uuid);
+    }
+
     values[currentNumberOfValues-1]->post();
     return values[currentNumberOfValues-1];
 }

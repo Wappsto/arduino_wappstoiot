@@ -25,19 +25,10 @@ void Value::_init(void)
     this->_onChangeCb = NULL;;
     this->_onRefreshCb = NULL;;
     this->_onDeleteCb = NULL;;
+}
 
-    uint32_t readId  = (uint32_t) (((uint32_t)0x00 << 24) |
-                                   ((uint32_t)parent->id << 16) |
-                                   ((uint32_t)id << 8) |
-                                   ((uint32_t)0xFF));
-
-    if(readUuid(readId) != NULL) {
-        strcpy(this->uuid, readUuid(readId));
-    } else {
-        generateNewUuid(this->uuid);
-        writeUuid(readId, this->uuid);
-    }
-
+void Value::post(void)
+{
     switch(permission) {
         case READ:
             reportState = new State(this, _wappstoRpc, TYPE_REPORT);
@@ -50,11 +41,6 @@ void Value::_init(void)
             controlState = new State(this, _wappstoRpc, TYPE_CONTROL);
             break;
     }
-
-}
-
-void Value::post(void)
-{
     this->_wappstoRpc.postValue(this);
 }
 

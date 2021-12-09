@@ -29,7 +29,7 @@ void WappstoRpc::setDebug(bool jsonDebug)
     _jsonDebug = jsonDebug;
 }
 
-uint8_t WappstoRpc::_awaitResponse()
+uint8_t WappstoRpc::_awaitResponse(void)
 {
     uint16_t timeoutCounter = 0;
     while (_client->connected()) {
@@ -57,6 +57,44 @@ uint8_t WappstoRpc::_awaitResponse()
                 return(0);
             }
         }
+        delay(10);
+        timeoutCounter++;
+        if(timeoutCounter > 100) {
+            PRINT("Timeout waiting for reply");
+            return(0);
+        }
+    }
+}
+
+uint8_t WappstoRpc::_awaitUuidResponse(char *uuid)
+{
+    uint16_t timeoutCounter = 0;
+    while (_client->connected()) {
+        int ret;
+        memset(rspBuffer, 0x00, sizeof(rspBuffer));
+        ret = _client->read(rspBuffer, sizeof(rspBuffer));
+        if (ret > 0) {
+            PRINTV("Init received: ", ret);
+            PRINT(rspBuffer);
+
+            StaticJsonDocument<JSON_CHAR_BUFFER> root;
+            DeserializationError err = deserializeJson(root, rspBuffer);
+
+            if(err) {
+                PRINT("RPC Response Not parsable Json");
+                return(0);
+            }
+            if(root["result"]["value"]["id"].size() > 0) {
+                char getId[UUID_LENGTH] = {0,};
+                strcpy(uuid, root["result"]["value"]["id"][0]);
+
+                Serial.print("Found UUID: ");
+                Serial.println(uuid);
+                return(1);
+            } else {
+                return(0);
+            }
+    }
         delay(10);
         timeoutCounter++;
         if(timeoutCounter > 100) {
@@ -397,4 +435,71 @@ RequestType_e WappstoRpc::readData(char* uuid, char *dataPtr)
         PRINT("No data read");
     }
     return REQUEST_UNKNOWN;
+}
+
+int WappstoRpc::getDeviceUuidFromName(Network *network, String &name, char *uuid)
+{
+    char url[200] = {0,};
+    StaticJsonDocument<JSON_POST_BUFFER> root;
+    memset(_jsonTxBufferChar, 0x00, JSON_TX_BUFFER_SIZE);
+
+    root["jsonrpc"] = "2.0";
+    root["id"] = _msgId;
+    _msgId++;
+    root["method"] = "GET";
+    JsonObject params = root.createNestedObject("params");
+    sprintf(url, "/services/2.0/network/%s/device?this_name==%s", network->uuid, name.c_str()); // "hest"); //
+    params["url"] = url;
+    serializeJson(root, _jsonTxBufferChar);
+    if(_jsonDebug) {
+        serializeJsonPretty(root, Serial);
+    }
+    _client->print(_jsonTxBufferChar);
+    return(_awaitUuidResponse(uuid));
+}
+
+int WappstoRpc::getValueUuidFromName(Device *device, String name, char *uuid)
+{
+    char url[200] = {0,};
+    StaticJsonDocument<JSON_POST_BUFFER> root;
+    memset(_jsonTxBufferChar, 0x00, JSON_TX_BUFFER_SIZE);
+
+    root["jsonrpc"] = "2.0";
+    root["id"] = _msgId;
+    _msgId++;
+    root["method"] = "GET";
+    JsonObject params = root.createNestedObject("params");
+    sprintf(url, "/services/2.0/device/%s/value?this_name==%s", device->uuid, name.c_str());
+    params["url"] = url;
+    serializeJson(root, _jsonTxBufferChar);
+    if(_jsonDebug) {
+        serializeJsonPretty(root, Serial);
+    }
+    _client->print(_jsonTxBufferChar);
+    return(_awaitUuidResponse(uuid));
+}
+
+int WappstoRpc::getStateUuidFromName(Value *value, StateType_e stateType, char *uuid)
+{
+    char url[200] = {0,};
+    StaticJsonDocument<JSON_POST_BUFFER> root;
+    memset(_jsonTxBufferChar, 0x00, JSON_TX_BUFFER_SIZE);
+
+    root["jsonrpc"] = "2.0";
+    root["id"] = _msgId;
+    _msgId++;
+    root["method"] = "GET";
+    JsonObject params = root.createNestedObject("params");
+    if(stateType == TYPE_REPORT) {
+        sprintf(url, "/services/2.0/value/%s/state?this_type==Report", value->uuid);
+    } else {
+        sprintf(url, "/services/2.0/value/%s/state?this_type==Control", value->uuid);
+    }
+    params["url"] = url;
+    serializeJson(root, _jsonTxBufferChar);
+    if(_jsonDebug) {
+        serializeJsonPretty(root, Serial);
+    }
+    _client->print(_jsonTxBufferChar);
+    return(_awaitUuidResponse(uuid));
 }

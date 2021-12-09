@@ -1,4 +1,15 @@
+static char strfTimeBuffer[21];
 
+
+const char* getUtcTime(void)
+{
+    now = rtc.now();
+    time_t t = now.unixtime();
+    struct tm *timeinfo = localtime(&t);
+    strftime(strfTimeBuffer, sizeof(strfTimeBuffer), "%FT%TZ", timeinfo);
+    Serial.println(strfTimeBuffer);
+    return strfTimeBuffer;
+}
 
 unsigned long getNTPtime()
 {
@@ -78,10 +89,18 @@ unsigned long sendNTPpacket(const char* address)
 
 void initializeNtp(void)
 {
+    uint8_t attempts = 3;
     // get the time via NTP (udp) call to time server
     // getNTPtime returns epoch UTC time adjusted for timezone but not daylight savings
     // time
-    devicetime = getNTPtime();
+
+    do {
+        devicetime = getNTPtime();
+        if(devicetime != 0) {
+            break;
+        }
+        attempts--;
+    } while(attempts > 0);
 
     // check if rtc present
     if (devicetime == 0) {

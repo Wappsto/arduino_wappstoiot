@@ -10,9 +10,6 @@
 void generateNewUuid(char* str);
 const char* getUtcTime(void);
 
-const char* readUuid(uint32_t storeId);
-bool writeUuid(uint32_t storeId, const char* uuid);
-
 typedef enum {
     TYPE_REPORT,
     TYPE_CONTROL,
