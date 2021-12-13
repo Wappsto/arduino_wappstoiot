@@ -75,7 +75,8 @@ typedef void (*WappstoCallback)(void *object);
 
 typedef void (*WappstoNetworkDeleteCallback)(Network *network);
 typedef void (*WappstoValueRefreshCallback)(Value *value);
-typedef void (*WappstoValueControlCallback)(Value *value, String data, String timestamp);
+typedef void (*WappstoValueControlStringCallback)(Value *value, String data, String timestamp);
+typedef void (*WappstoValueControlNumberCallback)(Value *value, double data, String timestamp);
 
 #include "Wappsto.h"
 #include "Network.h"

@@ -11,10 +11,13 @@ public:
     Value(Device *device, WappstoRpc &wappstoRpc, uint8_t id, String name, String type, PERMISSION_e permission, ValueString_t *valString);
     bool change(void);
     bool report(const String &data);
+    bool report(double data);
+    bool report(int data);
     bool control(const String &data);
     bool request(String &data);
     bool deleteReq(void);
-    void onControl(WappstoValueControlCallback cb);
+    void onControl(WappstoValueControlStringCallback cb);
+    void onControl(WappstoValueControlNumberCallback cb);
     void onChange(WappstoCallback cb);
     void onRefresh(WappstoValueRefreshCallback cb);
     void onDelete(WappstoCallback cb);
@@ -32,7 +35,8 @@ public:
 
     State* reportState;
     State* controlState;
-    WappstoValueControlCallback _onControlCb;
+    WappstoValueControlStringCallback _onControlStringCb;
+    WappstoValueControlNumberCallback _onControlNumberCb;
     WappstoCallback _onChangeCb;
     WappstoValueRefreshCallback _onRefreshCb;
     WappstoCallback _onDeleteCb;
@@ -44,5 +48,5 @@ public:
 
 private:
     WappstoRpc &_wappstoRpc;
-    void _init(void);
+    void _init(String type);
 };

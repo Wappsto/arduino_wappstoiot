@@ -4,7 +4,7 @@
 Value::Value(Device *device, WappstoRpc &wappstoRpc, uint8_t id, String name, String type, PERMISSION_e permission, ValueNumber_t *valNumber) :
     parent(device), _wappstoRpc(wappstoRpc), id(id), name(name), permission(permission), valueType(valueType)
 {
-    _init();
+    _init(type);
     this->valueType = NUMBER_VALUE;
     this->valNumber = valNumber;
     this->valString = NULL;
@@ -13,18 +13,20 @@ Value::Value(Device *device, WappstoRpc &wappstoRpc, uint8_t id, String name, St
 Value::Value(Device *device, WappstoRpc &wappstoRpc, uint8_t id, String name, String type, PERMISSION_e permission, ValueString_t *valString) :
     parent(device), _wappstoRpc(wappstoRpc), id(id), name(name), permission(permission), valueType(valueType)
 {
-    _init();
+    _init(type);
     this->valueType = STRING_VALUE;
     this->valNumber = NULL;
     this->valString = valString;
 }
 
-void Value::_init(void)
+void Value::_init(String type)
 {
-    this->_onControlCb = NULL;;
-    this->_onChangeCb = NULL;;
-    this->_onRefreshCb = NULL;;
-    this->_onDeleteCb = NULL;;
+    this->type = type;
+    this->_onControlStringCb = NULL;
+    this->_onControlNumberCb = NULL;
+    this->_onChangeCb = NULL;
+    this->_onRefreshCb = NULL;
+    this->_onDeleteCb = NULL;
 }
 
 void Value::post(void)
@@ -47,6 +49,22 @@ void Value::post(void)
 bool Value::change(void)
 {
     return false;
+}
+
+bool Value::report(int data)
+{
+    this->reportState->timestamp = getUtcTime();
+    this->reportState->data = String(data);
+    _wappstoRpc.putState(this->reportState);
+    return true;
+}
+
+bool Value::report(double data)
+{
+    this->reportState->timestamp = getUtcTime();
+    this->reportState->data = String(data);
+    _wappstoRpc.putState(this->reportState);
+    return true;
 }
 
 bool Value::report(const String &data)
@@ -106,9 +124,14 @@ String Value::getReportTimestamp(void)
     }
 }
 
-void Value::onControl(WappstoValueControlCallback cb)
+void Value::onControl(WappstoValueControlStringCallback cb)
 {
-    this->_onControlCb = cb;
+    this->_onControlStringCb = cb;
+}
+
+void Value::onControl(WappstoValueControlNumberCallback cb)
+{
+    this->_onControlNumberCb = cb;
 }
 
 void Value::onChange(WappstoCallback cb)

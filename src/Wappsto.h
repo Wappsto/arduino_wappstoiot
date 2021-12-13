@@ -12,7 +12,8 @@ public:
     Wappsto(WiFiClientSecure *client);
     Network* createNetwork(String name);
     Network* createNetwork(String name, String description);
-    bool connect(const char* network_id, const char* ca, const char* client_crt, const char* client_key);
+    void config(const char* network_id, const char* ca, const char* client_crt, const char* client_key);
+    bool connect(void);
     bool disconnect(void);
     bool dataAvailable();
 

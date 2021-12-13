@@ -28,34 +28,21 @@ WiFiClientSecure
 #include "DateTime.h"
 
 #include"TFT_eSPI.h"
-TFT_eSPI tft;
 
 #include "Wappsto.h"
+#include "wappsto_setup.h"
 
 #define BUZZER_PIN WIO_BUZZER
 
+TFT_eSPI tft;
 WiFiMulti WiFiMulti;
 WiFiClientSecure client;
 Wappsto wappsto(&client);
 
-unsigned int localPort = 2390;      // local port to listen for UDP packets
-char timeServer[] = "time.nist.gov"; // extenral NTP server e.g. time.nist.gov
-const int NTP_PACKET_SIZE = 48; // NTP time stamp is in the first 48 bytes of the message
-byte packetBuffer[NTP_PACKET_SIZE]; //buffer to hold incoming and outgoing packets
-// declare a time object
-DateTime now;
-WiFiUDP udp;
-unsigned long devicetime;
 RTC_SAMD51 rtc;
 
 const char* ssid = "";
 const char* password = "";
-
-const char* network_id = "ae9f973e-22b9-4c2a-9de5-b9eb5db64c3d";
-
-const char* ca = "-----BEGIN CERTIFICATE-----\n    \n-----END CERTIFICATE-----\n";
-const char* client_crt = "-----BEGIN CERTIFICATE-----\n  \n-----END CERTIFICATE-----\n";
-const char* client_key = "-----BEGIN RSA PRIVATE KEY-----\n  \n-----END RSA PRIVATE KEY-----\n";
 
 Network *myNetwork;
 Device *myDevice;
@@ -68,10 +55,9 @@ ValueString_t displayStrValueParameters = {.max = 200, .encoding = ""};
 ValueString_t buttonStringParameters = {.max = 6, .encoding = ""};
 
 
-void controlNumberCallback(Value *value, String data, String timestamp)
+void controlNumberCallback(Value *value, double data, String timestamp)
 {
-    int tone = data.toInt();
-    playTone(tone, 1000);
+    playTone((int)data, 1000);
     value->report(data);
 }
 
@@ -166,7 +152,8 @@ void setup()
     tft.fillScreen(TFT_YELLOW);
     tft.drawString("Connecting to Wappsto", 10, 10);
 
-    if(wappsto.connect(network_id, ca, client_crt, client_key)) {
+    wappsto.config(network_id, ca, client_crt, client_key);
+    if(wappsto.connect()) {
         Serial.println("Connected to Wappsto");
     } else {
         Serial.println("Could not connect");

@@ -9,15 +9,17 @@ Wappsto::Wappsto(WiFiClientSecure *client) : _wappstoRpc(client)
     _network = NULL;
 }
 
-bool Wappsto::connect(const char* network_id, const char* ca, const char* client_crt, const char* client_key)
+void Wappsto::config(const char* network_id, const char* ca, const char* client_crt, const char* client_key)
 {
-    //strcpy(this->uuid, network_id);
     strcpy(this->uuid, network_id);
 
     _client->setCACert(ca);
     _client->setCertificate(client_crt);
     _client->setPrivateKey(client_key);
+}
 
+bool Wappsto::connect(void)
+{
     if(_client->connect(wappsto_server, WAPPSTO_PORT)) {
         return true;
     }
@@ -97,9 +99,14 @@ bool Wappsto::dataAvailable(void)
             } else if(strcmp(_network->devices[devs]->values[vals]->controlState->uuid, tmpUuid) == 0) {
                 Serial.println("Found state control requested UUID");
                 if(req == REQUEST_PUT) {
-                    if(_network->devices[devs]->values[vals]->_onControlCb) {
+                    if(_network->devices[devs]->values[vals]->_onControlNumberCb) {
                         _network->devices[devs]->values[vals]->controlState->data = tmpData;
-                        _network->devices[devs]->values[vals]->_onControlCb(_network->devices[devs]->values[vals], tmpData, "");
+                        double tmpDouble = _network->devices[devs]->values[vals]->controlState->data.toDouble();
+                        _network->devices[devs]->values[vals]->_onControlNumberCb(_network->devices[devs]->values[vals], tmpDouble, "");
+                        return true;
+                    } else if(_network->devices[devs]->values[vals]->_onControlStringCb) {
+                        _network->devices[devs]->values[vals]->controlState->data = tmpData;
+                        _network->devices[devs]->values[vals]->_onControlStringCb(_network->devices[devs]->values[vals], tmpData, "");
                         return true;
                     }
                 }
