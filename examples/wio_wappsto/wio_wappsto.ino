@@ -37,6 +37,16 @@ const char* password = "";
 Network *myNetwork;
 Device *myDevice;
 Value *myTemperatureValue;
+
+DeviceDescription_t myDeviceDescription = {
+    .product = "WIO Terminal example",
+    .manufacturer = "",
+    .description = "Examle device",
+    .version = "1.0",
+    .serial = "00001",
+    .protocol = "Json-RPC",
+    .communication = "WiFi",
+};
 ValueNumber_t myTemperatureParameters = {.min = -20, .max = 100, .step = 0.1, .unit = "°C", .si_conversion = ""};
 
 double myTemperatureReading = 21.3;
@@ -44,14 +54,6 @@ double myTemperatureReading = 21.3;
 void refreshTemperatureCallback(Value *value)
 {
     value->report(myTemperatureReading);
-}
-
-void controlStringCallback(void *object, String data)
-{
-    Value *val = (Value*)object;
-    Serial.print("Control callback: ");
-    Serial.println(data);
-    val->report(data);
 }
 
 void initializeWifi(void)
@@ -84,7 +86,7 @@ void setup() {
     myNetwork = wappsto.createNetwork("Basic Example");
 
     // Create device
-    myDevice = myNetwork->createDevice("My Device", "", "", "", "", "");
+    myDevice = myNetwork->createDevice("My Device", &myDeviceDescription);
 
     // Create temperature value
     myTemperatureValue = myDevice->createValueNumber("Temperature", "temperature", READ, &myTemperatureParameters);

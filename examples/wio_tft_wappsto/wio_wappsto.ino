@@ -45,6 +45,15 @@ Value *myNumberValue;
 Value *displayStrValue;
 Value *buttonValue;
 
+DeviceDescription_t myDeviceDescription = {
+    .product = "WIO Terminal example",
+    .manufacturer = "",
+    .description = "Examle device",
+    .version = "1.0",
+    .serial = "00001",
+    .protocol = "Json-RPC",
+    .communication = "WiFi",
+};
 ValueNumber_t myNumberValueParameters = {.min = 100, .max = 4000, .step = 1, .unit = "", .si_conversion = ""};
 ValueString_t displayStrValueParameters = {.max = 200, .encoding = ""};
 ValueString_t buttonStringParameters = {.max = 6, .encoding = ""};
@@ -161,7 +170,7 @@ void setup()
     myNetwork = wappsto.createNetwork("Demo");
 
     // Create device
-    myDevice = myNetwork->createDevice("My Demo Device", "", "", "", "", "");
+    myDevice = myNetwork->createDevice("My Demo Device", &myDeviceDescription);
 
     // Create r/w number to play tone
     myNumberValue = myDevice->createValueNumber("Beep number", "audio number", READ_WRITE, &myNumberValueParameters);
