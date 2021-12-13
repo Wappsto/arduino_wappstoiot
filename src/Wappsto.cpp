@@ -49,12 +49,9 @@ bool Wappsto::dataAvailable(void)
     }
     RequestType_e req = _wappstoRpc.readData(tmpUuid, tmpData);
 
-    Serial.print(" type: ");
-    Serial.println(req);
-
     if(tmpUuid && strlen(tmpUuid) > 0) {
-        Serial.print("UUID: ");
-        Serial.print(tmpUuid);
+        //Serial.print("UUID: ");
+        //Serial.print(tmpUuid);
     } else {
         Serial.println("Invalid or no uuid");
         return false;
@@ -88,7 +85,7 @@ bool Wappsto::dataAvailable(void)
                 Serial.println("Found value requested UUID");
                 return true;
             }
-            if(strcmp(_network->devices[devs]->values[vals]->reportState->uuid, tmpUuid) == 0) {
+            if(_network->devices[devs]->values[vals]->reportState && strcmp(_network->devices[devs]->values[vals]->reportState->uuid, tmpUuid) == 0) {
                 Serial.println("Found state report requested UUID");
                 if(req == REQUEST_GET) {
                     if(_network->devices[devs]->values[vals]->_onRefreshCb) {
@@ -96,7 +93,7 @@ bool Wappsto::dataAvailable(void)
                         return true;
                     }
                 }
-            } else if(strcmp(_network->devices[devs]->values[vals]->controlState->uuid, tmpUuid) == 0) {
+            } else if(_network->devices[devs]->values[vals]->controlState && strcmp(_network->devices[devs]->values[vals]->controlState->uuid, tmpUuid) == 0) {
                 Serial.println("Found state control requested UUID");
                 if(req == REQUEST_PUT) {
                     if(_network->devices[devs]->values[vals]->_onControlNumberCb) {
@@ -113,6 +110,5 @@ bool Wappsto::dataAvailable(void)
             }
         }
     }
-
     return false;
 }

@@ -15,7 +15,7 @@ public:
 
     bool change(void);
     bool deleteReq(void);
-    Device* createDevice(String name, String product, String manufacturer, String description, String protocol, String communication);
+    Device* createDevice(String name, DeviceDescription_t *deviceInfo);
 
     void onChange(WappstoCallback cb);
     void onDelete(WappstoNetworkDeleteCallback cb);

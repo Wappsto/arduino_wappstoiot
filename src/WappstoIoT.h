@@ -31,7 +31,7 @@ typedef struct {
     String serial;
     String protocol;
     String communication;
-} DeviceInfo_t;
+} DeviceDescription_t;
 
 typedef enum {
     NUMBER_VALUE,

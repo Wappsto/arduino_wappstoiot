@@ -2,18 +2,18 @@
 
 
 
-Device::Device(Network *network, WappstoRpc &wappstoRpc, uint8_t id, String name, String product, String manufacturer, String description, String protocol, String communication) : _wappstoRpc(wappstoRpc)
+Device::Device(Network *network, WappstoRpc &wappstoRpc, uint8_t id, String name, DeviceDescription_t *deviceInfo) : _wappstoRpc(wappstoRpc)
 {
     this->parent = network;
     this->id = id;
     this->name = name;
-    this->deviceInfo.product = product;
-    this->deviceInfo.manufacturer = manufacturer;
-    this->deviceInfo.description = description;
-    this->deviceInfo.protocol = protocol;
-    this->deviceInfo.communication = communication;
-    this->deviceInfo.version = "NA";
-    this->deviceInfo.serial = "1";
+    this->deviceInfo.product = deviceInfo->product;
+    this->deviceInfo.manufacturer = deviceInfo->manufacturer;
+    this->deviceInfo.description = deviceInfo->description;
+    this->deviceInfo.protocol = deviceInfo->protocol;
+    this->deviceInfo.communication = deviceInfo->communication;
+    this->deviceInfo.version = deviceInfo->version;
+    this->deviceInfo.serial = deviceInfo->serial;
 
     this->_onChangeCb = NULL;
     this->_onDeleteCb = NULL;

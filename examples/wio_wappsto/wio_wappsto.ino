@@ -24,45 +24,26 @@ WiFiClientSecure
 #include <WiFiMulti.h>
 #include <WiFiClientSecure.h>
 
-#include "RTC_SAMD51.h" // arduino lib: Seeed_Arduino_RTC
-#include "DateTime.h"
-
 #include "Wappsto.h"
-
+#include "wappsto_setup.h"
 
 WiFiMulti WiFiMulti;
 WiFiClientSecure client;
 Wappsto wappsto(&client);
-
-RTC_SAMD51 rtc;
 
 const char* ssid = "";
 const char* password = "";
 
 Network *myNetwork;
 Device *myDevice;
-Value *myNumberValue;
-Value *myStringValue;
-ValueNumber_t myNumberValueParameters = {.min = 100, .max = 4000, .step = 1, .unit = "", .si_conversion = ""};
-ValueString_t myStringValueParameters = {.max = 200, .encoding = ""};
+Value *myTemperatureValue;
+ValueNumber_t myTemperatureParameters = {.min = -20, .max = 100, .step = 0.1, .unit = "°C", .si_conversion = ""};
 
-int myNumberCounter = 0;
+double myTemperatureReading = 21.3;
 
-void controlNumberCallback(void *object, String data)
+void refreshTemperatureCallback(Value *value)
 {
-    Value *val = (Value*)object;
-    Serial.print("Control callback: ");
-    Serial.println(data);
-    myNumberCounter++;
-    val->report(String(myNumberCounter));
-}
-
-void refreshNumberCallback(void *object, String data)
-{
-    Value *val = (Value*)object;
-    Serial.print("Refresh callback: ");
-    myNumberCounter++;
-    val->report(String(myNumberCounter));
+    value->report(myTemperatureReading);
 }
 
 void controlStringCallback(void *object, String data)
@@ -71,18 +52,6 @@ void controlStringCallback(void *object, String data)
     Serial.print("Control callback: ");
     Serial.println(data);
     val->report(data);
-}
-
-void refreshStringCallback(void *object, String data)
-{
-    Value *val = (Value*)object;
-    Serial.print("Refresh callback: ");
-    val->report(String("Refresh"));
-}
-
-void deleteNetworkCallback(void *object, String data)
-{
-    Serial.println("Network deleted, need to restart device, and claim network again");
 }
 
 void initializeWifi(void)
@@ -97,8 +66,6 @@ void initializeWifi(void)
     Serial.println(WiFi.localIP());
 }
 
-
-
 void setup() {
     Serial.begin(115200);
     randomSeed(analogRead(0));
@@ -106,34 +73,35 @@ void setup() {
 
     initializeNtp();
 
-    if(wappsto.connect(network_id, ca, client_crt, client_key)) {
+    wappsto.config(network_id, ca, client_crt, client_key);
+    if(wappsto.connect()) {
         Serial.println("Connected to Wappsto");
     } else {
         Serial.println("Could not connect");
     }
 
     // Create network
-    myNetwork = wappsto.createNetwork("test");
+    myNetwork = wappsto.createNetwork("Basic Example");
 
     // Create device
     myDevice = myNetwork->createDevice("My Device", "", "", "", "", "");
 
-    // Create r/w value, number
-    myNumberValue = myDevice->createValueNumber("My number", "test number", READ_WRITE, &myNumberValueParameters);
-    myNumberValue->onControl(&controlNumberCallback);
-    myNumberValue->onRefresh(&refreshNumberCallback);
-
-    // Create r/w value, string
-    myStringValue = myDevice->createValueString("My string", "test string", READ_WRITE, &myStringValueParameters);
-    myStringValue->onControl(&controlStringCallback);
-    myStringValue->onRefresh(&refreshStringCallback);
+    // Create temperature value
+    myTemperatureValue = myDevice->createValueNumber("Temperature", "temperature", READ, &myTemperatureParameters);
+    myTemperatureValue->onRefresh(&refreshTemperatureCallback);
 }
 
+unsigned long startMillis = 0;
+unsigned long currentMillis = 0;
+#define UPDATE_INTERVAL_MILLIS 2*60*1000
 
 void loop() {
     delay(500);
     wappsto.dataAvailable();
 
-    //myNumberValue->report(String(myNumberCounter));
-    //myNumberCounter++;
+    currentMillis = millis();
+    if(currentMillis - startMillis >= UPDATE_INTERVAL_MILLIS) {
+        startMillis = currentMillis;
+        myTemperatureValue->report(myTemperatureReading);
+    }
 }

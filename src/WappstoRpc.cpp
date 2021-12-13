@@ -227,25 +227,37 @@ int WappstoRpc::postValue(Value *value)
 
     JsonArray stateArray = data.createNestedArray("state");
     if(value->permission == READ || value->permission == READ_WRITE) {
-        JsonObject report = stateArray.createNestedObject();
-        JsonObject metaValReport = report.createNestedObject("meta");
-        metaValReport["version"] = "2.0";
-        metaValReport["type"] = "state";
-        metaValReport["id"] = value->reportState->uuid;
-        report["type"] = "Report";
-        report["timestamp"] = getUtcTime();
-        report["data"] = "";
+        if(value->reportState->requiresPost) {
+            JsonObject report = stateArray.createNestedObject();
+            JsonObject metaValReport = report.createNestedObject("meta");
+            metaValReport["version"] = "2.0";
+            metaValReport["type"] = "state";
+            metaValReport["id"] = value->reportState->uuid;
+            report["type"] = "Report";
+            report["timestamp"] = getUtcTime();
+            if(value->valueType == NUMBER_VALUE) {
+                report["data"] = "NA";
+            } else {
+                report["data"] = "";
+            }
+        }
     }
 
     if(value->permission == WRITE || value->permission == READ_WRITE) {
-        JsonObject control = stateArray.createNestedObject();
-        JsonObject metaValControl = control.createNestedObject("meta");
-        metaValControl["version"] = "2.0";
-        metaValControl["type"] = "state";
-        metaValControl["id"] = value->controlState->uuid;
-        control["type"] = "Control";
-        control["timestamp"] = getUtcTime();
-        control["data"] = "";
+        if(value->controlState->requiresPost) {
+            JsonObject control = stateArray.createNestedObject();
+            JsonObject metaValControl = control.createNestedObject("meta");
+            metaValControl["version"] = "2.0";
+            metaValControl["type"] = "state";
+            metaValControl["id"] = value->controlState->uuid;
+            control["type"] = "Control";
+            control["timestamp"] = getUtcTime();
+            if(value->valueType == NUMBER_VALUE) {
+                control["data"] = "NA";
+            } else {
+                control["data"] = "";
+            }
+        }
     }
 
     serializeJson(root, _jsonTxBufferChar);

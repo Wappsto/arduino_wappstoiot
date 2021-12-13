@@ -24,9 +24,6 @@ WiFiClientSecure
 #include <WiFiMulti.h>
 #include <WiFiClientSecure.h>
 
-#include "RTC_SAMD51.h" // arduino lib: Seeed_Arduino_RTC
-#include "DateTime.h"
-
 #include"TFT_eSPI.h"
 
 #include "Wappsto.h"
@@ -38,8 +35,6 @@ TFT_eSPI tft;
 WiFiMulti WiFiMulti;
 WiFiClientSecure client;
 Wappsto wappsto(&client);
-
-RTC_SAMD51 rtc;
 
 const char* ssid = "";
 const char* password = "";

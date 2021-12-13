@@ -5,6 +5,7 @@ State::State(Value *value, WappstoRpc &wappstoRpc, StateType_e stateType) : _wap
 {
     this->parent = value;
     this->stateType = stateType;
+    this->requiresPost = false;
 
     uint32_t readId = 0xFFFFFFFF;
     if(stateType == TYPE_REPORT) {
@@ -23,6 +24,7 @@ State::State(Value *value, WappstoRpc &wappstoRpc, StateType_e stateType) : _wap
     if(!_wappstoRpc.getStateUuidFromName(value, stateType, this->uuid)) {
         Serial.println("generateNewUuid STATE");
         generateNewUuid(this->uuid);
+        this->requiresPost = true;
     }
     this->_onChangeCb = NULL;
     this->_onDeleteCb = NULL;

@@ -22,6 +22,8 @@ Value::Value(Device *device, WappstoRpc &wappstoRpc, uint8_t id, String name, St
 void Value::_init(String type)
 {
     this->type = type;
+    this->reportState = NULL;
+    this->controlState = NULL;
     this->_onControlStringCb = NULL;
     this->_onControlNumberCb = NULL;
     this->_onChangeCb = NULL;

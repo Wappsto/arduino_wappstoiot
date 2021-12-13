@@ -1,3 +1,8 @@
+#include "RTC_SAMD51.h"
+#include "DateTime.h"
+
+RTC_SAMD51 rtc;
+
 unsigned int localPort = 2390;      // local port to listen for UDP packets
 char timeServer[] = "time.nist.gov"; // extenral NTP server e.g. time.nist.gov
 const int NTP_PACKET_SIZE = 48; // NTP time stamp is in the first 48 bytes of the message

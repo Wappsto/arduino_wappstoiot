@@ -20,6 +20,7 @@ public:
     char uuid[UUID_LENGTH];
     String data;
     String timestamp;
+    bool requiresPost;
 
 private:
     WappstoRpc &_wappstoRpc;
