@@ -21,6 +21,7 @@ Value::Value(Device *device, WappstoRpc &wappstoRpc, uint8_t id, String name, St
 
 void Value::_init(String type)
 {
+    this->valueCreated = false;
     this->type = type;
     this->reportState = NULL;
     this->controlState = NULL;
@@ -35,14 +36,14 @@ void Value::post(void)
 {
     switch(permission) {
         case READ:
-            reportState = new State(this, _wappstoRpc, TYPE_REPORT);
+            reportState = new State(this, _wappstoRpc, TYPE_REPORT, this->valueCreated);
             break;
         case WRITE:
-            controlState = new State(this, _wappstoRpc, TYPE_CONTROL);
+            controlState = new State(this, _wappstoRpc, TYPE_CONTROL, this->valueCreated);
             break;
         case READ_WRITE:
-            reportState = new State(this, _wappstoRpc, TYPE_REPORT);
-            controlState = new State(this, _wappstoRpc, TYPE_CONTROL);
+            reportState = new State(this, _wappstoRpc, TYPE_REPORT, this->valueCreated);
+            controlState = new State(this, _wappstoRpc, TYPE_CONTROL, this->valueCreated);
             break;
     }
     this->_wappstoRpc.postValue(this);

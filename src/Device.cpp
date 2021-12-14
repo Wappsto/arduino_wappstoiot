@@ -47,6 +47,7 @@ Value* Device::createValueNumber(String name, String type, PERMISSION_e permissi
 
     if(!_wappstoRpc.getValueUuidFromName(this, name, values[currentNumberOfValues-1]->uuid)) {
         generateNewUuid(values[currentNumberOfValues-1]->uuid);
+        values[currentNumberOfValues-1]->valueCreated = true;
     }
 
     values[currentNumberOfValues-1]->post();

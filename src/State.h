@@ -7,7 +7,7 @@
 class State
 {
 public:
-    State(Value *value, WappstoRpc &wappstoRpc, StateType_e stateType);
+    State(Value *value, WappstoRpc &wappstoRpc, StateType_e stateType, bool forceCreate);
     void control(String data);
     void report(String data);
     void deleteReq(void);

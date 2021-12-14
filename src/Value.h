@@ -32,6 +32,7 @@ public:
     VALUE_TYPE_e valueType;
     ValueNumber_t *valNumber;
     ValueString_t *valString;
+    bool valueCreated;
 
     State* reportState;
     State* controlState;
