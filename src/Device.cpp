@@ -2,10 +2,9 @@
 
 
 
-Device::Device(Network *network, WappstoRpc &wappstoRpc, uint8_t id, String name, DeviceDescription_t *deviceInfo) : _wappstoRpc(wappstoRpc)
+Device::Device(Network *network, WappstoRpc &wappstoRpc, String name, DeviceDescription_t *deviceInfo) : _wappstoRpc(wappstoRpc)
 {
     this->parent = network;
-    this->id = id;
     this->name = name;
     this->deviceInfo.product = deviceInfo->product;
     this->deviceInfo.manufacturer = deviceInfo->manufacturer;
@@ -43,7 +42,7 @@ Value* Device::createValueNumber(String name, String type, PERMISSION_e permissi
         return NULL;
     }
     currentNumberOfValues++;
-    values[currentNumberOfValues-1] = new Value(this, _wappstoRpc, currentNumberOfValues-1, name, type, permission, valNumber);
+    values[currentNumberOfValues-1] = new Value(this, _wappstoRpc, name, type, permission, valNumber);
 
     if(!_wappstoRpc.getValueUuidFromName(this, name, values[currentNumberOfValues-1]->uuid)) {
         generateNewUuid(values[currentNumberOfValues-1]->uuid);
@@ -61,7 +60,7 @@ Value* Device::createValueString(String name, String type, PERMISSION_e permissi
         return NULL;
     }
     currentNumberOfValues++;
-    values[currentNumberOfValues-1] = new Value(this, _wappstoRpc, currentNumberOfValues-1, name, type, permission, valString);
+    values[currentNumberOfValues-1] = new Value(this, _wappstoRpc, name, type, permission, valString);
 
     if(!_wappstoRpc.getValueUuidFromName(this, name, values[currentNumberOfValues-1]->uuid)) {
         generateNewUuid(values[currentNumberOfValues-1]->uuid);

@@ -7,8 +7,8 @@
 class Value
 {
 public:
-    Value(Device *device, WappstoRpc &wappstoRpc, uint8_t id, String name, String type, PERMISSION_e permission, ValueNumber_t *valNumber);
-    Value(Device *device, WappstoRpc &wappstoRpc, uint8_t id, String name, String type, PERMISSION_e permission, ValueString_t *valString);
+    Value(Device *device, WappstoRpc &wappstoRpc, String name, String type, PERMISSION_e permission, ValueNumber_t *valNumber);
+    Value(Device *device, WappstoRpc &wappstoRpc, String name, String type, PERMISSION_e permission, ValueString_t *valString);
     bool change(void);
     bool report(const String &data);
     bool report(double data);
@@ -24,7 +24,6 @@ public:
     void post(void);
 
     Device *parent;
-    uint8_t id;
     char uuid[UUID_LENGTH];
     String name;
     String type;

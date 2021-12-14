@@ -7,20 +7,6 @@ State::State(Value *value, WappstoRpc &wappstoRpc, StateType_e stateType, bool f
     this->stateType = stateType;
     this->requiresPost = false;
 
-    uint32_t readId = 0xFFFFFFFF;
-    if(stateType == TYPE_REPORT) {
-        readId  = (uint32_t)(((uint32_t)0x00 << 24) |
-                                 ((uint32_t)parent->parent->id << 16) |
-                                 ((uint32_t)parent->id << 8) |
-                                  ((uint32_t)0x01));
-    } else {
-        readId  = (uint32_t)(((uint32_t)0x00 << 24) |
-                             ((uint32_t)parent->parent->id << 16) |
-                             ((uint32_t)parent->id << 8) |
-                                  ((uint32_t)0x02));
-
-    }
-
     if(forceCreate) {
         generateNewUuid(this->uuid);
         this->requiresPost = true;

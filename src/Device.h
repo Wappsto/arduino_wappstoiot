@@ -8,7 +8,7 @@
 class Device
 {
 public:
-    Device(Network *network, WappstoRpc &wappstoRpc, uint8_t id, String name, DeviceDescription_t *deviceInfo);
+    Device(Network *network, WappstoRpc &wappstoRpc, String name, DeviceDescription_t *deviceInfo);
     bool change(void);
     bool deleteReq(void);
     Value* createValueNumber(String name, String type, PERMISSION_e permission, ValueNumber_t *valNumber);
@@ -18,7 +18,6 @@ public:
     void post(void);
 
     Network *parent;
-    uint8_t id;
     char uuid[UUID_LENGTH];
     String name;
     DeviceDescription_t deviceInfo;

@@ -34,7 +34,7 @@ int WappstoRpc::_getNextMsgId(void)
     return _msgId;
 }
 
-uint8_t WappstoRpc::_awaitResponse(void)
+bool WappstoRpc::_awaitResponse(void)
 {
     uint16_t timeoutCounter = 0;
     while (_client->connected()) {
@@ -50,7 +50,7 @@ uint8_t WappstoRpc::_awaitResponse(void)
 
             if(err) {
                 PRINT("RPC Response Not parsable Json");
-                return(0);
+                return false;
             }
             int msgId = root["id"];
             if(msgId != _msgId) {
@@ -62,22 +62,22 @@ uint8_t WappstoRpc::_awaitResponse(void)
             bool result = root["result"]["value"];
             if(result == true) {
                 PRINT("RPC Response Success");
-                return(1);
+                return true;
             } else {
                 PRINT("RPC Response Error");
-                return(0);
+                return false;
             }
         }
         delay(10);
         timeoutCounter++;
         if(timeoutCounter > 300) {
             PRINT("Timeout waiting for reply");
-            return(0);
+            return true;
         }
     }
 }
 
-uint8_t WappstoRpc::_awaitUuidResponse(char *uuid)
+bool WappstoRpc::_awaitUuidResponse(char *uuid)
 {
     uint16_t timeoutCounter = 0;
     while (_client->connected()) {
@@ -93,7 +93,7 @@ uint8_t WappstoRpc::_awaitUuidResponse(char *uuid)
 
             if(err) {
                 PRINT("RPC Response Not parsable Json");
-                return(0);
+                return false;
             }
             int msgId = root["id"];
             if(msgId != _msgId) {
@@ -107,16 +107,16 @@ uint8_t WappstoRpc::_awaitUuidResponse(char *uuid)
                 strcpy(uuid, root["result"]["value"]["id"][0]);
 
                 PRINTV("Found UUID: ", uuid);
-                return(1);
+                return true;
             } else {
-                return(0);
+                return false;
             }
     }
         delay(10);
         timeoutCounter++;
         if(timeoutCounter > 300) {
             PRINT("Timeout waiting for reply");
-            return(0);
+            return false;
         }
     }
 }
@@ -139,7 +139,7 @@ void WappstoRpc::_sendSuccessResponse(const char *id)
 }
 
 
-int WappstoRpc::postNetwork(const char *networkId, String &networkName)
+bool WappstoRpc::postNetwork(const char *networkId, String &networkName)
 {
     StaticJsonDocument<JSON_POST_BUFFER> root;
     memset(_jsonTxBufferChar, 0x00, JSON_TX_BUFFER_SIZE);
@@ -166,7 +166,7 @@ int WappstoRpc::postNetwork(const char *networkId, String &networkName)
     return(_awaitResponse());
 }
 
-int WappstoRpc::postDevice(Device *device)
+bool WappstoRpc::postDevice(Device *device)
 {
     char url[200] = {0,};
     StaticJsonDocument<JSON_POST_BUFFER> root;
@@ -204,7 +204,7 @@ int WappstoRpc::postDevice(Device *device)
     return(_awaitResponse());
 }
 
-int WappstoRpc::postValue(Value *value)
+bool WappstoRpc::postValue(Value *value)
 {
     char url[200] = {0,};
     sprintf(url, "/network/%s/device/%s/value", &value->parent->parent->uuid, &value->parent->uuid);
@@ -286,7 +286,7 @@ int WappstoRpc::postValue(Value *value)
     return(_awaitResponse());
 }
 
-int WappstoRpc::deleteValue(const char* networkId, const char* deviceId, int valueId)
+bool WappstoRpc::deleteValue(const char* networkId, const char* deviceId, int valueId)
 {
     /*
     char url[200] = {0,};
@@ -309,10 +309,10 @@ int WappstoRpc::deleteValue(const char* networkId, const char* deviceId, int val
 
     return(_awaitResponse());
     */
-    return 0;
+    return false;
 }
 
-int WappstoRpc::putValue(Value *value)
+bool WappstoRpc::putValue(Value *value)
 {
     /*
     char url[200] = {0,};
@@ -345,10 +345,10 @@ int WappstoRpc::putValue(Value *value)
 
     return(_awaitResponse());
     */
-    return 0;
+    return false;
 }
 
-int WappstoRpc::putState(State *state)
+bool WappstoRpc::putState(State *state)
 {
     char url[200] = {0,};
     StaticJsonDocument<JSON_POST_BUFFER> root;
@@ -468,7 +468,7 @@ RequestType_e WappstoRpc::readData(char* uuid, char *dataPtr)
     return REQUEST_UNKNOWN;
 }
 
-int WappstoRpc::getDeviceUuidFromName(Network *network, String &name, char *uuid)
+bool WappstoRpc::getDeviceUuidFromName(Network *network, String &name, char *uuid)
 {
     char url[200] = {0,};
     StaticJsonDocument<JSON_POST_BUFFER> root;
@@ -489,7 +489,7 @@ int WappstoRpc::getDeviceUuidFromName(Network *network, String &name, char *uuid
     return(_awaitUuidResponse(uuid));
 }
 
-int WappstoRpc::getValueUuidFromName(Device *device, String name, char *uuid)
+bool WappstoRpc::getValueUuidFromName(Device *device, String name, char *uuid)
 {
     char url[200] = {0,};
     StaticJsonDocument<JSON_POST_BUFFER> root;
@@ -510,7 +510,7 @@ int WappstoRpc::getValueUuidFromName(Device *device, String name, char *uuid)
     return(_awaitUuidResponse(uuid));
 }
 
-int WappstoRpc::getStateUuidFromName(Value *value, StateType_e stateType, char *uuid)
+bool WappstoRpc::getStateUuidFromName(Value *value, StateType_e stateType, char *uuid)
 {
     char url[200] = {0,};
     StaticJsonDocument<JSON_POST_BUFFER> root;

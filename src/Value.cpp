@@ -1,8 +1,8 @@
 #include "WappstoIoT.h"
 
 
-Value::Value(Device *device, WappstoRpc &wappstoRpc, uint8_t id, String name, String type, PERMISSION_e permission, ValueNumber_t *valNumber) :
-    parent(device), _wappstoRpc(wappstoRpc), id(id), name(name), permission(permission), valueType(valueType)
+Value::Value(Device *device, WappstoRpc &wappstoRpc, String name, String type, PERMISSION_e permission, ValueNumber_t *valNumber) :
+    parent(device), _wappstoRpc(wappstoRpc), name(name), permission(permission), valueType(valueType)
 {
     _init(type);
     this->valueType = NUMBER_VALUE;
@@ -10,8 +10,8 @@ Value::Value(Device *device, WappstoRpc &wappstoRpc, uint8_t id, String name, St
     this->valString = NULL;
 }
 
-Value::Value(Device *device, WappstoRpc &wappstoRpc, uint8_t id, String name, String type, PERMISSION_e permission, ValueString_t *valString) :
-    parent(device), _wappstoRpc(wappstoRpc), id(id), name(name), permission(permission), valueType(valueType)
+Value::Value(Device *device, WappstoRpc &wappstoRpc, String name, String type, PERMISSION_e permission, ValueString_t *valString) :
+    parent(device), _wappstoRpc(wappstoRpc), name(name), permission(permission), valueType(valueType)
 {
     _init(type);
     this->valueType = STRING_VALUE;

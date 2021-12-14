@@ -31,7 +31,7 @@ Device* Network::createDevice(String name, DeviceDescription_t *deviceInfo)
         return NULL;
     }
     currentNumberOfDevices++;
-    devices[currentNumberOfDevices-1] = new Device(this, _wappstoRpc, currentNumberOfDevices-1, name, deviceInfo);
+    devices[currentNumberOfDevices-1] = new Device(this, _wappstoRpc, name, deviceInfo);
 
     if(!_wappstoRpc.getDeviceUuidFromName(this, name, devices[currentNumberOfDevices-1]->uuid)) {
             generateNewUuid(devices[currentNumberOfDevices-1]->uuid);

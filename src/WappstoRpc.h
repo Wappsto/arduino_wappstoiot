@@ -15,15 +15,15 @@ class WappstoRpc
     public:
         WappstoRpc(WiFiClientSecure *client);
         void setDebug(bool jsonDebug);
-        int postNetwork(const char *networkId, String &networkName);
-        int postDevice(Device *device);
-        int postValue(Value *value);
-        int putValue(Value *value);
-        int putState(State *state);
-        int deleteValue(const char* networkId, const char* deviceId, int valueId);
-        int getDeviceUuidFromName(Network *network, String &name, char *uuid);
-        int getValueUuidFromName(Device *device, String name, char *uuid);
-        int getStateUuidFromName(Value *value, StateType_e stateType, char *uuid);
+        bool postNetwork(const char *networkId, String &networkName);
+        bool postDevice(Device *device);
+        bool postValue(Value *value);
+        bool putValue(Value *value);
+        bool putState(State *state);
+        bool deleteValue(const char* networkId, const char* deviceId, int valueId);
+        bool getDeviceUuidFromName(Network *network, String &name, char *uuid);
+        bool getValueUuidFromName(Device *device, String name, char *uuid);
+        bool getStateUuidFromName(Value *value, StateType_e stateType, char *uuid);
 
         RequestType_e readData(char* uuid, char* data);
 
@@ -35,8 +35,8 @@ class WappstoRpc
         uint8_t readBuffer[JSON_STATIC_BUFFER_SIZE];
         uint8_t rspBuffer[JSON_STATIC_BUFFER_SIZE];
         char _jsonTxBufferChar[JSON_TX_BUFFER_SIZE];
-        uint8_t _awaitResponse(void);
-        uint8_t _awaitUuidResponse(char *uuid);
+        bool _awaitResponse(void);
+        bool _awaitUuidResponse(char *uuid);
         void _sendSuccessResponse(const char *id);
         const char* _getUtcTime(void);
 };
