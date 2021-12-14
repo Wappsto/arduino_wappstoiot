@@ -29,6 +29,7 @@ class WappstoRpc
 
     private:
         int _msgId;
+        int _getNextMsgId(void);
         WiFiClientSecure *_client;
         bool _jsonDebug;
         uint8_t readBuffer[JSON_STATIC_BUFFER_SIZE];

@@ -20,12 +20,18 @@
 WappstoRpc::WappstoRpc(WiFiClientSecure *client)
 {
     _client = client;
-    _msgId = 1;
+    _msgId = random(0xFFFF);
 }
 
 void WappstoRpc::setDebug(bool jsonDebug)
 {
     _jsonDebug = jsonDebug;
+}
+
+int WappstoRpc::_getNextMsgId(void)
+{
+    _msgId++;
+    return _msgId;
 }
 
 uint8_t WappstoRpc::_awaitResponse(void)
@@ -36,7 +42,7 @@ uint8_t WappstoRpc::_awaitResponse(void)
         memset(rspBuffer, 0x00, sizeof(rspBuffer));
         ret = _client->read(rspBuffer, sizeof(rspBuffer));
         if (ret > 0) {
-            PRINTV("Await response bytes received: ", ret);
+            //PRINTV("Await response bytes received: ", ret);
             PRINT(rspBuffer);
 
             StaticJsonDocument<JSON_CHAR_BUFFER> root;
@@ -45,6 +51,12 @@ uint8_t WappstoRpc::_awaitResponse(void)
             if(err) {
                 PRINT("RPC Response Not parsable Json");
                 return(0);
+            }
+            int msgId = root["id"];
+            if(msgId != _msgId) {
+                PRINTV("Msg id incorrect: ", msgId);
+                PRINTV("Expected: ", _msgId);
+                continue;
             }
 
             bool result = root["result"]["value"];
@@ -73,7 +85,7 @@ uint8_t WappstoRpc::_awaitUuidResponse(char *uuid)
         memset(rspBuffer, 0x00, sizeof(rspBuffer));
         ret = _client->read(rspBuffer, sizeof(rspBuffer));
         if (ret > 0) {
-            PRINTV("Await UUID bytes received: ", ret);
+            //PRINTV("Await UUID bytes received: ", ret);
             PRINT(rspBuffer);
 
             StaticJsonDocument<JSON_CHAR_BUFFER> root;
@@ -83,12 +95,18 @@ uint8_t WappstoRpc::_awaitUuidResponse(char *uuid)
                 PRINT("RPC Response Not parsable Json");
                 return(0);
             }
+            int msgId = root["id"];
+            if(msgId != _msgId) {
+                PRINTV("Msg id incorrect: ", msgId);
+                PRINTV("Expected: ", _msgId);
+                continue;
+            }
+
             if(root["result"]["value"]["id"].size() > 0) {
                 char getId[UUID_LENGTH] = {0,};
                 strcpy(uuid, root["result"]["value"]["id"][0]);
 
-                PRINT("Found UUID: ");
-                PRINT(uuid);
+                PRINTV("Found UUID: ", uuid);
                 return(1);
             } else {
                 return(0);
@@ -110,12 +128,12 @@ void WappstoRpc::_sendSuccessResponse(const char *id)
 
     root["jsonrpc"] = "2.0";
     root["id"] = id;
-    _msgId++;
     root["result"] = true;
 
     serializeJson(root, _jsonTxBufferChar);
     if(_jsonDebug) {
         serializeJsonPretty(root, Serial);
+        Serial.println("");
     }
     _client->print(_jsonTxBufferChar);
 }
@@ -127,8 +145,7 @@ int WappstoRpc::postNetwork(const char *networkId, String &networkName)
     memset(_jsonTxBufferChar, 0x00, JSON_TX_BUFFER_SIZE);
 
     root["jsonrpc"] = "2.0";
-    root["id"] = _msgId;
-    _msgId++;
+    root["id"] = _getNextMsgId();
     root["method"] = "POST";
     JsonObject params = root.createNestedObject("params");
     params["url"] = "/network";
@@ -142,6 +159,7 @@ int WappstoRpc::postNetwork(const char *networkId, String &networkName)
     serializeJson(root, _jsonTxBufferChar);
     if(_jsonDebug) {
         serializeJsonPretty(root, Serial);
+        Serial.println("");
     }
     _client->print(_jsonTxBufferChar);
 
@@ -155,8 +173,7 @@ int WappstoRpc::postDevice(Device *device)
     memset(_jsonTxBufferChar, 0x00, JSON_TX_BUFFER_SIZE);
 
     root["jsonrpc"] = "2.0";
-    root["id"] = _msgId;
-    _msgId++;
+    root["id"] = _getNextMsgId();
     root["method"] = "POST";
     JsonObject params = root.createNestedObject("params");
     sprintf(url, "/network/%s/device", &device->parent->uuid);
@@ -180,6 +197,7 @@ int WappstoRpc::postDevice(Device *device)
     serializeJson(root, _jsonTxBufferChar);
     if(_jsonDebug) {
         serializeJsonPretty(root, Serial);
+        Serial.println("");
     }
     _client->print(_jsonTxBufferChar);
 
@@ -194,8 +212,7 @@ int WappstoRpc::postValue(Value *value)
     memset(_jsonTxBufferChar, 0x00, JSON_TX_BUFFER_SIZE);
 
     root["jsonrpc"] = "2.0";
-    root["id"] = _msgId;
-    _msgId++;
+    root["id"] = _getNextMsgId();
     root["method"] = "POST";
     JsonObject params = root.createNestedObject("params");
     sprintf(url, "/network/%s/device/%s/value", &value->parent->parent->uuid, &value->parent->uuid);
@@ -262,6 +279,7 @@ int WappstoRpc::postValue(Value *value)
     serializeJson(root, _jsonTxBufferChar);
     if(_jsonDebug) {
         serializeJsonPretty(root, Serial);
+        Serial.println("");
     }
     _client->print(_jsonTxBufferChar);
 
@@ -285,6 +303,7 @@ int WappstoRpc::deleteValue(const char* networkId, const char* deviceId, int val
     serializeJson(root, _jsonTxBufferChar);
     if(_jsonDebug) {
         serializeJsonPretty(root, Serial);
+        Serial.println("");
     }
     _client->print(_jsonTxBufferChar);
 
@@ -301,8 +320,7 @@ int WappstoRpc::putValue(Value *value)
     memset(_jsonTxBufferChar, 0x00, JSON_TX_BUFFER_SIZE);
 
     root["jsonrpc"] = "2.0";
-    root["id"] = _msgId;
-    _msgId++;
+    root["id"] = _getNextMsgId();
     root["method"] = "PUT";
     JsonObject params = root.createNestedObject("params");
     sprintf(url, "/network/%s/device/%s/value/%s/state/%s", networkId, deviceId, _values[valueId-1].valueUuid, _values[valueId-1].reportUuid);
@@ -321,6 +339,7 @@ int WappstoRpc::putValue(Value *value)
     serializeJson(root, _jsonTxBufferChar);
     if(_jsonDebug) {
         serializeJsonPretty(root, Serial);
+        Serial.println("");
     }
     _client->print(_jsonTxBufferChar);
 
@@ -336,8 +355,7 @@ int WappstoRpc::putState(State *state)
     memset(_jsonTxBufferChar, 0x00, JSON_TX_BUFFER_SIZE);
 
     root["jsonrpc"] = "2.0";
-    root["id"] = _msgId;
-    _msgId++;
+    root["id"] = _getNextMsgId();
     root["method"] = "PUT";
     JsonObject params = root.createNestedObject("params");
     sprintf(url, "/network/%s/device/%s/value/%s/state/%s", state->parent->parent->parent->uuid, state->parent->parent->uuid, state->parent->uuid, state->uuid);
@@ -365,6 +383,7 @@ int WappstoRpc::putState(State *state)
     serializeJson(root, _jsonTxBufferChar);
     if(_jsonDebug) {
         serializeJsonPretty(root, Serial);
+        Serial.println("");
     }
     _client->print(_jsonTxBufferChar);
     return(_awaitResponse());
@@ -389,6 +408,7 @@ RequestType_e WappstoRpc::readData(char* uuid, char *dataPtr)
 
         if(_jsonDebug) {
             serializeJsonPretty(root, Serial);
+            Serial.println("");
         }
 
         if(root.containsKey("method")) {
@@ -455,8 +475,7 @@ int WappstoRpc::getDeviceUuidFromName(Network *network, String &name, char *uuid
     memset(_jsonTxBufferChar, 0x00, JSON_TX_BUFFER_SIZE);
 
     root["jsonrpc"] = "2.0";
-    root["id"] = _msgId;
-    _msgId++;
+    root["id"] = _getNextMsgId();
     root["method"] = "GET";
     JsonObject params = root.createNestedObject("params");
     sprintf(url, "/services/2.0/network/%s/device?this_name==%s", network->uuid, name.c_str()); // "hest"); //
@@ -464,6 +483,7 @@ int WappstoRpc::getDeviceUuidFromName(Network *network, String &name, char *uuid
     serializeJson(root, _jsonTxBufferChar);
     if(_jsonDebug) {
         serializeJsonPretty(root, Serial);
+        Serial.println("");
     }
     _client->print(_jsonTxBufferChar);
     return(_awaitUuidResponse(uuid));
@@ -476,8 +496,7 @@ int WappstoRpc::getValueUuidFromName(Device *device, String name, char *uuid)
     memset(_jsonTxBufferChar, 0x00, JSON_TX_BUFFER_SIZE);
 
     root["jsonrpc"] = "2.0";
-    root["id"] = _msgId;
-    _msgId++;
+    root["id"] = _getNextMsgId();
     root["method"] = "GET";
     JsonObject params = root.createNestedObject("params");
     sprintf(url, "/services/2.0/device/%s/value?this_name==%s", device->uuid, name.c_str());
@@ -485,6 +504,7 @@ int WappstoRpc::getValueUuidFromName(Device *device, String name, char *uuid)
     serializeJson(root, _jsonTxBufferChar);
     if(_jsonDebug) {
         serializeJsonPretty(root, Serial);
+        Serial.println("");
     }
     _client->print(_jsonTxBufferChar);
     return(_awaitUuidResponse(uuid));
@@ -497,8 +517,7 @@ int WappstoRpc::getStateUuidFromName(Value *value, StateType_e stateType, char *
     memset(_jsonTxBufferChar, 0x00, JSON_TX_BUFFER_SIZE);
 
     root["jsonrpc"] = "2.0";
-    root["id"] = _msgId;
-    _msgId++;
+    root["id"] = _getNextMsgId();
     root["method"] = "GET";
     JsonObject params = root.createNestedObject("params");
     if(stateType == TYPE_REPORT) {
@@ -510,6 +529,7 @@ int WappstoRpc::getStateUuidFromName(Value *value, StateType_e stateType, char *
     serializeJson(root, _jsonTxBufferChar);
     if(_jsonDebug) {
         serializeJsonPretty(root, Serial);
+        Serial.println("");
     }
     _client->print(_jsonTxBufferChar);
     return(_awaitUuidResponse(uuid));
