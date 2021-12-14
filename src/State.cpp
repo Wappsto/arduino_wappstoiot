@@ -22,7 +22,6 @@ State::State(Value *value, WappstoRpc &wappstoRpc, StateType_e stateType) : _wap
     }
 
     if(!_wappstoRpc.getStateUuidFromName(value, stateType, this->uuid)) {
-        Serial.println("generateNewUuid STATE");
         generateNewUuid(this->uuid);
         this->requiresPost = true;
     }

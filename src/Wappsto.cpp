@@ -26,6 +26,20 @@ bool Wappsto::connect(void)
     return false;
 }
 
+bool Wappsto::disconnect(void)
+{
+    if(_client->connected()) {
+        _client->stop();
+        return true;
+    }
+    return false;
+}
+
+void Wappsto::setLog(bool enabled)
+{
+    _wappstoRpc.setDebug(enabled);
+}
+
 Network *Wappsto::createNetwork(String name, String description)
 {
     _network = new Network(_wappstoRpc, this->uuid, name, description);
@@ -75,18 +89,16 @@ bool Wappsto::dataAvailable(void)
             continue;
         }
         if(strcmp(_network->devices[devs]->uuid, tmpUuid) == 0) {
-            Serial.println("Found device requested UUID");
+            Serial.println("Found device requested UUID - not handled");
         }
         for(int vals=0; vals < _network->devices[devs]->currentNumberOfValues; vals++) {
             if(_network->devices[devs]->values[vals] == NULL) {
                 continue;
             }
             if(strcmp(_network->devices[devs]->values[vals]->uuid, tmpUuid) == 0) {
-                Serial.println("Found value requested UUID");
                 return true;
             }
             if(_network->devices[devs]->values[vals]->reportState && strcmp(_network->devices[devs]->values[vals]->reportState->uuid, tmpUuid) == 0) {
-                Serial.println("Found state report requested UUID");
                 if(req == REQUEST_GET) {
                     if(_network->devices[devs]->values[vals]->_onRefreshCb) {
                         _network->devices[devs]->values[vals]->_onRefreshCb(_network->devices[devs]->values[vals]);
@@ -94,7 +106,6 @@ bool Wappsto::dataAvailable(void)
                     }
                 }
             } else if(_network->devices[devs]->values[vals]->controlState && strcmp(_network->devices[devs]->values[vals]->controlState->uuid, tmpUuid) == 0) {
-                Serial.println("Found state control requested UUID");
                 if(req == REQUEST_PUT) {
                     if(_network->devices[devs]->values[vals]->_onControlNumberCb) {
                         _network->devices[devs]->values[vals]->controlState->data = tmpData;

@@ -16,6 +16,7 @@ public:
     bool connect(void);
     bool disconnect(void);
     bool dataAvailable();
+    void setLog(bool enabled);
 
     char uuid[UUID_LENGTH];
     Network *network;

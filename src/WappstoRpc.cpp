@@ -10,17 +10,16 @@
 
 //#define DISABLE_FAST_SENDING 1
 
-#define PRINT(s)    { if(_jsonDebug) \
-                            Serial.println(F(s)); }
-#define PRINTV(s,v) {  if(_jsonDebug) \
-                            Serial.print(F(s)); Serial.println(v); }
-#define PRINTX(s,v) { if(_jsonDebug) \
-                            Serial.print(F(s)); Serial.print(F("0x")); Serial.println(v, HEX); }
+#define PRINT(s)    { if(_jsonDebug) {\
+                            Serial.println(F(s));} }
+#define PRINTV(s,v) {  if(_jsonDebug) {\
+                            Serial.print(F(s)); Serial.println(v);} }
+#define PRINTX(s,v) { if(_jsonDebug) {\
+                            Serial.print(F(s)); Serial.print(F("0x")); Serial.println(v, HEX);} }
 
 WappstoRpc::WappstoRpc(WiFiClientSecure *client)
 {
     _client = client;
-    _jsonDebug = true;
     _msgId = 1;
 }
 
@@ -37,7 +36,7 @@ uint8_t WappstoRpc::_awaitResponse(void)
         memset(rspBuffer, 0x00, sizeof(rspBuffer));
         ret = _client->read(rspBuffer, sizeof(rspBuffer));
         if (ret > 0) {
-            PRINTV("Init received: ", ret);
+            PRINTV("Await response bytes received: ", ret);
             PRINT(rspBuffer);
 
             StaticJsonDocument<JSON_CHAR_BUFFER> root;
@@ -59,7 +58,7 @@ uint8_t WappstoRpc::_awaitResponse(void)
         }
         delay(10);
         timeoutCounter++;
-        if(timeoutCounter > 100) {
+        if(timeoutCounter > 300) {
             PRINT("Timeout waiting for reply");
             return(0);
         }
@@ -74,7 +73,7 @@ uint8_t WappstoRpc::_awaitUuidResponse(char *uuid)
         memset(rspBuffer, 0x00, sizeof(rspBuffer));
         ret = _client->read(rspBuffer, sizeof(rspBuffer));
         if (ret > 0) {
-            PRINTV("Init received: ", ret);
+            PRINTV("Await UUID bytes received: ", ret);
             PRINT(rspBuffer);
 
             StaticJsonDocument<JSON_CHAR_BUFFER> root;
@@ -88,8 +87,8 @@ uint8_t WappstoRpc::_awaitUuidResponse(char *uuid)
                 char getId[UUID_LENGTH] = {0,};
                 strcpy(uuid, root["result"]["value"]["id"][0]);
 
-                Serial.print("Found UUID: ");
-                Serial.println(uuid);
+                PRINT("Found UUID: ");
+                PRINT(uuid);
                 return(1);
             } else {
                 return(0);
@@ -97,7 +96,7 @@ uint8_t WappstoRpc::_awaitUuidResponse(char *uuid)
     }
         delay(10);
         timeoutCounter++;
-        if(timeoutCounter > 100) {
+        if(timeoutCounter > 300) {
             PRINT("Timeout waiting for reply");
             return(0);
         }
