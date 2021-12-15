@@ -19,6 +19,16 @@ Value::Value(Device *device, WappstoRpc &wappstoRpc, String name, String type, P
     this->valString = valString;
 }
 
+Value::Value(Device *device, WappstoRpc &wappstoRpc, String name, String type, PERMISSION_e permission, ValueBlob_t *valBlob) :
+    parent(device), _wappstoRpc(wappstoRpc), name(name), permission(permission), valueType(valueType)
+{
+    _init(type);
+    this->valueType = BLOB_VALUE;
+    this->valNumber = NULL;
+    this->valString = NULL;
+    this->valBlob = valBlob;
+}
+
 void Value::_init(String type)
 {
     this->valueCreated = false;
@@ -75,6 +85,22 @@ bool Value::report(const String &data)
     this->reportState->timestamp = getUtcTime();
     this->reportState->data = data;
     _wappstoRpc.putState(this->reportState);
+    return true;
+}
+
+bool Value::control(int data)
+{
+    this->controlState->timestamp = getUtcTime();
+    this->controlState->data = String(data);
+    _wappstoRpc.putState(this->controlState);
+    return true;
+}
+
+bool Value::control(double data)
+{
+    this->controlState->timestamp = getUtcTime();
+    this->controlState->data = String(data);
+    _wappstoRpc.putState(this->controlState);
     return true;
 }
 

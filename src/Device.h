@@ -13,6 +13,7 @@ public:
     bool deleteReq(void);
     Value* createValueNumber(String name, String type, PERMISSION_e permission, ValueNumber_t *valNumber);
     Value* createValueString(String name, String type, PERMISSION_e permission, ValueString_t *valString);
+    Value* createValueBlob(String name, String type, PERMISSION_e permission, ValueBlob_t *valBlob);
     void onChange(WappstoCallback cb);
     void onDelete(WappstoCallback cb);
     void post(void);

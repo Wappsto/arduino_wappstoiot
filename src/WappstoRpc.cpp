@@ -226,7 +226,14 @@ bool WappstoRpc::postValue(Value *value)
     metaVal["id"] = value->uuid;
 
     data["name"] = value->name;
-    data["permission"] = "rw";
+    if(value->permission == READ_WRITE) {
+        data["permission"] = "rw";
+    } else if(value->permission == READ) {
+        data["permission"] = "r";
+    } else if(value->permission == WRITE) {
+        data["permission"] = "w";
+    }
+
     data["type"] = value->type;
 
     if(value->valueType == NUMBER_VALUE) {
@@ -239,6 +246,10 @@ bool WappstoRpc::postValue(Value *value)
         JsonObject str = data.createNestedObject("string");
         str["max"] = value->valString->max;
         str["encoding"] = value->valString->encoding;
+    } else if(value->valueType == BLOB_VALUE) {
+        JsonObject str = data.createNestedObject("blob");
+        str["max"] = value->valBlob->max;
+        str["encoding"] = value->valBlob->encoding;
     }
 
     JsonArray stateArray = data.createNestedArray("state");

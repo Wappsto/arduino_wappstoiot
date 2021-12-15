@@ -70,6 +70,23 @@ Value* Device::createValueString(String name, String type, PERMISSION_e permissi
     return values[currentNumberOfValues-1];
 }
 
+Value* Device::createValueBlob(String name, String type, PERMISSION_e permission, ValueBlob_t *valBlob)
+{
+    if(currentNumberOfValues >= MAX_VALUES) {
+        Serial.println("Cannot create more values");
+        return NULL;
+    }
+    currentNumberOfValues++;
+    values[currentNumberOfValues-1] = new Value(this, _wappstoRpc, name, type, permission, valBlob);
+
+    if(!_wappstoRpc.getValueUuidFromName(this, name, values[currentNumberOfValues-1]->uuid)) {
+        generateNewUuid(values[currentNumberOfValues-1]->uuid);
+    }
+
+    values[currentNumberOfValues-1]->post();
+    return values[currentNumberOfValues-1];
+}
+
 void Device::onChange(WappstoCallback cb)
 {
     this->_onChangeCb = cb;
