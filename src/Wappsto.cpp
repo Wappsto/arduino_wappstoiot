@@ -56,12 +56,13 @@ Network *Wappsto::createNetwork(String name)
 
 bool Wappsto::dataAvailable(void)
 {
-    char tmpData[200];
+    char tmpData[1200] = {0,};
+    char tmpTimestamp[28] = {0,};
     char tmpUuid[UUID_LENGTH];
     if(!_client->available()) {
         return false;
     }
-    RequestType_e req = _wappstoRpc.readData(tmpUuid, tmpData);
+    RequestType_e req = _wappstoRpc.readData(tmpUuid, tmpData, tmpTimestamp);
 
     if(tmpUuid && strlen(tmpUuid) > 0) {
         //Serial.print("UUID: ");
@@ -109,12 +110,18 @@ bool Wappsto::dataAvailable(void)
                 if(req == REQUEST_PUT) {
                     if(_network->devices[devs]->values[vals]->_onControlNumberCb) {
                         _network->devices[devs]->values[vals]->controlState->data = tmpData;
+                        _network->devices[devs]->values[vals]->controlState->timestamp = tmpTimestamp;
                         double tmpDouble = _network->devices[devs]->values[vals]->controlState->data.toDouble();
-                        _network->devices[devs]->values[vals]->_onControlNumberCb(_network->devices[devs]->values[vals], tmpDouble, "");
+                        _network->devices[devs]->values[vals]->_onControlNumberCb(_network->devices[devs]->values[vals],
+                                                                                    tmpDouble,
+                                                                                    _network->devices[devs]->values[vals]->controlState->timestamp);
                         return true;
                     } else if(_network->devices[devs]->values[vals]->_onControlStringCb) {
                         _network->devices[devs]->values[vals]->controlState->data = tmpData;
-                        _network->devices[devs]->values[vals]->_onControlStringCb(_network->devices[devs]->values[vals], tmpData, "");
+                        _network->devices[devs]->values[vals]->controlState->timestamp = tmpTimestamp;
+                        _network->devices[devs]->values[vals]->_onControlStringCb(_network->devices[devs]->values[vals],
+                                                                                    _network->devices[devs]->values[vals]->controlState->data,
+                                                                                    _network->devices[devs]->values[vals]->controlState->timestamp);
                         return true;
                     }
                 }

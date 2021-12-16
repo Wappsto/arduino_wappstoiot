@@ -517,7 +517,7 @@ bool WappstoRpc::putState(State *state)
     return(_awaitResponse());
 }
 
-RequestType_e WappstoRpc::readData(char* uuid, char *dataPtr)
+RequestType_e WappstoRpc::readData(char* uuid, char *dataPtr, char *timestampPtr)
 {
     int ret;
     memset(readBuffer, 0x00, sizeof(readBuffer));
@@ -558,6 +558,8 @@ RequestType_e WappstoRpc::readData(char* uuid, char *dataPtr)
             } else if(strcmp(method, "PUT") == 0) {
                 JsonObject data = params["data"];
                 strcpy(dataPtr, data["data"]);
+                strcpy(timestampPtr, data["timestamp"]);
+
                 strcpy(uuid, data["meta"]["id"]);
 
                 PRINTV("PUT: ",uuid);

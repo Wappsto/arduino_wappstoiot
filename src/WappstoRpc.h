@@ -27,7 +27,7 @@ class WappstoRpc
         bool getStateDataTime(const char *stateUuid, String &data, String &timestamp);
         bool sendPing(void);
 
-        RequestType_e readData(char* uuid, char* data);
+        RequestType_e readData(char* uuid, char* data, char *timestampPtr);
 
     private:
         int _msgId;
