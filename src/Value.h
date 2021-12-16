@@ -46,8 +46,10 @@ public:
     WappstoCallback _onDeleteCb;
 
     String getControlData(void);
+    double getControlNumberData(void);
     String getControlTimestamp(void);
     String getReportData(void);
+    double getReportNumberData(void);
     String getReportTimestamp(void);
 
 private:

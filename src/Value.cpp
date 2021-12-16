@@ -126,6 +126,15 @@ String Value::getControlData(void)
     }
 }
 
+double Value::getControlNumberData(void)
+{
+    if(this->controlState) {
+        return this->controlState->data.toDouble();
+    } else {
+        return 0;
+    }
+}
+
 String Value::getControlTimestamp(void)
 {
     if(this->controlState) {
@@ -141,6 +150,15 @@ String Value::getReportData(void)
         return this->reportState->data;
     }  else {
         return "";
+    }
+}
+
+double Value::getReportNumberData(void)
+{
+    if(this->reportState) {
+        return this->reportState->data.toDouble();
+    }  else {
+        return 0;
     }
 }
 

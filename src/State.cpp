@@ -6,11 +6,15 @@ State::State(Value *value, WappstoRpc &wappstoRpc, StateType_e stateType, bool f
     this->parent = value;
     this->stateType = stateType;
     this->requiresPost = false;
+    this->data = "";
+    this->timestamp = "";
 
     if(forceCreate) {
         generateNewUuid(this->uuid);
         this->requiresPost = true;
-    } else if(!_wappstoRpc.getStateUuidFromName(value, stateType, this->uuid)) {
+    } else if(_wappstoRpc.getStateUuidFromName(value, stateType, this->uuid)) {
+        _wappstoRpc.getStateDataTime(this->uuid, this->data, this->timestamp);
+    } else {
         generateNewUuid(this->uuid);
         this->requiresPost = true;
     }

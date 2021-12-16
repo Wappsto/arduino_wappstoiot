@@ -37,6 +37,13 @@ int WappstoRpc::_getNextMsgId(void)
 bool WappstoRpc::_awaitResponse(void)
 {
     uint16_t timeoutCounter = 0;
+/*
+    if(_client->connected()) {
+        Serial.println("_awaitResponse CLIENT IS CONNECTED");
+    } else {
+        Serial.println("_awaitResponse CLIENT IS NOT CONNECTED");
+    }
+*/
     while (_client->connected()) {
         int ret;
         memset(rspBuffer, 0x00, sizeof(rspBuffer));
@@ -72,7 +79,7 @@ bool WappstoRpc::_awaitResponse(void)
         timeoutCounter++;
         if(timeoutCounter > 300) {
             PRINT("Timeout waiting for reply");
-            return true;
+            return false;
         }
     }
 }
@@ -80,6 +87,13 @@ bool WappstoRpc::_awaitResponse(void)
 bool WappstoRpc::_awaitUuidResponse(char *uuid)
 {
     uint16_t timeoutCounter = 0;
+/*
+    if(_client->connected()) {
+        Serial.println("_awaitUuidResponse CLIENT IS CONNECTED");
+    } else {
+        Serial.println("_awaitUuidResponse CLIENT IS NOT CONNECTED");
+    }
+*/
     while (_client->connected()) {
         int ret;
         memset(rspBuffer, 0x00, sizeof(rspBuffer));
@@ -111,6 +125,75 @@ bool WappstoRpc::_awaitUuidResponse(char *uuid)
             } else {
                 return false;
             }
+    }
+        delay(10);
+        timeoutCounter++;
+        if(timeoutCounter > 300) {
+            PRINT("Timeout waiting for reply");
+            return false;
+        }
+    }
+}
+
+bool WappstoRpc::_awaitDataTimeResponse(String &data, String &timestamp)
+{
+    uint16_t timeoutCounter = 0;
+/*
+    if(_client->connected()) {
+        Serial.println("_awaitDataTimeResponse CLIENT IS CONNECTED");
+    } else {
+        Serial.println("_awaitDataTimeResponse CLIENT IS NOT CONNECTED");
+    }
+*/
+    while (_client->connected()) {
+        int ret;
+        memset(rspBuffer, 0x00, sizeof(rspBuffer));
+        ret = _client->read(rspBuffer, sizeof(rspBuffer));
+        if (ret > 0) {
+            //PRINTV("Await UUID bytes received: ", ret);
+            PRINT(rspBuffer);
+
+            StaticJsonDocument<JSON_CHAR_BUFFER> root;
+            DeserializationError err = deserializeJson(root, rspBuffer);
+
+            if(err) {
+                PRINT("RPC Response Not parsable Json");
+                return false;
+            }
+            int msgId = root["id"];
+            if(msgId != _msgId) {
+                PRINTV("Msg id incorrect: ", msgId);
+                PRINTV("Expected: ", _msgId);
+                continue;
+            }
+            /*
+{
+   "jsonrpc":"2.0",
+   "id":19589,
+   "result":{
+      "value":{
+         "timestamp":"2021-12-16T10:03:11Z",
+         "data":"400",
+         "type":"Report",
+         "meta":{
+            "id":"94e6eeb8-bd85-4413-b27d-342b274bcef8",
+            "type":"state",
+            "version":"2.0"
+         }
+      },
+      "meta":{
+         "server_send_time":"2021-12-16T10:04:49.653171Z"
+      }
+   }
+}
+*/
+            data = String((const char*)root["result"]["value"]["data"]);
+            timestamp = String((const char*)root["result"]["value"]["timestamp"]);
+
+            //PRINTV("DATA: ", data);
+            //PRINTV("TIME: ", timestamp);
+
+            return true;
     }
         delay(10);
         timeoutCounter++;
@@ -359,8 +442,42 @@ bool WappstoRpc::putValue(Value *value)
     return false;
 }
 
+bool WappstoRpc::sendPing(void)
+{
+    // {"jsonrpc":"2.0","method":"HEAD","id":"PING-12","params":{"url":"/services/2.0/network"}}
+/*
+    if(_client->connected()) {
+        Serial.println("sendPing CLIENT IS CONNECTED");
+    } else {
+        Serial.println("sendPing CLIENT IS NOT CONNECTED");
+    }
+*/
+    StaticJsonDocument<JSON_POST_BUFFER> root;
+    memset(_jsonTxBufferChar, 0x00, JSON_TX_BUFFER_SIZE);
+
+    root["jsonrpc"] = "2.0";
+    root["id"] = _getNextMsgId();
+    root["method"] = "HEAD";
+    JsonObject params = root.createNestedObject("params");
+    params["url"] = "/services/2.0/network";
+    serializeJson(root, _jsonTxBufferChar);
+    if(_jsonDebug) {
+        serializeJsonPretty(root, Serial);
+        Serial.println("");
+    }
+    _client->print(_jsonTxBufferChar);
+    return(_awaitResponse());
+}
+
 bool WappstoRpc::putState(State *state)
 {
+/*
+    if(_client->connected()) {
+        Serial.println("putState CLIENT IS CONNECTED");
+    } else {
+        Serial.println("putState CLIENT IS NOT CONNECTED");
+    }
+*/
     char url[200] = {0,};
     StaticJsonDocument<JSON_POST_BUFFER> root;
     memset(_jsonTxBufferChar, 0x00, JSON_TX_BUFFER_SIZE);
@@ -544,4 +661,25 @@ bool WappstoRpc::getStateUuidFromName(Value *value, StateType_e stateType, char 
     }
     _client->print(_jsonTxBufferChar);
     return(_awaitUuidResponse(uuid));
+}
+
+bool WappstoRpc::getStateDataTime(const char *stateUuid, String &data, String &timestamp)
+{
+    char url[200] = {0,};
+    StaticJsonDocument<JSON_POST_BUFFER> root;
+    memset(_jsonTxBufferChar, 0x00, JSON_TX_BUFFER_SIZE);
+
+    root["jsonrpc"] = "2.0";
+    root["id"] = _getNextMsgId();
+    root["method"] = "GET";
+    JsonObject params = root.createNestedObject("params");
+    sprintf(url, "/state/%s", stateUuid);
+    params["url"] = url;
+    serializeJson(root, _jsonTxBufferChar);
+    if(_jsonDebug) {
+        serializeJsonPretty(root, Serial);
+        Serial.println("");
+    }
+    _client->print(_jsonTxBufferChar);
+    return(_awaitDataTimeResponse(data, timestamp));
 }
