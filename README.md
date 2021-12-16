@@ -146,3 +146,23 @@ void refreshNumberCallback(Value *value)
 myNumberValue->onRefresh(&refreshNumberCallback);
 
 ```
+## Getting last data and timestamp from value
+You can access the last received/send data and timestamp by using these functions. 
+For instance after a new boot, the last controlled state set in Wappsto.com will be retrieved, so your program and start with that state.
+
+_Note_ retriveing numberData from an empty value will return a 0;
+
+```
+String ctrlData = myNumberValue.getControlData();
+
+double ctrlDataNumber = myNumberValue.getControlNumberData();
+
+String ctrlTime = myNumberValue.getControlTimestamp();
+
+String reportData = myNumberValue.getReportData();
+
+double reportDataNumber = myNumberValue.getReportNumberData();
+
+String reportTime = myNumberValue.getReportTimestamp();
+```
+
