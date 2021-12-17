@@ -13,7 +13,7 @@ WiFiClientSecure
 #include <WiFiClientSecure.h>
 
 #include "Wappsto.h"
-#include "wappsto_setup.h"
+#include "wappsto_config.h"
 
 WiFiMulti WiFiMulti;
 WiFiClientSecure client;
@@ -63,7 +63,7 @@ void setup() {
 
     initializeNtp();
 
-    wappsto.config(network_id, ca, client_crt, client_key);
+    wappsto.config(network_uuid, ca, client_crt, client_key);
     if(wappsto.connect()) {
         Serial.println("Connected to Wappsto");
     } else {

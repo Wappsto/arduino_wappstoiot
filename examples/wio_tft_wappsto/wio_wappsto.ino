@@ -27,7 +27,7 @@ WiFiClientSecure
 #include"TFT_eSPI.h"
 
 #include "Wappsto.h"
-#include "wappsto_setup.h"
+#include "wappsto_config.h"
 
 #define BUZZER_PIN WIO_BUZZER
 
@@ -156,7 +156,7 @@ void setup()
     tft.fillScreen(TFT_YELLOW);
     tft.drawString("Connecting to Wappsto", 10, 10);
 
-    wappsto.config(network_id, ca, client_crt, client_key);
+    wappsto.config(network_uuid, ca, client_crt, client_key);
     if(wappsto.connect()) {
         Serial.println("Connected to Wappsto");
     } else {
