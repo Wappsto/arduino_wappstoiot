@@ -8,7 +8,7 @@
 class Device
 {
 public:
-    Device(Network *network, WappstoRpc &wappstoRpc, String name, DeviceDescription_t *deviceInfo);
+    Device(Network *network, String name, DeviceDescription_t *deviceInfo);
     bool change(void);
     bool deleteReq(void);
     Value* createValueNumber(String name, String type, PERMISSION_e permission, ValueNumber_t *valNumber);
@@ -27,7 +27,7 @@ public:
     Value* values[MAX_VALUES];
 
 private:
-    WappstoRpc &_wappstoRpc;
+    WappstoRpc *_wappstoRpc;
     WappstoCallback _onChangeCb;
     WappstoCallback _onDeleteCb;
 };

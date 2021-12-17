@@ -2,8 +2,9 @@
 
 
 
-Device::Device(Network *network, WappstoRpc &wappstoRpc, String name, DeviceDescription_t *deviceInfo) : _wappstoRpc(wappstoRpc)
+Device::Device(Network *network, String name, DeviceDescription_t *deviceInfo)
 {
+    _wappstoRpc = WappstoRpc::instance();
     this->parent = network;
     this->name = name;
     this->deviceInfo.product = deviceInfo->product;
@@ -22,7 +23,7 @@ Device::Device(Network *network, WappstoRpc &wappstoRpc, String name, DeviceDesc
 
 void Device::post(void)
 {
-    this->_wappstoRpc.postDevice(this);
+    this->_wappstoRpc->postDevice(this);
 }
 
 bool Device::change(void)
@@ -42,9 +43,9 @@ Value* Device::createValueNumber(String name, String type, PERMISSION_e permissi
         return NULL;
     }
     currentNumberOfValues++;
-    values[currentNumberOfValues-1] = new Value(this, _wappstoRpc, name, type, permission, valNumber);
+    values[currentNumberOfValues-1] = new Value(this, name, type, permission, valNumber);
 
-    if(!_wappstoRpc.getValueUuidFromName(this, name, values[currentNumberOfValues-1]->uuid)) {
+    if(!_wappstoRpc->getValueUuidFromName(this, name, values[currentNumberOfValues-1]->uuid)) {
         generateNewUuid(values[currentNumberOfValues-1]->uuid);
         values[currentNumberOfValues-1]->valueCreated = true;
     }
@@ -60,9 +61,9 @@ Value* Device::createValueString(String name, String type, PERMISSION_e permissi
         return NULL;
     }
     currentNumberOfValues++;
-    values[currentNumberOfValues-1] = new Value(this, _wappstoRpc, name, type, permission, valString);
+    values[currentNumberOfValues-1] = new Value(this, name, type, permission, valString);
 
-    if(!_wappstoRpc.getValueUuidFromName(this, name, values[currentNumberOfValues-1]->uuid)) {
+    if(!_wappstoRpc->getValueUuidFromName(this, name, values[currentNumberOfValues-1]->uuid)) {
         generateNewUuid(values[currentNumberOfValues-1]->uuid);
     }
 
@@ -77,9 +78,9 @@ Value* Device::createValueBlob(String name, String type, PERMISSION_e permission
         return NULL;
     }
     currentNumberOfValues++;
-    values[currentNumberOfValues-1] = new Value(this, _wappstoRpc, name, type, permission, valBlob);
+    values[currentNumberOfValues-1] = new Value(this, name, type, permission, valBlob);
 
-    if(!_wappstoRpc.getValueUuidFromName(this, name, values[currentNumberOfValues-1]->uuid)) {
+    if(!_wappstoRpc->getValueUuidFromName(this, name, values[currentNumberOfValues-1]->uuid)) {
         generateNewUuid(values[currentNumberOfValues-1]->uuid);
     }
 

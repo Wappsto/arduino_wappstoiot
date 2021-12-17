@@ -13,7 +13,8 @@
 class WappstoRpc
 {
     public:
-        WappstoRpc(WiFiClientSecure *client);
+        static WappstoRpc* instance();
+        void init(WiFiClientSecure *client);
         void setDebug(bool jsonDebug);
         bool postNetwork(const char *networkId, String &networkName);
         bool postDevice(Device *device);
@@ -30,6 +31,11 @@ class WappstoRpc
         RequestType_e readData(char* uuid, char* data, char *timestampPtr);
 
     private:
+        WappstoRpc() = default;
+        ~WappstoRpc() {};
+        WappstoRpc(const WappstoRpc&) = delete;
+        WappstoRpc& operator=(const WappstoRpc&) = delete;
+
         int _msgId;
         int _getNextMsgId(void);
         WiFiClientSecure *_client;

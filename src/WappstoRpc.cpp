@@ -17,7 +17,14 @@
 #define PRINTX(s,v) { if(_jsonDebug) {\
                             Serial.print(F(s)); Serial.print(F("0x")); Serial.println(v, HEX);} }
 
-WappstoRpc::WappstoRpc(WiFiClientSecure *client)
+
+WappstoRpc* WappstoRpc::instance()
+{
+    static WappstoRpc instance_;
+    return &instance_;
+}
+
+void WappstoRpc::init(WiFiClientSecure *client)
 {
     _client = client;
     _msgId = random(0xFFFF);
@@ -26,10 +33,14 @@ WappstoRpc::WappstoRpc(WiFiClientSecure *client)
 void WappstoRpc::setDebug(bool jsonDebug)
 {
     _jsonDebug = jsonDebug;
+    _jsonDebug = true;
 }
 
 int WappstoRpc::_getNextMsgId(void)
 {
+    char tmp[20];
+    sprintf(tmp, "%X", this);
+    Serial.println(tmp);
     _msgId++;
     return _msgId;
 }

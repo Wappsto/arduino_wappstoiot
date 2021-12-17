@@ -3,10 +3,12 @@
 #define WAPPSTO_PORT 443
 const char* wappsto_server = "collector.wappsto.com";
 
-Wappsto::Wappsto(WiFiClientSecure *client) : _wappstoRpc(client)
+Wappsto::Wappsto(WiFiClientSecure *client)
 {
     _client = client;
     _network = NULL;
+    _wappstoRpc = WappstoRpc::instance();
+    _wappstoRpc->init(_client);
 }
 
 void Wappsto::config(const char* network_id, const char* ca, const char* client_crt, const char* client_key)
@@ -16,6 +18,19 @@ void Wappsto::config(const char* network_id, const char* ca, const char* client_
     _client->setCACert(ca);
     _client->setCertificate(client_crt);
     _client->setPrivateKey(client_key);
+    this->_pingIntervalMinutes = 0;
+    this->_startPingMillis = millis();
+}
+
+void Wappsto::config(const char* network_id, const char* ca, const char* client_crt, const char* client_key, int pingInterval)
+{
+    strcpy(this->uuid, network_id);
+
+    _client->setCACert(ca);
+    _client->setCertificate(client_crt);
+    _client->setPrivateKey(client_key);
+    this->_pingIntervalMinutes = pingInterval;
+    this->_startPingMillis = millis();
 }
 
 bool Wappsto::connect(void)
@@ -37,19 +52,19 @@ bool Wappsto::disconnect(void)
 
 void Wappsto::setLog(bool enabled)
 {
-    _wappstoRpc.setDebug(enabled);
+    _wappstoRpc->setDebug(enabled);
 }
 
 Network *Wappsto::createNetwork(String name, String description)
 {
-    _network = new Network(_wappstoRpc, this->uuid, name, description);
+    _network = new Network(this->uuid, name, description);
     _network->post();
     return _network;
 }
 
 Network *Wappsto::createNetwork(String name)
 {
-    _network = new Network(_wappstoRpc, this->uuid, name, "");
+    _network = new Network(this->uuid, name, "");
     _network->post();
     return _network;
 }
@@ -59,10 +74,16 @@ bool Wappsto::dataAvailable(void)
     char tmpData[1200] = {0,};
     char tmpTimestamp[28] = {0,};
     char tmpUuid[UUID_LENGTH];
+
     if(!_client->available()) {
+        unsigned long currentMillis = millis();
+        if(currentMillis - _startPingMillis >= _pingIntervalMinutes*60*1000) {
+            _startPingMillis = currentMillis;
+            _wappstoRpc->sendPing();
+        }
         return false;
     }
-    RequestType_e req = _wappstoRpc.readData(tmpUuid, tmpData, tmpTimestamp);
+    RequestType_e req = _wappstoRpc->readData(tmpUuid, tmpData, tmpTimestamp);
 
     if(tmpUuid && strlen(tmpUuid) > 0) {
         //Serial.print("UUID: ");

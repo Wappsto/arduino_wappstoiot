@@ -1,8 +1,9 @@
 #include "WappstoIoT.h"
 #include "WappstoRpc.h"
 
-Network::Network(WappstoRpc &wappstoRpc, const char* uuid, String name, String description) : _wappstoRpc(wappstoRpc)
+Network::Network(const char* uuid, String name, String description)
 {
+    _wappstoRpc = WappstoRpc::instance();
     this->name = name;
     strcpy(this->uuid, uuid);
     this->description = description;
@@ -11,7 +12,7 @@ Network::Network(WappstoRpc &wappstoRpc, const char* uuid, String name, String d
 
 void Network::post(void)
 {
-    _wappstoRpc.postNetwork(this->uuid, this->name);
+    _wappstoRpc->postNetwork(this->uuid, this->name);
 }
 
 bool Network::change(void)
@@ -31,9 +32,9 @@ Device* Network::createDevice(String name, DeviceDescription_t *deviceInfo)
         return NULL;
     }
     currentNumberOfDevices++;
-    devices[currentNumberOfDevices-1] = new Device(this, _wappstoRpc, name, deviceInfo);
+    devices[currentNumberOfDevices-1] = new Device(this, name, deviceInfo);
 
-    if(!_wappstoRpc.getDeviceUuidFromName(this, name, devices[currentNumberOfDevices-1]->uuid)) {
+    if(!_wappstoRpc->getDeviceUuidFromName(this, name, devices[currentNumberOfDevices-1]->uuid)) {
             generateNewUuid(devices[currentNumberOfDevices-1]->uuid);
     }
 

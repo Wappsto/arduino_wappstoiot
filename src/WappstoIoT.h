@@ -41,9 +41,9 @@ typedef enum {
 
 typedef struct
 {
-    float min;
-    float max;
-    float step;
+    double min;
+    double max;
+    double step;
     String unit;
     String si_conversion;
 } ValueNumber_t;

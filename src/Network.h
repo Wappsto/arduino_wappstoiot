@@ -9,7 +9,7 @@
 class Network
 {
 public:
-    Network(WappstoRpc &wappstoRpc, const char* uuid, String name, String description);
+    Network(const char* uuid, String name, String description);
 
     void post(void);
 
@@ -29,7 +29,7 @@ public:
     WappstoNetworkDeleteCallback _onDeleteCb;
 
 private:
-    WappstoRpc _wappstoRpc;
+    WappstoRpc *_wappstoRpc;
 
     WappstoCallback _onChangeCb;
 };

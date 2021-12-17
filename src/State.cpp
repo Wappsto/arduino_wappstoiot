@@ -1,8 +1,9 @@
 #include "WappstoIoT.h"
 
 
-State::State(Value *value, WappstoRpc &wappstoRpc, StateType_e stateType, bool forceCreate) : _wappstoRpc(wappstoRpc)
+State::State(Value *value, StateType_e stateType, bool forceCreate)
 {
+    _wappstoRpc = WappstoRpc::instance();
     this->parent = value;
     this->stateType = stateType;
     this->requiresPost = false;
@@ -12,8 +13,8 @@ State::State(Value *value, WappstoRpc &wappstoRpc, StateType_e stateType, bool f
     if(forceCreate) {
         generateNewUuid(this->uuid);
         this->requiresPost = true;
-    } else if(_wappstoRpc.getStateUuidFromName(value, stateType, this->uuid)) {
-        _wappstoRpc.getStateDataTime(this->uuid, this->data, this->timestamp);
+    } else if(_wappstoRpc->getStateUuidFromName(value, stateType, this->uuid)) {
+        _wappstoRpc->getStateDataTime(this->uuid, this->data, this->timestamp);
     } else {
         generateNewUuid(this->uuid);
         this->requiresPost = true;

@@ -1,8 +1,8 @@
 #include "WappstoIoT.h"
 
 
-Value::Value(Device *device, WappstoRpc &wappstoRpc, String name, String type, PERMISSION_e permission, ValueNumber_t *valNumber) :
-    parent(device), _wappstoRpc(wappstoRpc), name(name), permission(permission), valueType(valueType)
+Value::Value(Device *device, String name, String type, PERMISSION_e permission, ValueNumber_t *valNumber) :
+    parent(device), name(name), permission(permission), valueType(valueType)
 {
     _init(type);
     this->valueType = NUMBER_VALUE;
@@ -10,8 +10,8 @@ Value::Value(Device *device, WappstoRpc &wappstoRpc, String name, String type, P
     this->valString = NULL;
 }
 
-Value::Value(Device *device, WappstoRpc &wappstoRpc, String name, String type, PERMISSION_e permission, ValueString_t *valString) :
-    parent(device), _wappstoRpc(wappstoRpc), name(name), permission(permission), valueType(valueType)
+Value::Value(Device *device, String name, String type, PERMISSION_e permission, ValueString_t *valString) :
+    parent(device), name(name), permission(permission), valueType(valueType)
 {
     _init(type);
     this->valueType = STRING_VALUE;
@@ -19,8 +19,8 @@ Value::Value(Device *device, WappstoRpc &wappstoRpc, String name, String type, P
     this->valString = valString;
 }
 
-Value::Value(Device *device, WappstoRpc &wappstoRpc, String name, String type, PERMISSION_e permission, ValueBlob_t *valBlob) :
-    parent(device), _wappstoRpc(wappstoRpc), name(name), permission(permission), valueType(valueType)
+Value::Value(Device *device, String name, String type, PERMISSION_e permission, ValueBlob_t *valBlob) :
+    parent(device), name(name), permission(permission), valueType(valueType)
 {
     _init(type);
     this->valueType = BLOB_VALUE;
@@ -31,6 +31,7 @@ Value::Value(Device *device, WappstoRpc &wappstoRpc, String name, String type, P
 
 void Value::_init(String type)
 {
+    _wappstoRpc = WappstoRpc::instance();
     this->valueCreated = false;
     this->type = type;
     this->reportState = NULL;
@@ -46,17 +47,17 @@ void Value::post(void)
 {
     switch(permission) {
         case READ:
-            reportState = new State(this, _wappstoRpc, TYPE_REPORT, this->valueCreated);
+            reportState = new State(this, TYPE_REPORT, this->valueCreated);
             break;
         case WRITE:
-            controlState = new State(this, _wappstoRpc, TYPE_CONTROL, this->valueCreated);
+            controlState = new State(this, TYPE_CONTROL, this->valueCreated);
             break;
         case READ_WRITE:
-            reportState = new State(this, _wappstoRpc, TYPE_REPORT, this->valueCreated);
-            controlState = new State(this, _wappstoRpc, TYPE_CONTROL, this->valueCreated);
+            reportState = new State(this, TYPE_REPORT, this->valueCreated);
+            controlState = new State(this, TYPE_CONTROL, this->valueCreated);
             break;
     }
-    this->_wappstoRpc.postValue(this);
+    this->_wappstoRpc->postValue(this);
 }
 
 bool Value::change(void)
@@ -68,7 +69,7 @@ bool Value::report(int data)
 {
     this->reportState->timestamp = getUtcTime();
     this->reportState->data = String(data);
-    _wappstoRpc.putState(this->reportState);
+    _wappstoRpc->putState(this->reportState);
     return true;
 }
 
@@ -76,7 +77,7 @@ bool Value::report(double data)
 {
     this->reportState->timestamp = getUtcTime();
     this->reportState->data = String(data);
-    _wappstoRpc.putState(this->reportState);
+    _wappstoRpc->putState(this->reportState);
     return true;
 }
 
@@ -84,7 +85,7 @@ bool Value::report(const String &data)
 {
     this->reportState->timestamp = getUtcTime();
     this->reportState->data = data;
-    _wappstoRpc.putState(this->reportState);
+    _wappstoRpc->putState(this->reportState);
     return true;
 }
 
@@ -92,7 +93,7 @@ bool Value::control(int data)
 {
     this->controlState->timestamp = getUtcTime();
     this->controlState->data = String(data);
-    _wappstoRpc.putState(this->controlState);
+    _wappstoRpc->putState(this->controlState);
     return true;
 }
 
@@ -100,7 +101,7 @@ bool Value::control(double data)
 {
     this->controlState->timestamp = getUtcTime();
     this->controlState->data = String(data);
-    _wappstoRpc.putState(this->controlState);
+    _wappstoRpc->putState(this->controlState);
     return true;
 }
 
@@ -108,7 +109,7 @@ bool Value::control(const String &data)
 {
     this->controlState->timestamp = getUtcTime();
     this->controlState->data = data;
-    _wappstoRpc.putState(this->controlState);
+    _wappstoRpc->putState(this->controlState);
     return true;
 }
 
