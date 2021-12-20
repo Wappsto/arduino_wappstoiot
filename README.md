@@ -6,6 +6,7 @@ The library will ask Wappsto if an device/value exist with that name before crea
 
 Because of this it is adviced not to give identical names to children, example. two devices under the same network, or two values under the same device.
 
+It is also assumes you have created a account on www.wappsto.com, if not please create one first.
 
 ## Initialize Wappsto:
 Wappsto needs a reference to WiFiClientSecure when created, example.
@@ -42,10 +43,19 @@ if(wappsto.connect()) {
 }
 ```
 
-## Enable debug output from Wappsto
-By setting this you can see debug info on the serial port from the library.
+## Optional config parameters, log and ping
+Besides the mandatory commands you can also set ping interval and log level:
 ```
-wappsto.setLog(true);
+wappsto.config(network_uuid, ca, client_crt, client_key, ping interval in minutes, log level);
+```
+* The ping interval will send a short package from the device to wappsto to keep the connection alive. If your device rarely sends data, it might be a good idea to add this to avoid timeout on the connection.
+* The log level can print information from the wappsto library to the serial debug port - the following levels are possible:
+```
+   VERBOSE
+   INFO
+   WARNING
+   ERROR
+   NO_LOGS <- Default
 ```
 
 ## Create your network:
@@ -56,6 +66,7 @@ myNetwork = wappsto.createNetwork("Network Name");
 ## Create a device:
 ```
 DeviceDescription_t myDeviceDescription = {
+    .name = "Device name",
     .product = "Product name",
     .manufacturer = "Company name",
     .description = "Description of the product",
@@ -81,20 +92,38 @@ If the value exist, the data of the value will not change. If you want to value 
 
 ### Create a number value:
 ```
-ValueNumber_t myNumberValueParameters = {.min = 0, .max = 100, .step = 1, .unit = "", .si_conversion = ""};
-myNumberValue = myDevice->createValueNumber("Value Number Name", "value type", READ_WRITE, &myNumberValueParameters);
+ValueNumber_t myNumberValueParameters = {   .name = "Value Number Name",
+                                            .type = "value type",
+                                            .permission = READ_WRITE,
+                                            .min = -20,
+                                            .max = 100,
+                                            .step = 0.1,
+                                            .unit = "°C",
+                                            .si_conversion = ""};
+
+myNumberValue = myDevice->createValueNumber(&myNumberValueParameters);
 ```
 
 ### Create a string value:
 ```
-ValueString_t myStringValueParameters = {.max = 200, .encoding = ""};
+ValueString_t myStringValueParameters = { .name = "Value String Name",
+                                          .type = "value type",
+                                          .permission = READ_WRITE,
+                                          .max = 200,
+                                          .encoding = ""};
+
 myStringValue = myDevice->createValueString("Value String Name", "value type", READ_WRITE, &myStringValueParameters);
 ```
 
 ### Create a blob value:
 ```
-ValueBlob_t myBlobValueParameters = {.max = 200, .encoding = ""};
-myBlobValue = myDevice->createValueBlob("Value Blob Name", "value type", READ_WRITE, &myBlobValueParameters);
+ValueBlob_t myBlobValueParameters =  { .name = "Value Blob Name",
+                                       .type = "value type",
+                                       .permission = READ_WRITE,
+                                       .max = 200,
+                                       .encoding = ""};
+
+myBlobValue = myDevice->createValueBlob(&myBlobValueParameters);
 ```
 
 
