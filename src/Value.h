@@ -7,9 +7,9 @@
 class Value
 {
 public:
-    Value(Device *device, String name, String type, PERMISSION_e permission, ValueNumber_t *valNumber);
-    Value(Device *device, String name, String type, PERMISSION_e permission, ValueString_t *valString);
-    Value(Device *device, String name, String type, PERMISSION_e permission, ValueBlob_t *valBlob);
+    Value(Device *device, ValueNumber_t *valNumber);
+    Value(Device *device, ValueString_t *valString);
+    Value(Device *device, ValueBlob_t *valBlob);
     bool change(void);
     bool report(const String &data);
     bool report(double data);
@@ -54,5 +54,5 @@ public:
 
 private:
     WappstoRpc *_wappstoRpc;
-    void _init(String type);
+    void _init(void);
 };

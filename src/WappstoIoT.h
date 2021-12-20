@@ -23,7 +23,14 @@ typedef enum {
     REQUEST_UNKNOWN,
 } RequestType_e;
 
+typedef enum {
+    READ,
+    WRITE,
+    READ_WRITE,
+} PERMISSION_e;
+
 typedef struct {
+    String name;
     String product;
     String manufacturer;
     String description;
@@ -41,6 +48,9 @@ typedef enum {
 
 typedef struct
 {
+    String name;
+    String type;
+    PERMISSION_e permission;
     double min;
     double max;
     double step;
@@ -50,21 +60,21 @@ typedef struct
 
 typedef struct
 {
+    String name;
+    String type;
+    PERMISSION_e permission;
     int max;
     String encoding;
 } ValueString_t;
 
 typedef struct
 {
+    String name;
+    String type;
+    PERMISSION_e permission;
     int max;
     String encoding;
 } ValueBlob_t;
-
-typedef enum {
-    READ,
-    WRITE,
-    READ_WRITE,
-} PERMISSION_e;
 
 class Network;
 class Device;
@@ -78,6 +88,7 @@ typedef void (*WappstoValueRefreshCallback)(Value *value);
 typedef void (*WappstoValueControlStringCallback)(Value *value, String data, String timestamp);
 typedef void (*WappstoValueControlNumberCallback)(Value *value, double data, String timestamp);
 
+#include "WappstoLog.h"
 #include "Wappsto.h"
 #include "Network.h"
 #include "Device.h"

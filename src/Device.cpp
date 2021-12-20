@@ -2,11 +2,11 @@
 
 
 
-Device::Device(Network *network, String name, DeviceDescription_t *deviceInfo)
+Device::Device(Network *network, DeviceDescription_t *deviceInfo)
 {
     _wappstoRpc = WappstoRpc::instance();
     this->parent = network;
-    this->name = name;
+    this->name = deviceInfo->name;
     this->deviceInfo.product = deviceInfo->product;
     this->deviceInfo.manufacturer = deviceInfo->manufacturer;
     this->deviceInfo.description = deviceInfo->description;
@@ -36,16 +36,16 @@ bool Device::deleteReq(void)
     return false;
 }
 
-Value* Device::createValueNumber(String name, String type, PERMISSION_e permission, ValueNumber_t *valNumber)
+Value* Device::createValueNumber(ValueNumber_t *valNumber)
 {
     if(currentNumberOfValues >= MAX_VALUES) {
         Serial.println("Cannot create more values");
         return NULL;
     }
     currentNumberOfValues++;
-    values[currentNumberOfValues-1] = new Value(this, name, type, permission, valNumber);
+    values[currentNumberOfValues-1] = new Value(this, valNumber);
 
-    if(!_wappstoRpc->getValueUuidFromName(this, name, values[currentNumberOfValues-1]->uuid)) {
+    if(!_wappstoRpc->getValueUuidFromName(this, valNumber->name, values[currentNumberOfValues-1]->uuid)) {
         generateNewUuid(values[currentNumberOfValues-1]->uuid);
         values[currentNumberOfValues-1]->valueCreated = true;
     }
@@ -54,33 +54,31 @@ Value* Device::createValueNumber(String name, String type, PERMISSION_e permissi
     return values[currentNumberOfValues-1];
 }
 
-Value* Device::createValueString(String name, String type, PERMISSION_e permission, ValueString_t *valString)
+Value* Device::createValueString(ValueString_t *valString)
 {
     if(currentNumberOfValues >= MAX_VALUES) {
         Serial.println("Cannot create more values");
         return NULL;
     }
     currentNumberOfValues++;
-    values[currentNumberOfValues-1] = new Value(this, name, type, permission, valString);
-
-    if(!_wappstoRpc->getValueUuidFromName(this, name, values[currentNumberOfValues-1]->uuid)) {
+    values[currentNumberOfValues-1] = new Value(this, valString);
+    if(!_wappstoRpc->getValueUuidFromName(this, valString->name, values[currentNumberOfValues-1]->uuid)) {
         generateNewUuid(values[currentNumberOfValues-1]->uuid);
     }
-
     values[currentNumberOfValues-1]->post();
     return values[currentNumberOfValues-1];
 }
 
-Value* Device::createValueBlob(String name, String type, PERMISSION_e permission, ValueBlob_t *valBlob)
+Value* Device::createValueBlob(ValueBlob_t *valBlob)
 {
     if(currentNumberOfValues >= MAX_VALUES) {
         Serial.println("Cannot create more values");
         return NULL;
     }
     currentNumberOfValues++;
-    values[currentNumberOfValues-1] = new Value(this, name, type, permission, valBlob);
+    values[currentNumberOfValues-1] = new Value(this, valBlob);
 
-    if(!_wappstoRpc->getValueUuidFromName(this, name, values[currentNumberOfValues-1]->uuid)) {
+    if(!_wappstoRpc->getValueUuidFromName(this, valBlob->name, values[currentNumberOfValues-1]->uuid)) {
         generateNewUuid(values[currentNumberOfValues-1]->uuid);
     }
 

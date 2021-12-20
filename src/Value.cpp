@@ -1,39 +1,44 @@
 #include "WappstoIoT.h"
 
 
-Value::Value(Device *device, String name, String type, PERMISSION_e permission, ValueNumber_t *valNumber) :
-    parent(device), name(name), permission(permission), valueType(valueType)
+Value::Value(Device *device, ValueNumber_t *valNumber) : parent(device)
 {
-    _init(type);
+    _init();
+    this->name = valNumber->name;
+    this->type = valNumber->type;
+    this->permission = valNumber->permission;
     this->valueType = NUMBER_VALUE;
     this->valNumber = valNumber;
     this->valString = NULL;
 }
 
-Value::Value(Device *device, String name, String type, PERMISSION_e permission, ValueString_t *valString) :
-    parent(device), name(name), permission(permission), valueType(valueType)
+Value::Value(Device *device, ValueString_t *valString) : parent(device)
 {
-    _init(type);
+    _init();
+    this->name = valString->name;
+    this->type = valString->type;
+    this->permission = valString->permission;
     this->valueType = STRING_VALUE;
     this->valNumber = NULL;
     this->valString = valString;
 }
 
-Value::Value(Device *device, String name, String type, PERMISSION_e permission, ValueBlob_t *valBlob) :
-    parent(device), name(name), permission(permission), valueType(valueType)
+Value::Value(Device *device, ValueBlob_t *valBlob) : parent(device)
 {
-    _init(type);
+    _init();
+    this->name = valBlob->name;
+    this->type = valBlob->type;
+    this->permission = valBlob->permission;
     this->valueType = BLOB_VALUE;
     this->valNumber = NULL;
     this->valString = NULL;
     this->valBlob = valBlob;
 }
 
-void Value::_init(String type)
+void Value::_init(void)
 {
     _wappstoRpc = WappstoRpc::instance();
     this->valueCreated = false;
-    this->type = type;
     this->reportState = NULL;
     this->controlState = NULL;
     this->_onControlStringCb = NULL;

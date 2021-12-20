@@ -39,6 +39,7 @@ Device *myDevice;
 Value *myTemperatureValue;
 
 DeviceDescription_t myDeviceDescription = {
+    .name = "My Device",
     .product = "WIO Terminal example",
     .manufacturer = "",
     .description = "Examle device",
@@ -47,7 +48,14 @@ DeviceDescription_t myDeviceDescription = {
     .protocol = "Json-RPC",
     .communication = "WiFi",
 };
-ValueNumber_t myTemperatureParameters = {.min = -20, .max = 100, .step = 0.1, .unit = "°C", .si_conversion = ""};
+ValueNumber_t myTemperatureParameters = {   .name = "Temperature",
+                                            .type = "temperature",
+                                            .permission = READ,
+                                            .min = -20,
+                                            .max = 100,
+                                            .step = 0.1,
+                                            .unit = "°C",
+                                            .si_conversion = ""};
 
 double myTemperatureReading = 21.3;
 
@@ -83,13 +91,13 @@ void setup() {
     }
 
     // Create network
-    myNetwork = wappsto.createNetwork("Basic Example");
+    myNetwork = wappsto.createNetwork("Wio Example");
 
     // Create device
-    myDevice = myNetwork->createDevice("My Device", &myDeviceDescription);
+    myDevice = myNetwork->createDevice(&myDeviceDescription);
 
     // Create temperature value
-    myTemperatureValue = myDevice->createValueNumber("Temperature", "temperature", READ, &myTemperatureParameters);
+    myTemperatureValue = myDevice->createValueNumber(&myTemperatureParameters);
     myTemperatureValue->onRefresh(&refreshTemperatureCallback);
 }
 

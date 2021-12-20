@@ -25,16 +25,16 @@ bool Network::deleteReq(void)
     return false;
 }
 
-Device* Network::createDevice(String name, DeviceDescription_t *deviceInfo)
+Device* Network::createDevice(DeviceDescription_t *deviceInfo)
 {
     if(currentNumberOfDevices >= MAX_DEVICES) {
         Serial.println("Cannot create more devices");
         return NULL;
     }
     currentNumberOfDevices++;
-    devices[currentNumberOfDevices-1] = new Device(this, name, deviceInfo);
+    devices[currentNumberOfDevices-1] = new Device(this, deviceInfo);
 
-    if(!_wappstoRpc->getDeviceUuidFromName(this, name, devices[currentNumberOfDevices-1]->uuid)) {
+    if(!_wappstoRpc->getDeviceUuidFromName(this, deviceInfo->name, devices[currentNumberOfDevices-1]->uuid)) {
             generateNewUuid(devices[currentNumberOfDevices-1]->uuid);
     }
 

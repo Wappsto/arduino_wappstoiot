@@ -46,6 +46,7 @@ Value *displayStrValue;
 Value *buttonValue;
 
 DeviceDescription_t myDeviceDescription = {
+    .name = "My Demo Device",
     .product = "WIO Terminal example",
     .manufacturer = "",
     .description = "Examle device",
@@ -54,9 +55,24 @@ DeviceDescription_t myDeviceDescription = {
     .protocol = "Json-RPC",
     .communication = "WiFi",
 };
-ValueNumber_t myNumberValueParameters = {.min = 100, .max = 4000, .step = 1, .unit = "", .si_conversion = ""};
-ValueString_t displayStrValueParameters = {.max = 200, .encoding = ""};
-ValueString_t buttonStringParameters = {.max = 6, .encoding = ""};
+ValueNumber_t myNumberValueParameters = {   .name = "Beep number",
+                                            .type = "audio number",
+                                            .permission = READ_WRITE,
+                                            .min = 100,
+                                            .max = 4000,
+                                            .step = 1,
+                                            .unit = "",
+                                            .si_conversion = ""};
+ValueString_t displayStrValueParameters = { .name = "Display Sting",
+                                            .type = "string",
+                                            .permission = READ_WRITE,
+                                            .max = 200,
+                                            .encoding = ""};
+ValueString_t buttonStringParameters = {    .name = "Button direction",
+                                            .type = "string",
+                                            .pemission = READ,
+                                            .max = 6,
+                                            .encoding = ""};
 
 
 void controlNumberCallback(Value *value, double data, String timestamp)
@@ -170,20 +186,20 @@ void setup()
     myNetwork = wappsto.createNetwork("Demo");
 
     // Create device
-    myDevice = myNetwork->createDevice("My Demo Device", &myDeviceDescription);
+    myDevice = myNetwork->createDevice(&myDeviceDescription);
 
     // Create r/w number to play tone
-    myNumberValue = myDevice->createValueNumber("Beep number", "audio number", READ_WRITE, &myNumberValueParameters);
+    myNumberValue = myDevice->createValueNumber(&myNumberValueParameters);
     myNumberValue->onControl(&controlNumberCallback);
     myNumberValue->onRefresh(&refreshNumberCallback);
 
     // Create r/w value for display string
-    displayStrValue = myDevice->createValueString("Display Sting", "string", READ_WRITE, &displayStrValueParameters);
+    displayStrValue = myDevice->createValueString(&displayStrValueParameters);
     displayStrValue->onControl(&controlStringCallback);
     displayStrValue->onRefresh(&refreshStringCallback);
 
     // Create r value for button output
-    buttonValue = myDevice->createValueString("Button direction", "string", READ, &buttonStringParameters);
+    buttonValue = myDevice->createValueString(&buttonStringParameters);
     buttonValue->onRefresh(&buttonRefresh);
 
     // Screen update
