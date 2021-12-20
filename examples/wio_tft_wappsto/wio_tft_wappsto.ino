@@ -70,7 +70,7 @@ ValueString_t displayStrValueParameters = { .name = "Display Sting",
                                             .encoding = ""};
 ValueString_t buttonStringParameters = {    .name = "Button direction",
                                             .type = "string",
-                                            .pemission = READ,
+                                            .permission = READ,
                                             .max = 6,
                                             .encoding = ""};
 
@@ -183,7 +183,7 @@ void setup()
     }
 
     // Create network
-    myNetwork = wappsto.createNetwork("Demo");
+    myNetwork = wappsto.createNetwork("Wio TFT Wappsto");
 
     // Create device
     myDevice = myNetwork->createDevice(&myDeviceDescription);

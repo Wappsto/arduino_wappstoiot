@@ -343,7 +343,7 @@ bool WappstoRpc::postValue(Value *value)
             report["type"] = "Report";
             report["timestamp"] = getUtcTime();
             if(value->valueType == NUMBER_VALUE) {
-                report["data"] = "NA";
+                report["data"] = "";
             } else {
                 report["data"] = "";
             }
@@ -360,7 +360,7 @@ bool WappstoRpc::postValue(Value *value)
             control["type"] = "Control";
             control["timestamp"] = getUtcTime();
             if(value->valueType == NUMBER_VALUE) {
-                control["data"] = "NA";
+                control["data"] = "";
             } else {
                 control["data"] = "";
             }

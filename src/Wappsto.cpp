@@ -75,7 +75,7 @@ bool Wappsto::dataAvailable(void)
 
     if(!_client->available()) {
         unsigned long currentMillis = millis();
-        if(_pingIntervalMinutes > 0 && (currentMillis - _startPingMillis >= _pingIntervalMinutes*60*1000)) {
+        if(_pingIntervalMinutes != 0 && (currentMillis - _startPingMillis >= _pingIntervalMinutes*60*1000)) {
             _startPingMillis = currentMillis;
             _wappstoRpc->sendPing();
         }
