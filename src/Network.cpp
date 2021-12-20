@@ -4,6 +4,7 @@
 Network::Network(const char* uuid, String name, String description)
 {
     _wappstoRpc = WappstoRpc::instance();
+    _wappstoLog = WappstoLog::instance();
     this->name = name;
     strcpy(this->uuid, uuid);
     this->description = description;
@@ -28,7 +29,7 @@ bool Network::deleteReq(void)
 Device* Network::createDevice(DeviceDescription_t *deviceInfo)
 {
     if(currentNumberOfDevices >= MAX_DEVICES) {
-        Serial.println("Cannot create more devices");
+        _wappstoLog->error("Cannot create more devices");
         return NULL;
     }
     currentNumberOfDevices++;

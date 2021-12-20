@@ -13,11 +13,10 @@ public:
     Network* createNetwork(String name);
     Network* createNetwork(String name, String description);
     void config(const char* network_id, const char* ca, const char* client_crt, const char* client_key);
-    void config(const char* network_id, const char* ca, const char* client_crt, const char* client_key, int pingInterval);
+    void config(const char* network_id, const char* ca, const char* client_crt, const char* client_key, int pingInterval, LOG_LEVELS_e logLevel);
     bool connect(void);
     bool disconnect(void);
     bool dataAvailable();
-    void setLog(bool enabled);
 
     char uuid[UUID_LENGTH];
     Network *network;
@@ -25,6 +24,7 @@ public:
 
 private:
     WappstoRpc *_wappstoRpc;
+    WappstoLog *_wappstoLog;
     WiFiClientSecure *_client;
     Network *_network;
     int _pingIntervalMinutes;

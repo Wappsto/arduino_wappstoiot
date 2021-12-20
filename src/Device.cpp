@@ -5,6 +5,7 @@
 Device::Device(Network *network, DeviceDescription_t *deviceInfo)
 {
     _wappstoRpc = WappstoRpc::instance();
+    _wappstoLog = WappstoLog::instance();
     this->parent = network;
     this->name = deviceInfo->name;
     this->deviceInfo.product = deviceInfo->product;
@@ -39,7 +40,7 @@ bool Device::deleteReq(void)
 Value* Device::createValueNumber(ValueNumber_t *valNumber)
 {
     if(currentNumberOfValues >= MAX_VALUES) {
-        Serial.println("Cannot create more values");
+        _wappstoLog->error("Cannot create more values");
         return NULL;
     }
     currentNumberOfValues++;
@@ -57,7 +58,7 @@ Value* Device::createValueNumber(ValueNumber_t *valNumber)
 Value* Device::createValueString(ValueString_t *valString)
 {
     if(currentNumberOfValues >= MAX_VALUES) {
-        Serial.println("Cannot create more values");
+        _wappstoLog->error("Cannot create more values");
         return NULL;
     }
     currentNumberOfValues++;
@@ -72,7 +73,7 @@ Value* Device::createValueString(ValueString_t *valString)
 Value* Device::createValueBlob(ValueBlob_t *valBlob)
 {
     if(currentNumberOfValues >= MAX_VALUES) {
-        Serial.println("Cannot create more values");
+        _wappstoLog->error("Cannot create more values");
         return NULL;
     }
     currentNumberOfValues++;

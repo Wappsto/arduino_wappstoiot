@@ -15,7 +15,6 @@ class WappstoRpc
     public:
         static WappstoRpc* instance();
         void init(WiFiClientSecure *client);
-        void setDebug(bool jsonDebug);
         bool postNetwork(const char *networkId, String &networkName);
         bool postDevice(Device *device);
         bool postValue(Value *value);
@@ -36,9 +35,10 @@ class WappstoRpc
         WappstoRpc(const WappstoRpc&) = delete;
         WappstoRpc& operator=(const WappstoRpc&) = delete;
 
+        WappstoLog *_wappstoLog;
+        WiFiClientSecure *_client;
         int _msgId;
         int _getNextMsgId(void);
-        WiFiClientSecure *_client;
         bool _jsonDebug;
         uint8_t readBuffer[JSON_STATIC_BUFFER_SIZE];
         uint8_t rspBuffer[JSON_STATIC_BUFFER_SIZE];

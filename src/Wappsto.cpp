@@ -7,6 +7,7 @@ Wappsto::Wappsto(WiFiClientSecure *client)
 {
     _client = client;
     _network = NULL;
+    _wappstoLog = WappstoLog::instance();
     _wappstoRpc = WappstoRpc::instance();
     _wappstoRpc->init(_client);
 }
@@ -19,10 +20,11 @@ void Wappsto::config(const char* network_id, const char* ca, const char* client_
     _client->setCertificate(client_crt);
     _client->setPrivateKey(client_key);
     this->_pingIntervalMinutes = 0;
-    this->_startPingMillis = millis();
+    this->_startPingMillis = 0;
+    this->_wappstoLog->setLogLevel(NO_LOGS);
 }
 
-void Wappsto::config(const char* network_id, const char* ca, const char* client_crt, const char* client_key, int pingInterval)
+void Wappsto::config(const char* network_id, const char* ca, const char* client_crt, const char* client_key, int pingInterval, LOG_LEVELS_e logLevel)
 {
     strcpy(this->uuid, network_id);
 
@@ -31,6 +33,7 @@ void Wappsto::config(const char* network_id, const char* ca, const char* client_
     _client->setPrivateKey(client_key);
     this->_pingIntervalMinutes = pingInterval;
     this->_startPingMillis = millis();
+    this->_wappstoLog->setLogLevel(logLevel);
 }
 
 bool Wappsto::connect(void)
@@ -48,11 +51,6 @@ bool Wappsto::disconnect(void)
         return true;
     }
     return false;
-}
-
-void Wappsto::setLog(bool enabled)
-{
-    _wappstoRpc->setDebug(enabled);
 }
 
 Network *Wappsto::createNetwork(String name, String description)
@@ -77,7 +75,7 @@ bool Wappsto::dataAvailable(void)
 
     if(!_client->available()) {
         unsigned long currentMillis = millis();
-        if(currentMillis - _startPingMillis >= _pingIntervalMinutes*60*1000) {
+        if(_pingIntervalMinutes > 0 && (currentMillis - _startPingMillis >= _pingIntervalMinutes*60*1000)) {
             _startPingMillis = currentMillis;
             _wappstoRpc->sendPing();
         }
@@ -89,7 +87,7 @@ bool Wappsto::dataAvailable(void)
         //Serial.print("UUID: ");
         //Serial.print(tmpUuid);
     } else {
-        Serial.println("Invalid or no uuid");
+        _wappstoLog->warning("Invalid or no uuid");
         return false;
     }
 
@@ -98,10 +96,10 @@ bool Wappsto::dataAvailable(void)
             this->_network->_onDeleteCb(this->_network);
             return true;
         }
-        Serial.println("Delete not handled yet");
+        _wappstoLog->warning("Delete not handled yet");
         return false;
     } else if(req == REQUEST_UNKNOWN) {
-        Serial.println("Unknown request - not handled");
+        _wappstoLog->warning("Unknown request - not handled");
         return false;
     }
 
@@ -111,7 +109,7 @@ bool Wappsto::dataAvailable(void)
             continue;
         }
         if(strcmp(_network->devices[devs]->uuid, tmpUuid) == 0) {
-            Serial.println("Found device requested UUID - not handled");
+            _wappstoLog->warning("Found device requested UUID - not handled");
         }
         for(int vals=0; vals < _network->devices[devs]->currentNumberOfValues; vals++) {
             if(_network->devices[devs]->values[vals] == NULL) {

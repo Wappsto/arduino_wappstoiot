@@ -28,6 +28,7 @@ public:
 
 private:
     WappstoRpc *_wappstoRpc;
+    WappstoLog *_wappstoLog;
     WappstoCallback _onChangeCb;
     WappstoCallback _onDeleteCb;
 };
