@@ -1,5 +1,7 @@
 # arduino_wappstoiot
 
+_This is an early version of the library, so the interface may still change at certain points. We will try to keep the changes to a minimum, if possible._
+
 A general rule that you should be aware of, is that that "name" for device and value object have extra functionality.
 
 The library will ask Wappsto if an device/value exist with that name before creating it, so it will link to the right value. If nothing have this name a new will be created. If a parent have multiple children with the same name the library will choose the first available.
@@ -7,6 +9,8 @@ The library will ask Wappsto if an device/value exist with that name before crea
 Because of this it is adviced not to give identical names to children, example. two devices under the same network, or two values under the same device.
 
 It is also assumes you have created a account on www.wappsto.com, if not please create one first.
+
+To install this library in Arduino Ide, download this project as a zip-file, and then choose "Sketch"->"Include Library"->"Add .Zip Library..."
 
 ## Initialize Wappsto:
 Wappsto needs a reference to WiFiClientSecure when created, example.
