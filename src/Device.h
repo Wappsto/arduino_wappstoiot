@@ -9,12 +9,9 @@ class Device
 {
 public:
     Device(Network *network, DeviceDescription_t *deviceInfo);
-    bool change(void);
-    bool deleteReq(void);
     Value* createValueNumber(ValueNumber_t *valNumber);
     Value* createValueString(ValueString_t *valString);
     Value* createValueBlob(ValueBlob_t *valBlob);
-    void onChange(WappstoCallback cb);
     void onDelete(WappstoCallback cb);
     void post(void);
 
@@ -29,6 +26,5 @@ public:
 private:
     WappstoRpc *_wappstoRpc;
     WappstoLog *_wappstoLog;
-    WappstoCallback _onChangeCb;
     WappstoCallback _onDeleteCb;
 };

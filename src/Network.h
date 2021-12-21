@@ -6,19 +6,16 @@
 #include "WappstoIoT.h"
 #include "WappstoRpc.h"
 
+
 class Network
 {
 public:
     Network(const char* uuid, String name, String description);
 
     void post(void);
-
-    bool change(void);
-    bool deleteReq(void);
     Device* createDevice(DeviceDescription_t *deviceInfo);
-
-    void onChange(WappstoCallback cb);
     void onDelete(WappstoNetworkDeleteCallback cb);
+    WappstoNetworkDeleteCallback _onDeleteCb;
 
     char uuid[UUID_LENGTH];
     String name;
@@ -26,10 +23,7 @@ public:
     int currentNumberOfDevices;
     Device* devices[MAX_DEVICES];
 
-    WappstoNetworkDeleteCallback _onDeleteCb;
-
 private:
     WappstoRpc *_wappstoRpc;
     WappstoLog *_wappstoLog;
-    WappstoCallback _onChangeCb;
 };

@@ -10,7 +10,6 @@ public:
     Value(Device *device, ValueNumber_t *valNumber);
     Value(Device *device, ValueString_t *valString);
     Value(Device *device, ValueBlob_t *valBlob);
-    bool change(void);
     bool report(const String &data);
     bool report(double data);
     bool report(int data);
@@ -18,10 +17,8 @@ public:
     bool control(double data);
     bool control(int data);
     bool request(String &data);
-    bool deleteReq(void);
     void onControl(WappstoValueControlStringCallback cb);
     void onControl(WappstoValueControlNumberCallback cb);
-    void onChange(WappstoCallback cb);
     void onRefresh(WappstoValueRefreshCallback cb);
     void onDelete(WappstoCallback cb);
     void post(void);
@@ -41,7 +38,6 @@ public:
     State* controlState;
     WappstoValueControlStringCallback _onControlStringCb;
     WappstoValueControlNumberCallback _onControlNumberCb;
-    WappstoCallback _onChangeCb;
     WappstoValueRefreshCallback _onRefreshCb;
     WappstoCallback _onDeleteCb;
 
@@ -51,6 +47,7 @@ public:
     String getReportData(void);
     double getReportNumberData(void);
     String getReportTimestamp(void);
+
 
 private:
     WappstoRpc *_wappstoRpc;

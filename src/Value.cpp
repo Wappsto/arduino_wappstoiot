@@ -43,7 +43,6 @@ void Value::_init(void)
     this->controlState = NULL;
     this->_onControlStringCb = NULL;
     this->_onControlNumberCb = NULL;
-    this->_onChangeCb = NULL;
     this->_onRefreshCb = NULL;
     this->_onDeleteCb = NULL;
 }
@@ -63,11 +62,6 @@ void Value::post(void)
             break;
     }
     this->_wappstoRpc->postValue(this);
-}
-
-bool Value::change(void)
-{
-    return false;
 }
 
 bool Value::report(int data)
@@ -116,11 +110,6 @@ bool Value::control(const String &data)
     this->controlState->data = data;
     _wappstoRpc->putState(this->controlState);
     return true;
-}
-
-bool Value::deleteReq(void)
-{
-    return false;
 }
 
 String Value::getControlData(void)
@@ -185,11 +174,6 @@ void Value::onControl(WappstoValueControlStringCallback cb)
 void Value::onControl(WappstoValueControlNumberCallback cb)
 {
     this->_onControlNumberCb = cb;
-}
-
-void Value::onChange(WappstoCallback cb)
-{
-    this->_onChangeCb = cb;
 }
 
 void Value::onRefresh(WappstoValueRefreshCallback cb)

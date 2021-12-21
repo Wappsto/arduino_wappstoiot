@@ -10,10 +10,6 @@ public:
     State(Value *value, StateType_e stateType, bool forceCreate);
     void control(String data);
     void report(String data);
-    void deleteReq(void);
-
-    void onChange(WappstoCallback cb);
-    void onDelete(WappstoCallback cb);
 
     Value *parent;
     StateType_e stateType;
@@ -24,7 +20,5 @@ public:
 
 private:
     WappstoRpc *_wappstoRpc;
-    WappstoCallback _onChangeCb;
-    WappstoCallback _onDeleteCb;
 };
 

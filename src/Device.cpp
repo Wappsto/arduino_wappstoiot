@@ -16,7 +16,6 @@ Device::Device(Network *network, DeviceDescription_t *deviceInfo)
     this->deviceInfo.version = deviceInfo->version;
     this->deviceInfo.serial = deviceInfo->serial;
 
-    this->_onChangeCb = NULL;
     this->_onDeleteCb = NULL;
 
     currentNumberOfValues = 0;
@@ -25,16 +24,6 @@ Device::Device(Network *network, DeviceDescription_t *deviceInfo)
 void Device::post(void)
 {
     this->_wappstoRpc->postDevice(this);
-}
-
-bool Device::change(void)
-{
-    return false;
-}
-
-bool Device::deleteReq(void)
-{
-    return false;
 }
 
 Value* Device::createValueNumber(ValueNumber_t *valNumber)
@@ -85,11 +74,6 @@ Value* Device::createValueBlob(ValueBlob_t *valBlob)
 
     values[currentNumberOfValues-1]->post();
     return values[currentNumberOfValues-1];
-}
-
-void Device::onChange(WappstoCallback cb)
-{
-    this->_onChangeCb = cb;
 }
 
 void Device::onDelete(WappstoCallback cb)

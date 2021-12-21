@@ -16,16 +16,6 @@ void Network::post(void)
     _wappstoRpc->postNetwork(this->uuid, this->name);
 }
 
-bool Network::change(void)
-{
-    return false;
-}
-
-bool Network::deleteReq(void)
-{
-    return false;
-}
-
 Device* Network::createDevice(DeviceDescription_t *deviceInfo)
 {
     if(currentNumberOfDevices >= MAX_DEVICES) {
@@ -41,11 +31,6 @@ Device* Network::createDevice(DeviceDescription_t *deviceInfo)
 
     devices[currentNumberOfDevices-1]->post();
     return devices[currentNumberOfDevices-1];
-}
-
-void Network::onChange(WappstoCallback cb)
-{
-    this->_onChangeCb = cb;
 }
 
 void Network::onDelete(WappstoNetworkDeleteCallback cb)

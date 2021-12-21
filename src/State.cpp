@@ -19,21 +19,4 @@ State::State(Value *value, StateType_e stateType, bool forceCreate)
         generateNewUuid(this->uuid);
         this->requiresPost = true;
     }
-    this->_onChangeCb = NULL;
-    this->_onDeleteCb = NULL;
-}
-
-void State::control(String data)
-{
-
-}
-
-void State::report(String data)
-{
-
-}
-
-void State::deleteReq(void)
-{
-
 }

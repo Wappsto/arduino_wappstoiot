@@ -10,6 +10,11 @@
 void generateNewUuid(char* str);
 const char* getUtcTime(void);
 
+class Network;
+class Device;
+class Value;
+class State;
+
 typedef enum {
     TYPE_REPORT,
     TYPE_CONTROL,
@@ -75,11 +80,6 @@ typedef struct
     int max;
     String encoding;
 } ValueBlob_t;
-
-class Network;
-class Device;
-class Value;
-class State;
 
 typedef void (*WappstoCallback)(void *object);
 
