@@ -165,6 +165,13 @@ myBlobValue.control("A5FF2C");
 
 ```
 
+## Add wappsto in your loop function
+For Wappsto to be able to receive data (control, refresh, and pings), it has to be included in your Arduino loop function - if not you will never receive any callbacks with data, and the connection may experience a timeout.
+It is also recommended not to block the loop for extended periods of time.
+...
+wappsto.dataAvailable();
+...
+
 ## Receive a value control request:
 You can choose if you want the control data translated to a double, or if you want the string directly.
 
