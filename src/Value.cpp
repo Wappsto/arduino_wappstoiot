@@ -66,50 +66,68 @@ void Value::post(void)
 
 bool Value::report(int data)
 {
-    this->reportState->timestamp = getUtcTime();
-    this->reportState->data = String(data);
-    _wappstoRpc->putState(this->reportState);
-    return true;
+    if(this->reportState) {
+        this->reportState->timestamp = getUtcTime();
+        this->reportState->data = String(data);
+        _wappstoRpc->putState(this->reportState);
+        return true;
+    }
+    return false;
 }
 
 bool Value::report(double data)
 {
-    this->reportState->timestamp = getUtcTime();
-    this->reportState->data = String(data);
-    _wappstoRpc->putState(this->reportState);
-    return true;
+    if(this->reportState) {
+        this->reportState->timestamp = getUtcTime();
+        this->reportState->data = String(data);
+        _wappstoRpc->putState(this->reportState);
+        return true;
+    }
+    return false;
 }
 
 bool Value::report(const String &data)
 {
-    this->reportState->timestamp = getUtcTime();
-    this->reportState->data = data;
-    _wappstoRpc->putState(this->reportState);
-    return true;
+    if(this->reportState) {
+        this->reportState->timestamp = getUtcTime();
+        this->reportState->data = data;
+        _wappstoRpc->putState(this->reportState);
+        return true;
+    }
+    return false;
 }
 
 bool Value::control(int data)
 {
-    this->controlState->timestamp = getUtcTime();
-    this->controlState->data = String(data);
-    _wappstoRpc->putState(this->controlState);
-    return true;
+    if(this->controlState) {
+        this->controlState->timestamp = getUtcTime();
+        this->controlState->data = String(data);
+        _wappstoRpc->putState(this->controlState);
+        return true;
+    }
+    return false;
 }
 
 bool Value::control(double data)
 {
-    this->controlState->timestamp = getUtcTime();
-    this->controlState->data = String(data);
-    _wappstoRpc->putState(this->controlState);
-    return true;
+    if(this->controlState) {
+        this->controlState->timestamp = getUtcTime();
+        this->controlState->data = String(data);
+        _wappstoRpc->putState(this->controlState);
+        return true;
+    }
+    return false;
 }
 
 bool Value::control(const String &data)
 {
-    this->controlState->timestamp = getUtcTime();
-    this->controlState->data = data;
-    _wappstoRpc->putState(this->controlState);
-    return true;
+    if(this->controlState) {
+        this->controlState->timestamp = getUtcTime();
+        this->controlState->data = data;
+        _wappstoRpc->putState(this->controlState);
+        return true;
+    }
+    return false;
 }
 
 String Value::getControlData(void)
