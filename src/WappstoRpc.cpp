@@ -211,10 +211,6 @@ void WappstoRpc::_sendSuccessResponse(const char *id)
     root["result"] = true;
 
     serializeJson(root, _jsonTxBufferChar);
-    if(_wappstoLog->shouldPrintLevel(VERBOSE)) {
-        serializeJsonPretty(root, Serial);
-        _wappstoLog->verbose("");
-    }
     _client->print(_jsonTxBufferChar);
 }
 
@@ -237,10 +233,7 @@ bool WappstoRpc::postNetwork(const char *networkId, String &networkName)
     meta["version"] = "2.0";
 
     serializeJson(root, _jsonTxBufferChar);
-    if(_wappstoLog->shouldPrintLevel(VERBOSE)) {
-        serializeJsonPretty(root, Serial);
-        _wappstoLog->verbose("");
-    }
+    _wappstoLog->verbose(root);
     _client->print(_jsonTxBufferChar);
 
     return(_awaitResponse());
@@ -275,10 +268,7 @@ bool WappstoRpc::postDevice(Device *device)
     data["communication"] = device->deviceInfo.communication;
 
     serializeJson(root, _jsonTxBufferChar);
-    if(_wappstoLog->shouldPrintLevel(VERBOSE)) {
-        serializeJsonPretty(root, Serial);
-        _wappstoLog->verbose("");
-    }
+    _wappstoLog->verbose(root);
     _client->print(_jsonTxBufferChar);
 
     return(_awaitResponse());
@@ -368,10 +358,7 @@ bool WappstoRpc::postValue(Value *value)
     }
 
     serializeJson(root, _jsonTxBufferChar);
-    if(_wappstoLog->shouldPrintLevel(VERBOSE)) {
-        serializeJsonPretty(root, Serial);
-        _wappstoLog->verbose("");
-    }
+    _wappstoLog->verbose(root);
     _client->print(_jsonTxBufferChar);
 
     return(_awaitResponse());
@@ -392,10 +379,7 @@ bool WappstoRpc::deleteValue(const char* networkId, const char* deviceId, int va
     params["url"] = url;
 
     serializeJson(root, _jsonTxBufferChar);
-    if(_wappstoLog->shouldPrintLevel(VERBOSE)) {
-        serializeJsonPretty(root, Serial);
-        _wappstoLog->verbose("");
-    }
+    _wappstoLog->verbose(root);
     _client->print(_jsonTxBufferChar);
 
     return(_awaitResponse());
@@ -428,10 +412,7 @@ bool WappstoRpc::putValue(Value *value)
     data["type"] = "Report";
 
     serializeJson(root, _jsonTxBufferChar);
-    if(_wappstoLog->shouldPrintLevel(VERBOSE)) {
-        serializeJsonPretty(root, Serial);
-        Serial.println("");
-    }
+    _wappstoLog->verbose(root);
     _client->print(_jsonTxBufferChar);
 
     return(_awaitResponse());
@@ -458,10 +439,7 @@ bool WappstoRpc::sendPing(void)
     JsonObject params = root.createNestedObject("params");
     params["url"] = "/services/2.0/network";
     serializeJson(root, _jsonTxBufferChar);
-    if(_wappstoLog->shouldPrintLevel(VERBOSE)) {
-        serializeJsonPretty(root, Serial);
-        _wappstoLog->verbose("");
-    }
+    _wappstoLog->verbose(root);
     _client->print(_jsonTxBufferChar);
     return(_awaitResponse());
 }
@@ -506,10 +484,7 @@ bool WappstoRpc::putState(State *state)
     }
 
     serializeJson(root, _jsonTxBufferChar);
-    if(_wappstoLog->shouldPrintLevel(VERBOSE)) {
-        serializeJsonPretty(root, Serial);
-        _wappstoLog->verbose("");
-    }
+    _wappstoLog->verbose(root);
     _client->print(_jsonTxBufferChar);
     return(_awaitResponse());
 }
@@ -531,11 +506,7 @@ RequestType_e WappstoRpc::readData(char* uuid, char *dataPtr, char *timestampPtr
             return REQUEST_UNKNOWN;
         }
 
-        if(_wappstoLog->shouldPrintLevel(VERBOSE)) {
-            serializeJsonPretty(root, Serial);
-            _wappstoLog->verbose("");
-        }
-
+        _wappstoLog->verbose(root);
         if(root.containsKey("method")) {
             const char *msgId = root["id"];
             const char* method = root["method"];
@@ -608,10 +579,7 @@ bool WappstoRpc::getDeviceUuidFromName(Network *network, String &name, char *uui
     sprintf(url, "/services/2.0/network/%s/device?this_name==%s", network->uuid, name.c_str()); // "hest"); //
     params["url"] = url;
     serializeJson(root, _jsonTxBufferChar);
-    if(_wappstoLog->shouldPrintLevel(VERBOSE)) {
-        serializeJsonPretty(root, Serial);
-        _wappstoLog->verbose("");
-    }
+    _wappstoLog->verbose(root);
     _client->print(_jsonTxBufferChar);
     return(_awaitUuidResponse(uuid));
 }
@@ -629,10 +597,7 @@ bool WappstoRpc::getValueUuidFromName(Device *device, String name, char *uuid)
     sprintf(url, "/services/2.0/device/%s/value?this_name==%s", device->uuid, name.c_str());
     params["url"] = url;
     serializeJson(root, _jsonTxBufferChar);
-    if(_wappstoLog->shouldPrintLevel(VERBOSE)) {
-        serializeJsonPretty(root, Serial);
-        _wappstoLog->verbose("");
-    }
+    _wappstoLog->verbose(root);
     _client->print(_jsonTxBufferChar);
     return(_awaitUuidResponse(uuid));
 }
@@ -654,10 +619,7 @@ bool WappstoRpc::getStateUuidFromName(Value *value, StateType_e stateType, char 
     }
     params["url"] = url;
     serializeJson(root, _jsonTxBufferChar);
-    if(_wappstoLog->shouldPrintLevel(VERBOSE)) {
-        serializeJsonPretty(root, Serial);
-        _wappstoLog->verbose("");
-    }
+    _wappstoLog->verbose(root);
     _client->print(_jsonTxBufferChar);
     return(_awaitUuidResponse(uuid));
 }
@@ -675,10 +637,7 @@ bool WappstoRpc::getStateDataTime(const char *stateUuid, String &data, String &t
     sprintf(url, "/state/%s", stateUuid);
     params["url"] = url;
     serializeJson(root, _jsonTxBufferChar);
-    if(_wappstoLog->shouldPrintLevel(VERBOSE)) {
-        serializeJsonPretty(root, Serial);
-        _wappstoLog->verbose("");
-    }
+    _wappstoLog->verbose(root);
     _client->print(_jsonTxBufferChar);
     return(_awaitDataTimeResponse(data, timestamp));
 }

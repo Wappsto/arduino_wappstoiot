@@ -30,6 +30,13 @@ void WappstoLog::error(const char* text, const char* data)
         _print(text, data);
     }
 }
+void WappstoLog::error(const JsonDocument& root)
+{
+    if(_logLevel <= VERBOSE) {
+        serializeJsonPretty(root, Serial);
+        _print("");
+    }
+}
 void WappstoLog::warning(const char* text)
 {
     if(_logLevel <= WARNING) {
@@ -46,6 +53,13 @@ void WappstoLog::warning(const char* text, const char* data)
 {
     if(_logLevel <= WARNING) {
         _print(text, data);
+    }
+}
+void WappstoLog::warning(const JsonDocument& root)
+{
+    if(_logLevel <= VERBOSE) {
+        serializeJsonPretty(root, Serial);
+        _print("");
     }
 }
 void WappstoLog::info(const char* text)
@@ -66,6 +80,14 @@ void WappstoLog::info(const char* text, const char* data)
         _print(text, data);
     }
 }
+
+void WappstoLog::info(const JsonDocument& root)
+{
+    if(_logLevel <= VERBOSE) {
+        serializeJsonPretty(root, Serial);
+        _print("");
+    }
+}
 void WappstoLog::verbose(const char* text)
 {
     if(_logLevel <= VERBOSE) {
@@ -82,6 +104,14 @@ void WappstoLog::verbose(const char* text, const char* data)
 {
     if(_logLevel <= VERBOSE) {
         _print(text, data);
+    }
+}
+
+void WappstoLog::verbose(const JsonDocument& root)
+{
+    if(_logLevel <= VERBOSE) {
+        serializeJsonPretty(root, Serial);
+        _print("");
     }
 }
 
