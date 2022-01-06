@@ -47,5 +47,6 @@ class WappstoRpc
         bool _awaitUuidResponse(char *uuid);
         bool _awaitDataTimeResponse(String &data, String &timestamp);
         void _sendSuccessResponse(const char *id);
+        bool _readJson(JsonDocument& root);
         const char* _getUtcTime(void);
 };
