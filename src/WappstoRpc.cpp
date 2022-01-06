@@ -19,8 +19,8 @@ WappstoRpc* WappstoRpc::instance()
 
 void WappstoRpc::init(WiFiClientSecure *client)
 {
-    _client = client;
-    _wappstoLog = WappstoLog::instance();
+    this->_client = client;
+    this->_wappstoLog = WappstoLog::instance();
     _msgId = random(0xFFFF);
 }
 
@@ -35,47 +35,47 @@ bool WappstoRpc::_awaitResponse(void)
 {
     uint16_t timeoutCounter = 0;
 /*
-    if(_client->connected()) {
+    if(this->_client->connected()) {
         Serial.println("_awaitResponse CLIENT IS CONNECTED");
     } else {
         Serial.println("_awaitResponse CLIENT IS NOT CONNECTED");
     }
 */
-    while (_client->connected()) {
+    while (this->_client->connected()) {
         int ret;
         memset(rspBuffer, 0x00, sizeof(rspBuffer));
-        ret = _client->read(rspBuffer, sizeof(rspBuffer));
+        ret = this->_client->read(rspBuffer, sizeof(rspBuffer));
         if (ret > 0) {
             //PRINTV("Await response bytes received: ", ret);
-            _wappstoLog->verbose((const char*)rspBuffer);
+            this->_wappstoLog->verbose((const char*)rspBuffer);
 
             StaticJsonDocument<JSON_CHAR_BUFFER> root;
             DeserializationError err = deserializeJson(root, rspBuffer);
 
             if(err) {
-                _wappstoLog->warning("RPC Response Not parsable Json");
+                this->_wappstoLog->warning("RPC Response Not parsable Json");
                 return false;
             }
             int msgId = root["id"];
             if(msgId != _msgId) {
-                _wappstoLog->warning("Msg id incorrect: ", msgId);
-                _wappstoLog->warning("Expected: ", _msgId);
+                this->_wappstoLog->warning("Msg id incorrect: ", msgId);
+                this->_wappstoLog->warning("Expected: ", _msgId);
                 continue;
             }
 
             bool result = root["result"]["value"];
             if(result == true) {
-                _wappstoLog->verbose("RPC Response Success");
+                this->_wappstoLog->verbose("RPC Response Success");
                 return true;
             } else {
-                _wappstoLog->warning("RPC Response Error");
+                this->_wappstoLog->warning("RPC Response Error");
                 return false;
             }
         }
         delay(10);
         timeoutCounter++;
         if(timeoutCounter > 300) {
-            _wappstoLog->warning("Timeout waiting for reply");
+            this->_wappstoLog->warning("Timeout waiting for reply");
             return false;
         }
     }
@@ -85,31 +85,31 @@ bool WappstoRpc::_awaitUuidResponse(char *uuid)
 {
     uint16_t timeoutCounter = 0;
 /*
-    if(_client->connected()) {
+    if(this->_client->connected()) {
         Serial.println("_awaitUuidResponse CLIENT IS CONNECTED");
     } else {
         Serial.println("_awaitUuidResponse CLIENT IS NOT CONNECTED");
     }
 */
-    while (_client->connected()) {
+    while (this->_client->connected()) {
         int ret;
         memset(rspBuffer, 0x00, sizeof(rspBuffer));
-        ret = _client->read(rspBuffer, sizeof(rspBuffer));
+        ret = this->_client->read(rspBuffer, sizeof(rspBuffer));
         if (ret > 0) {
             //PRINTV("Await UUID bytes received: ", ret);
-            _wappstoLog->verbose((const char*)rspBuffer);
+            this->_wappstoLog->verbose((const char*)rspBuffer);
 
             StaticJsonDocument<JSON_CHAR_BUFFER> root;
             DeserializationError err = deserializeJson(root, rspBuffer);
 
             if(err) {
-                _wappstoLog->warning("RPC Response Not parsable Json");
+                this->_wappstoLog->warning("RPC Response Not parsable Json");
                 return false;
             }
             int msgId = root["id"];
             if(msgId != _msgId) {
-                _wappstoLog->warning("Msg id incorrect: ", msgId);
-                _wappstoLog->warning("Expected: ", _msgId);
+                this->_wappstoLog->warning("Msg id incorrect: ", msgId);
+                this->_wappstoLog->warning("Expected: ", _msgId);
                 continue;
             }
 
@@ -117,7 +117,7 @@ bool WappstoRpc::_awaitUuidResponse(char *uuid)
                 char getId[UUID_LENGTH] = {0,};
                 strcpy(uuid, root["result"]["value"]["id"][0]);
 
-                _wappstoLog->verbose("Found UUID: ", uuid);
+                this->_wappstoLog->verbose("Found UUID: ", uuid);
                 return true;
             } else {
                 return false;
@@ -126,7 +126,7 @@ bool WappstoRpc::_awaitUuidResponse(char *uuid)
         delay(10);
         timeoutCounter++;
         if(timeoutCounter > 300) {
-            _wappstoLog->warning("Timeout waiting for reply");
+            this->_wappstoLog->warning("Timeout waiting for reply");
             return false;
         }
     }
@@ -136,31 +136,31 @@ bool WappstoRpc::_awaitDataTimeResponse(String &data, String &timestamp)
 {
     uint16_t timeoutCounter = 0;
 /*
-    if(_client->connected()) {
+    if(this->_client->connected()) {
         Serial.println("_awaitDataTimeResponse CLIENT IS CONNECTED");
     } else {
         Serial.println("_awaitDataTimeResponse CLIENT IS NOT CONNECTED");
     }
 */
-    while (_client->connected()) {
+    while (this->_client->connected()) {
         int ret;
         memset(rspBuffer, 0x00, sizeof(rspBuffer));
-        ret = _client->read(rspBuffer, sizeof(rspBuffer));
+        ret = this->_client->read(rspBuffer, sizeof(rspBuffer));
         if (ret > 0) {
             //PRINTV("Await UUID bytes received: ", ret);
-            _wappstoLog->verbose((const char*)rspBuffer);
+            this->_wappstoLog->verbose((const char*)rspBuffer);
 
             StaticJsonDocument<JSON_CHAR_BUFFER> root;
             DeserializationError err = deserializeJson(root, rspBuffer);
 
             if(err) {
-                _wappstoLog->warning("RPC Response Not parsable Json");
+                this->_wappstoLog->warning("RPC Response Not parsable Json");
                 return false;
             }
             int msgId = root["id"];
             if(msgId != _msgId) {
-                _wappstoLog->warning("Msg id incorrect: ", msgId);
-                _wappstoLog->warning("Expected: ", _msgId);
+                this->_wappstoLog->warning("Msg id incorrect: ", msgId);
+                this->_wappstoLog->warning("Expected: ", _msgId);
                 continue;
             }
             /*
@@ -195,7 +195,7 @@ bool WappstoRpc::_awaitDataTimeResponse(String &data, String &timestamp)
         delay(10);
         timeoutCounter++;
         if(timeoutCounter > 300) {
-            _wappstoLog->warning("Timeout waiting for reply");
+            this->_wappstoLog->warning("Timeout waiting for reply");
             return false;
         }
     }
@@ -211,7 +211,7 @@ void WappstoRpc::_sendSuccessResponse(const char *id)
     root["result"] = true;
 
     serializeJson(root, _jsonTxBufferChar);
-    _client->print(_jsonTxBufferChar);
+    this->_client->print(_jsonTxBufferChar);
 }
 
 
@@ -233,8 +233,8 @@ bool WappstoRpc::postNetwork(const char *networkId, String &networkName)
     meta["version"] = "2.0";
 
     serializeJson(root, _jsonTxBufferChar);
-    _wappstoLog->verbose(root);
-    _client->print(_jsonTxBufferChar);
+    this->_wappstoLog->verbose(root);
+    this->_client->print(_jsonTxBufferChar);
 
     return(_awaitResponse());
 }
@@ -268,8 +268,8 @@ bool WappstoRpc::postDevice(Device *device)
     data["communication"] = device->deviceInfo.communication;
 
     serializeJson(root, _jsonTxBufferChar);
-    _wappstoLog->verbose(root);
-    _client->print(_jsonTxBufferChar);
+    this->_wappstoLog->verbose(root);
+    this->_client->print(_jsonTxBufferChar);
 
     return(_awaitResponse());
 }
@@ -358,8 +358,8 @@ bool WappstoRpc::postValue(Value *value)
     }
 
     serializeJson(root, _jsonTxBufferChar);
-    _wappstoLog->verbose(root);
-    _client->print(_jsonTxBufferChar);
+    this->_wappstoLog->verbose(root);
+    this->_client->print(_jsonTxBufferChar);
 
     return(_awaitResponse());
 }
@@ -379,8 +379,8 @@ bool WappstoRpc::deleteValue(const char* networkId, const char* deviceId, int va
     params["url"] = url;
 
     serializeJson(root, _jsonTxBufferChar);
-    _wappstoLog->verbose(root);
-    _client->print(_jsonTxBufferChar);
+    this->_wappstoLog->verbose(root);
+    this->_client->print(_jsonTxBufferChar);
 
     return(_awaitResponse());
     */
@@ -412,8 +412,8 @@ bool WappstoRpc::putValue(Value *value)
     data["type"] = "Report";
 
     serializeJson(root, _jsonTxBufferChar);
-    _wappstoLog->verbose(root);
-    _client->print(_jsonTxBufferChar);
+    this->_wappstoLog->verbose(root);
+    this->_client->print(_jsonTxBufferChar);
 
     return(_awaitResponse());
     */
@@ -424,7 +424,7 @@ bool WappstoRpc::sendPing(void)
 {
     // {"jsonrpc":"2.0","method":"HEAD","id":"PING-12","params":{"url":"/services/2.0/network"}}
 /*
-    if(_client->connected()) {
+    if(this->_client->connected()) {
         Serial.println("sendPing CLIENT IS CONNECTED");
     } else {
         Serial.println("sendPing CLIENT IS NOT CONNECTED");
@@ -439,15 +439,15 @@ bool WappstoRpc::sendPing(void)
     JsonObject params = root.createNestedObject("params");
     params["url"] = "/services/2.0/network";
     serializeJson(root, _jsonTxBufferChar);
-    _wappstoLog->verbose(root);
-    _client->print(_jsonTxBufferChar);
+    this->_wappstoLog->verbose(root);
+    this->_client->print(_jsonTxBufferChar);
     return(_awaitResponse());
 }
 
 bool WappstoRpc::putState(State *state)
 {
 /*
-    if(_client->connected()) {
+    if(this->_client->connected()) {
         Serial.println("putState CLIENT IS CONNECTED");
     } else {
         Serial.println("putState CLIENT IS NOT CONNECTED");
@@ -484,8 +484,8 @@ bool WappstoRpc::putState(State *state)
     }
 
     serializeJson(root, _jsonTxBufferChar);
-    _wappstoLog->verbose(root);
-    _client->print(_jsonTxBufferChar);
+    this->_wappstoLog->verbose(root);
+    this->_client->print(_jsonTxBufferChar);
     return(_awaitResponse());
 }
 
@@ -493,20 +493,20 @@ RequestType_e WappstoRpc::readData(char* uuid, char *dataPtr, char *timestampPtr
 {
     int ret;
     memset(readBuffer, 0x00, sizeof(readBuffer));
-    ret = _client->read(readBuffer, sizeof(readBuffer));
+    ret = this->_client->read(readBuffer, sizeof(readBuffer));
     if(ret > 0) {
-        _wappstoLog->verbose("Reading received:");
-        _wappstoLog->verbose((const char*)readBuffer);
+        this->_wappstoLog->verbose("Reading received:");
+        this->_wappstoLog->verbose((const char*)readBuffer);
 
         StaticJsonDocument<JSON_STATIC_BUFFER_SIZE> root;
         DeserializationError err = deserializeJson(root, readBuffer);
 
         if (err) {
-            _wappstoLog->warning("Not parsable Json receive");
+            this->_wappstoLog->warning("Not parsable Json receive");
             return REQUEST_UNKNOWN;
         }
 
-        _wappstoLog->verbose(root);
+        this->_wappstoLog->verbose(root);
         if(root.containsKey("method")) {
             const char *msgId = root["id"];
             const char* method = root["method"];
@@ -519,7 +519,7 @@ RequestType_e WappstoRpc::readData(char* uuid, char *dataPtr, char *timestampPtr
                 int lastSlash = url.lastIndexOf('/');
                 url.substring(lastSlash+1).toCharArray(getId, UUID_LENGTH);
 
-                _wappstoLog->verbose("GET: ", getId);
+                this->_wappstoLog->verbose("GET: ", getId);
                 strcpy(uuid, getId);
                 _sendSuccessResponse(msgId);
                 return REQUEST_GET;
@@ -530,8 +530,8 @@ RequestType_e WappstoRpc::readData(char* uuid, char *dataPtr, char *timestampPtr
 
                 strcpy(uuid, data["meta"]["id"]);
 
-                _wappstoLog->verbose("PUT: ",uuid);
-                _wappstoLog->verbose(dataPtr);
+                this->_wappstoLog->verbose("PUT: ",uuid);
+                this->_wappstoLog->verbose(dataPtr);
 
                 _sendSuccessResponse(msgId);
                 return REQUEST_PUT;
@@ -542,26 +542,26 @@ RequestType_e WappstoRpc::readData(char* uuid, char *dataPtr, char *timestampPtr
                 int lastSlash = url.lastIndexOf('/');
                 url.substring(lastSlash+1).toCharArray(getId, UUID_LENGTH);
 
-                _wappstoLog->verbose("DELETE: ", getId);
+                this->_wappstoLog->verbose("DELETE: ", getId);
                 strcpy(uuid, getId);
                 _sendSuccessResponse(msgId);
                 return REQUEST_DELETE;
             } else {
-                _wappstoLog->verbose("method");
+                this->_wappstoLog->verbose("method");
             }
         } else if(root.containsKey("result")) {
             bool result = root["result"]["value"];
             if(result == true) {
-                _wappstoLog->verbose("Return success");
+                this->_wappstoLog->verbose("Return success");
                 return REQUEST_SUCCESS;
             } else {
-                _wappstoLog->warning("Return Error");
+                this->_wappstoLog->warning("Return Error");
             }
         } else {
-            _wappstoLog->warning("Received msg not handled");
+            this->_wappstoLog->warning("Received msg not handled");
         }
     } else {
-        _wappstoLog->warning("No data read");
+        this->_wappstoLog->warning("No data read");
     }
     return REQUEST_UNKNOWN;
 }
@@ -579,8 +579,8 @@ bool WappstoRpc::getDeviceUuidFromName(Network *network, String &name, char *uui
     sprintf(url, "/services/2.0/network/%s/device?this_name==%s", network->uuid, name.c_str()); // "hest"); //
     params["url"] = url;
     serializeJson(root, _jsonTxBufferChar);
-    _wappstoLog->verbose(root);
-    _client->print(_jsonTxBufferChar);
+    this->_wappstoLog->verbose(root);
+    this->_client->print(_jsonTxBufferChar);
     return(_awaitUuidResponse(uuid));
 }
 
@@ -597,8 +597,8 @@ bool WappstoRpc::getValueUuidFromName(Device *device, String name, char *uuid)
     sprintf(url, "/services/2.0/device/%s/value?this_name==%s", device->uuid, name.c_str());
     params["url"] = url;
     serializeJson(root, _jsonTxBufferChar);
-    _wappstoLog->verbose(root);
-    _client->print(_jsonTxBufferChar);
+    this->_wappstoLog->verbose(root);
+    this->_client->print(_jsonTxBufferChar);
     return(_awaitUuidResponse(uuid));
 }
 
@@ -619,8 +619,8 @@ bool WappstoRpc::getStateUuidFromName(Value *value, StateType_e stateType, char 
     }
     params["url"] = url;
     serializeJson(root, _jsonTxBufferChar);
-    _wappstoLog->verbose(root);
-    _client->print(_jsonTxBufferChar);
+    this->_wappstoLog->verbose(root);
+    this->_client->print(_jsonTxBufferChar);
     return(_awaitUuidResponse(uuid));
 }
 
@@ -637,7 +637,7 @@ bool WappstoRpc::getStateDataTime(const char *stateUuid, String &data, String &t
     sprintf(url, "/state/%s", stateUuid);
     params["url"] = url;
     serializeJson(root, _jsonTxBufferChar);
-    _wappstoLog->verbose(root);
-    _client->print(_jsonTxBufferChar);
+    this->_wappstoLog->verbose(root);
+    this->_client->print(_jsonTxBufferChar);
     return(_awaitDataTimeResponse(data, timestamp));
 }

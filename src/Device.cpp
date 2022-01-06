@@ -4,8 +4,8 @@
 
 Device::Device(Network *network, DeviceDescription_t *deviceInfo)
 {
-    _wappstoRpc = WappstoRpc::instance();
-    _wappstoLog = WappstoLog::instance();
+    this->_wappstoRpc = WappstoRpc::instance();
+    this->_wappstoLog = WappstoLog::instance();
     this->parent = network;
     this->name = deviceInfo->name;
     this->deviceInfo.product = deviceInfo->product;
@@ -29,13 +29,13 @@ void Device::post(void)
 Value* Device::createValueNumber(ValueNumber_t *valNumber)
 {
     if(currentNumberOfValues >= MAX_VALUES) {
-        _wappstoLog->error("Cannot create more values");
+        this->_wappstoLog->error("Cannot create more values");
         return NULL;
     }
     currentNumberOfValues++;
     values[currentNumberOfValues-1] = new Value(this, valNumber);
 
-    if(!_wappstoRpc->getValueUuidFromName(this, valNumber->name, values[currentNumberOfValues-1]->uuid)) {
+    if(!this->_wappstoRpc->getValueUuidFromName(this, valNumber->name, values[currentNumberOfValues-1]->uuid)) {
         generateNewUuid(values[currentNumberOfValues-1]->uuid);
         values[currentNumberOfValues-1]->valueCreated = true;
     }
@@ -52,7 +52,7 @@ Value* Device::createValueString(ValueString_t *valString)
     }
     currentNumberOfValues++;
     values[currentNumberOfValues-1] = new Value(this, valString);
-    if(!_wappstoRpc->getValueUuidFromName(this, valString->name, values[currentNumberOfValues-1]->uuid)) {
+    if(!this->_wappstoRpc->getValueUuidFromName(this, valString->name, values[currentNumberOfValues-1]->uuid)) {
         generateNewUuid(values[currentNumberOfValues-1]->uuid);
     }
     values[currentNumberOfValues-1]->post();
@@ -62,13 +62,13 @@ Value* Device::createValueString(ValueString_t *valString)
 Value* Device::createValueBlob(ValueBlob_t *valBlob)
 {
     if(currentNumberOfValues >= MAX_VALUES) {
-        _wappstoLog->error("Cannot create more values");
+        this->_wappstoLog->error("Cannot create more values");
         return NULL;
     }
     currentNumberOfValues++;
     values[currentNumberOfValues-1] = new Value(this, valBlob);
 
-    if(!_wappstoRpc->getValueUuidFromName(this, valBlob->name, values[currentNumberOfValues-1]->uuid)) {
+    if(!this->_wappstoRpc->getValueUuidFromName(this, valBlob->name, values[currentNumberOfValues-1]->uuid)) {
         generateNewUuid(values[currentNumberOfValues-1]->uuid);
     }
 

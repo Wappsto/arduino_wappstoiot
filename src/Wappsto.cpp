@@ -5,20 +5,20 @@ const char* wappsto_server = "collector.wappsto.com";
 
 Wappsto::Wappsto(WiFiClientSecure *client)
 {
-    _client = client;
-    _network = NULL;
-    _wappstoLog = WappstoLog::instance();
-    _wappstoRpc = WappstoRpc::instance();
-    _wappstoRpc->init(_client);
+    this->_client = client;
+    this->_network = NULL;
+    this->_wappstoLog = WappstoLog::instance();
+    this->_wappstoRpc = WappstoRpc::instance();
+    this->_wappstoRpc->init(this->_client);
 }
 
 void Wappsto::config(const char* network_id, const char* ca, const char* client_crt, const char* client_key)
 {
     strcpy(this->uuid, network_id);
 
-    _client->setCACert(ca);
-    _client->setCertificate(client_crt);
-    _client->setPrivateKey(client_key);
+    this->_client->setCACert(ca);
+    this->_client->setCertificate(client_crt);
+    this->_client->setPrivateKey(client_key);
     this->_pingIntervalMinutes = 0;
     this->_startPingMillis = 0;
     this->_wappstoLog->setLogLevel(NO_LOGS);
@@ -28,9 +28,9 @@ void Wappsto::config(const char* network_id, const char* ca, const char* client_
 {
     strcpy(this->uuid, network_id);
 
-    _client->setCACert(ca);
-    _client->setCertificate(client_crt);
-    _client->setPrivateKey(client_key);
+    this->_client->setCACert(ca);
+    this->_client->setCertificate(client_crt);
+    this->_client->setPrivateKey(client_key);
     this->_pingIntervalMinutes = pingInterval;
     this->_startPingMillis = millis();
     this->_wappstoLog->setLogLevel(logLevel);
@@ -38,7 +38,7 @@ void Wappsto::config(const char* network_id, const char* ca, const char* client_
 
 bool Wappsto::connect(void)
 {
-    if(_client->connect(wappsto_server, WAPPSTO_PORT)) {
+    if(this->_client->connect(wappsto_server, WAPPSTO_PORT)) {
         return true;
     }
     return false;
@@ -46,8 +46,8 @@ bool Wappsto::connect(void)
 
 bool Wappsto::disconnect(void)
 {
-    if(_client->connected()) {
-        _client->stop();
+    if(this->_client->connected()) {
+        this->_client->stop();
         return true;
     }
     return false;
@@ -55,16 +55,16 @@ bool Wappsto::disconnect(void)
 
 Network *Wappsto::createNetwork(String name, String description)
 {
-    _network = new Network(this->uuid, name, description);
-    _network->post();
-    return _network;
+    this->_network = new Network(this->uuid, name, description);
+    this->_network->post();
+    return this->_network;
 }
 
 Network *Wappsto::createNetwork(String name)
 {
-    _network = new Network(this->uuid, name, "");
-    _network->post();
-    return _network;
+    this->_network = new Network(this->uuid, name, "");
+    this->_network->post();
+    return this->_network;
 }
 
 bool Wappsto::dataAvailable(void)
@@ -73,21 +73,21 @@ bool Wappsto::dataAvailable(void)
     char tmpTimestamp[28] = {0,};
     char tmpUuid[UUID_LENGTH];
 
-    if(!_client->available()) {
+    if(!this->_client->available()) {
         unsigned long currentMillis = millis();
         if(_pingIntervalMinutes != 0 && (currentMillis - _startPingMillis >= _pingIntervalMinutes*60*1000)) {
             _startPingMillis = currentMillis;
-            _wappstoRpc->sendPing();
+            this->_wappstoRpc->sendPing();
         }
         return false;
     }
-    RequestType_e req = _wappstoRpc->readData(tmpUuid, tmpData, tmpTimestamp);
+    RequestType_e req = this->_wappstoRpc->readData(tmpUuid, tmpData, tmpTimestamp);
 
     if(tmpUuid && strlen(tmpUuid) > 0) {
         //Serial.print("UUID: ");
         //Serial.print(tmpUuid);
     } else {
-        _wappstoLog->warning("Invalid or no uuid");
+        this->_wappstoLog->warning("Invalid or no uuid");
         return false;
     }
 
@@ -96,51 +96,51 @@ bool Wappsto::dataAvailable(void)
             this->_network->_onDeleteCb(this->_network);
             return true;
         }
-        _wappstoLog->warning("Delete not handled yet");
+        this->_wappstoLog->warning("Delete not handled yet");
         return false;
     } else if(req == REQUEST_UNKNOWN) {
-        _wappstoLog->warning("Unknown request - not handled");
+        this->_wappstoLog->warning("Unknown request - not handled");
         return false;
     }
 
-    for(int devs=0; devs < _network->currentNumberOfDevices; devs++) {
+    for(int devs=0; devs < this->_network->currentNumberOfDevices; devs++) {
 
-        if(_network->devices[devs] == NULL) {
+        if(this->_network->devices[devs] == NULL) {
             continue;
         }
-        if(strcmp(_network->devices[devs]->uuid, tmpUuid) == 0) {
-            _wappstoLog->warning("Found device requested UUID - not handled");
+        if(strcmp(this->_network->devices[devs]->uuid, tmpUuid) == 0) {
+            this->_wappstoLog->warning("Found device requested UUID - not handled");
         }
-        for(int vals=0; vals < _network->devices[devs]->currentNumberOfValues; vals++) {
-            if(_network->devices[devs]->values[vals] == NULL) {
+        for(int vals=0; vals < this->_network->devices[devs]->currentNumberOfValues; vals++) {
+            if(this->_network->devices[devs]->values[vals] == NULL) {
                 continue;
             }
-            if(strcmp(_network->devices[devs]->values[vals]->uuid, tmpUuid) == 0) {
+            if(strcmp(this->_network->devices[devs]->values[vals]->uuid, tmpUuid) == 0) {
                 return true;
             }
-            if(_network->devices[devs]->values[vals]->reportState && strcmp(_network->devices[devs]->values[vals]->reportState->uuid, tmpUuid) == 0) {
+            if(this->_network->devices[devs]->values[vals]->reportState && strcmp(this->_network->devices[devs]->values[vals]->reportState->uuid, tmpUuid) == 0) {
                 if(req == REQUEST_GET) {
-                    if(_network->devices[devs]->values[vals]->_onRefreshCb) {
-                        _network->devices[devs]->values[vals]->_onRefreshCb(_network->devices[devs]->values[vals]);
+                    if(this->_network->devices[devs]->values[vals]->_onRefreshCb) {
+                        this->_network->devices[devs]->values[vals]->_onRefreshCb(this->_network->devices[devs]->values[vals]);
                         return true;
                     }
                 }
-            } else if(_network->devices[devs]->values[vals]->controlState && strcmp(_network->devices[devs]->values[vals]->controlState->uuid, tmpUuid) == 0) {
+            } else if(this->_network->devices[devs]->values[vals]->controlState && strcmp(this->_network->devices[devs]->values[vals]->controlState->uuid, tmpUuid) == 0) {
                 if(req == REQUEST_PUT) {
-                    if(_network->devices[devs]->values[vals]->_onControlNumberCb) {
-                        _network->devices[devs]->values[vals]->controlState->data = tmpData;
-                        _network->devices[devs]->values[vals]->controlState->timestamp = tmpTimestamp;
-                        double tmpDouble = _network->devices[devs]->values[vals]->controlState->data.toDouble();
-                        _network->devices[devs]->values[vals]->_onControlNumberCb(_network->devices[devs]->values[vals],
+                    if(this->_network->devices[devs]->values[vals]->_onControlNumberCb) {
+                        this->_network->devices[devs]->values[vals]->controlState->data = tmpData;
+                        this->_network->devices[devs]->values[vals]->controlState->timestamp = tmpTimestamp;
+                        double tmpDouble = this->_network->devices[devs]->values[vals]->controlState->data.toDouble();
+                        this->_network->devices[devs]->values[vals]->_onControlNumberCb(this->_network->devices[devs]->values[vals],
                                                                                     tmpDouble,
-                                                                                    _network->devices[devs]->values[vals]->controlState->timestamp);
+                                                                                    this->_network->devices[devs]->values[vals]->controlState->timestamp);
                         return true;
-                    } else if(_network->devices[devs]->values[vals]->_onControlStringCb) {
-                        _network->devices[devs]->values[vals]->controlState->data = tmpData;
-                        _network->devices[devs]->values[vals]->controlState->timestamp = tmpTimestamp;
-                        _network->devices[devs]->values[vals]->_onControlStringCb(_network->devices[devs]->values[vals],
-                                                                                    _network->devices[devs]->values[vals]->controlState->data,
-                                                                                    _network->devices[devs]->values[vals]->controlState->timestamp);
+                    } else if(this->_network->devices[devs]->values[vals]->_onControlStringCb) {
+                        this->_network->devices[devs]->values[vals]->controlState->data = tmpData;
+                        this->_network->devices[devs]->values[vals]->controlState->timestamp = tmpTimestamp;
+                        this->_network->devices[devs]->values[vals]->_onControlStringCb(this->_network->devices[devs]->values[vals],
+                                                                                    this->_network->devices[devs]->values[vals]->controlState->data,
+                                                                                    this->_network->devices[devs]->values[vals]->controlState->timestamp);
                         return true;
                     }
                 }

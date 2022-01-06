@@ -3,7 +3,7 @@
 
 State::State(Value *value, StateType_e stateType, bool forceCreate)
 {
-    _wappstoRpc = WappstoRpc::instance();
+    this->_wappstoRpc = WappstoRpc::instance();
     this->parent = value;
     this->stateType = stateType;
     this->requiresPost = false;
@@ -14,7 +14,7 @@ State::State(Value *value, StateType_e stateType, bool forceCreate)
         generateNewUuid(this->uuid);
         this->requiresPost = true;
     } else if(_wappstoRpc->getStateUuidFromName(value, stateType, this->uuid)) {
-        _wappstoRpc->getStateDataTime(this->uuid, this->data, this->timestamp);
+        this->_wappstoRpc->getStateDataTime(this->uuid, this->data, this->timestamp);
     } else {
         generateNewUuid(this->uuid);
         this->requiresPost = true;

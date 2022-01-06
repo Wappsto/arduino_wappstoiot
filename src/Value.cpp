@@ -37,7 +37,7 @@ Value::Value(Device *device, ValueBlob_t *valBlob) : parent(device)
 
 void Value::_init(void)
 {
-    _wappstoRpc = WappstoRpc::instance();
+    this->_wappstoRpc = WappstoRpc::instance();
     this->valueCreated = false;
     this->reportState = NULL;
     this->controlState = NULL;
@@ -69,7 +69,7 @@ bool Value::report(int data)
     if(this->reportState) {
         this->reportState->timestamp = getUtcTime();
         this->reportState->data = String(data);
-        _wappstoRpc->putState(this->reportState);
+        this->_wappstoRpc->putState(this->reportState);
         return true;
     }
     return false;
@@ -80,7 +80,7 @@ bool Value::report(double data)
     if(this->reportState) {
         this->reportState->timestamp = getUtcTime();
         this->reportState->data = String(data);
-        _wappstoRpc->putState(this->reportState);
+        this->_wappstoRpc->putState(this->reportState);
         return true;
     }
     return false;
@@ -91,7 +91,7 @@ bool Value::report(const String &data)
     if(this->reportState) {
         this->reportState->timestamp = getUtcTime();
         this->reportState->data = data;
-        _wappstoRpc->putState(this->reportState);
+        this->_wappstoRpc->putState(this->reportState);
         return true;
     }
     return false;
@@ -102,7 +102,7 @@ bool Value::control(int data)
     if(this->controlState) {
         this->controlState->timestamp = getUtcTime();
         this->controlState->data = String(data);
-        _wappstoRpc->putState(this->controlState);
+        this->_wappstoRpc->putState(this->controlState);
         return true;
     }
     return false;
@@ -113,7 +113,7 @@ bool Value::control(double data)
     if(this->controlState) {
         this->controlState->timestamp = getUtcTime();
         this->controlState->data = String(data);
-        _wappstoRpc->putState(this->controlState);
+        this->_wappstoRpc->putState(this->controlState);
         return true;
     }
     return false;
@@ -124,7 +124,7 @@ bool Value::control(const String &data)
     if(this->controlState) {
         this->controlState->timestamp = getUtcTime();
         this->controlState->data = data;
-        _wappstoRpc->putState(this->controlState);
+        this->_wappstoRpc->putState(this->controlState);
         return true;
     }
     return false;

@@ -3,8 +3,8 @@
 
 Network::Network(const char* uuid, String name, String description)
 {
-    _wappstoRpc = WappstoRpc::instance();
-    _wappstoLog = WappstoLog::instance();
+    this->_wappstoRpc = WappstoRpc::instance();
+    this->_wappstoLog = WappstoLog::instance();
     this->name = name;
     strcpy(this->uuid, uuid);
     this->description = description;
@@ -13,13 +13,13 @@ Network::Network(const char* uuid, String name, String description)
 
 void Network::post(void)
 {
-    _wappstoRpc->postNetwork(this->uuid, this->name);
+    this->_wappstoRpc->postNetwork(this->uuid, this->name);
 }
 
 Device* Network::createDevice(DeviceDescription_t *deviceInfo)
 {
     if(currentNumberOfDevices >= MAX_DEVICES) {
-        _wappstoLog->error("Cannot create more devices");
+        this->_wappstoLog->error("Cannot create more devices");
         return NULL;
     }
     currentNumberOfDevices++;
