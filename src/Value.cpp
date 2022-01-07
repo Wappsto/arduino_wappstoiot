@@ -64,28 +64,6 @@ void Value::post(void)
     this->_wappstoRpc->postValue(this);
 }
 
-bool Value::report(int data)
-{
-    if(this->reportState) {
-        this->reportState->timestamp = getUtcTime();
-        this->reportState->data = String(data);
-        this->_wappstoRpc->putState(this->reportState);
-        return true;
-    }
-    return false;
-}
-
-bool Value::report(double data)
-{
-    if(this->reportState) {
-        this->reportState->timestamp = getUtcTime();
-        this->reportState->data = String(data);
-        this->_wappstoRpc->putState(this->reportState);
-        return true;
-    }
-    return false;
-}
-
 bool Value::report(const String &data)
 {
     if(this->reportState) {
@@ -97,26 +75,14 @@ bool Value::report(const String &data)
     return false;
 }
 
-bool Value::control(int data)
+bool Value::report(int data)
 {
-    if(this->controlState) {
-        this->controlState->timestamp = getUtcTime();
-        this->controlState->data = String(data);
-        this->_wappstoRpc->putState(this->controlState);
-        return true;
-    }
-    return false;
+    return this->report(String(data));
 }
 
-bool Value::control(double data)
+bool Value::report(double data)
 {
-    if(this->controlState) {
-        this->controlState->timestamp = getUtcTime();
-        this->controlState->data = String(data);
-        this->_wappstoRpc->putState(this->controlState);
-        return true;
-    }
-    return false;
+    return this->report(String(data));
 }
 
 bool Value::control(const String &data)
@@ -128,6 +94,16 @@ bool Value::control(const String &data)
         return true;
     }
     return false;
+}
+
+bool Value::control(int data)
+{
+    this->control(String(data));
+}
+
+bool Value::control(double data)
+{
+    this->control(String(data));
 }
 
 String Value::getControlData(void)
@@ -202,4 +178,32 @@ void Value::onRefresh(WappstoValueRefreshCallback cb)
 void Value::onDelete(WappstoCallback cb)
 {
     this->_onDeleteCb = cb;
+}
+
+bool Value::handleStateCb(const char* tmpUuid, RequestType_e req, const char *tmpData, const char *tmpTimestamp)
+{
+    if(this->reportState && strcmp(this->reportState->uuid, tmpUuid) == 0) {
+        if(req == REQUEST_GET) {
+            if(this->_onRefreshCb) {
+                this->_onRefreshCb(this);
+                return true;
+            }
+        }
+    } else if(this->controlState && strcmp(this->controlState->uuid, tmpUuid) == 0) {
+        if(req == REQUEST_PUT) {
+            if(this->_onControlNumberCb) {
+                this->controlState->data = tmpData;
+                this->controlState->timestamp = tmpTimestamp;
+                double tmpDouble = this->controlState->data.toDouble();
+                this->_onControlNumberCb(this, tmpDouble,this->controlState->timestamp);
+                return true;
+            } else if(this->_onControlStringCb) {
+                this->controlState->data = tmpData;
+                this->controlState->timestamp = tmpTimestamp;
+                this->_onControlStringCb(this, this->controlState->data, this->controlState->timestamp);
+                return true;
+            }
+        }
+    }
+    return false;
 }

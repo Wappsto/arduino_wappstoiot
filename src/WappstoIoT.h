@@ -2,8 +2,13 @@
 #include <Arduino.h>
 #include <WiFiClientSecure.h>
 
-#define MAX_DEVICES 5
-#define MAX_VALUES 10
+#ifndef MAX_DEVICES
+    #define MAX_DEVICES 5
+#endif
+
+#ifndef MAX_VALUES
+    #define MAX_VALUES 10
+#endif
 
 #define UUID_LENGTH 37
 

@@ -3,6 +3,7 @@
 #define WAPPSTO_PORT 443
 const char* wappsto_server = "collector.wappsto.com";
 
+
 Wappsto::Wappsto(WiFiClientSecure *client)
 {
     this->_client = client;
@@ -10,18 +11,6 @@ Wappsto::Wappsto(WiFiClientSecure *client)
     this->_wappstoLog = WappstoLog::instance();
     this->_wappstoRpc = WappstoRpc::instance();
     this->_wappstoRpc->init(this->_client);
-}
-
-void Wappsto::config(const char* network_id, const char* ca, const char* client_crt, const char* client_key)
-{
-    strcpy(this->uuid, network_id);
-
-    this->_client->setCACert(ca);
-    this->_client->setCertificate(client_crt);
-    this->_client->setPrivateKey(client_key);
-    this->_pingIntervalMinutes = 0;
-    this->_startPingMillis = 0;
-    this->_wappstoLog->setLogLevel(NO_LOGS);
 }
 
 void Wappsto::config(const char* network_id, const char* ca, const char* client_crt, const char* client_key, int pingInterval, LOG_LEVELS_e logLevel)
@@ -36,11 +25,17 @@ void Wappsto::config(const char* network_id, const char* ca, const char* client_
     this->_wappstoLog->setLogLevel(logLevel);
 }
 
+void Wappsto::config(const char* network_id, const char* ca, const char* client_crt, const char* client_key)
+{
+    this->config(network_id, ca, client_crt, client_key, 0, NO_LOGS);
+}
+
 bool Wappsto::connect(void)
 {
     if(this->_client->connect(wappsto_server, WAPPSTO_PORT)) {
         return true;
     }
+    this->_wappstoLog->error("Could not connect to wappsto");
     return false;
 }
 
@@ -72,6 +67,11 @@ bool Wappsto::dataAvailable(void)
     char tmpData[1200] = {0,};
     char tmpTimestamp[28] = {0,};
     char tmpUuid[UUID_LENGTH];
+
+    if(!this->_client->connected()) {
+        this->_wappstoLog->warning("Disconnected, trying reconnect");
+        this->connect();
+    }
 
     if(!this->_client->available()) {
         unsigned long currentMillis = millis();
@@ -118,32 +118,8 @@ bool Wappsto::dataAvailable(void)
             if(strcmp(this->_network->devices[devs]->values[vals]->uuid, tmpUuid) == 0) {
                 return true;
             }
-            if(this->_network->devices[devs]->values[vals]->reportState && strcmp(this->_network->devices[devs]->values[vals]->reportState->uuid, tmpUuid) == 0) {
-                if(req == REQUEST_GET) {
-                    if(this->_network->devices[devs]->values[vals]->_onRefreshCb) {
-                        this->_network->devices[devs]->values[vals]->_onRefreshCb(this->_network->devices[devs]->values[vals]);
-                        return true;
-                    }
-                }
-            } else if(this->_network->devices[devs]->values[vals]->controlState && strcmp(this->_network->devices[devs]->values[vals]->controlState->uuid, tmpUuid) == 0) {
-                if(req == REQUEST_PUT) {
-                    if(this->_network->devices[devs]->values[vals]->_onControlNumberCb) {
-                        this->_network->devices[devs]->values[vals]->controlState->data = tmpData;
-                        this->_network->devices[devs]->values[vals]->controlState->timestamp = tmpTimestamp;
-                        double tmpDouble = this->_network->devices[devs]->values[vals]->controlState->data.toDouble();
-                        this->_network->devices[devs]->values[vals]->_onControlNumberCb(this->_network->devices[devs]->values[vals],
-                                                                                    tmpDouble,
-                                                                                    this->_network->devices[devs]->values[vals]->controlState->timestamp);
-                        return true;
-                    } else if(this->_network->devices[devs]->values[vals]->_onControlStringCb) {
-                        this->_network->devices[devs]->values[vals]->controlState->data = tmpData;
-                        this->_network->devices[devs]->values[vals]->controlState->timestamp = tmpTimestamp;
-                        this->_network->devices[devs]->values[vals]->_onControlStringCb(this->_network->devices[devs]->values[vals],
-                                                                                    this->_network->devices[devs]->values[vals]->controlState->data,
-                                                                                    this->_network->devices[devs]->values[vals]->controlState->timestamp);
-                        return true;
-                    }
-                }
+            if(this->_network->devices[devs]->values[vals]->handleStateCb(tmpUuid, req, tmpData, tmpTimestamp)) {
+                return true;
             }
         }
     }

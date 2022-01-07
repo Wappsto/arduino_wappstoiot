@@ -4,7 +4,6 @@
 #include <ArduinoJson.h>
 #include <WiFiClientSecure.h>
 #include "WappstoIoT.h"
-//#include "Device.h"
 
 #define JSON_TX_BUFFER_SIZE 2000
 #define JSON_STATIC_BUFFER_SIZE 600
@@ -40,13 +39,13 @@ class WappstoRpc
         int _msgId;
         int _getNextMsgId(void);
         bool _jsonDebug;
-        uint8_t readBuffer[JSON_STATIC_BUFFER_SIZE];
-        uint8_t rspBuffer[JSON_STATIC_BUFFER_SIZE];
+        uint8_t _readBuffer[JSON_STATIC_BUFFER_SIZE];
+        uint8_t _rspBuffer[JSON_STATIC_BUFFER_SIZE];
         char _jsonTxBufferChar[JSON_TX_BUFFER_SIZE];
         bool _awaitResponse(void);
         bool _awaitUuidResponse(char *uuid);
         bool _awaitDataTimeResponse(String &data, String &timestamp);
         void _sendSuccessResponse(const char *id);
-        bool _readJson(JsonDocument& root);
+        bool _readJsonAwait(JsonDocument& root);
         const char* _getUtcTime(void);
 };

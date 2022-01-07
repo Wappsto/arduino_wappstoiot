@@ -22,6 +22,7 @@ public:
     void onRefresh(WappstoValueRefreshCallback cb);
     void onDelete(WappstoCallback cb);
     void post(void);
+    bool handleStateCb(const char* tmpUuid, RequestType_e req, const char *tmpData, const char *tmpTimestamp);
 
     Device *parent;
     char uuid[UUID_LENGTH];
