@@ -232,7 +232,7 @@ bool WappstoRpc::postValue(Value *value)
     } else if(value->valueType == XML_VALUE) {
         JsonObject xml = data.createNestedObject("xml");
         xml["xsd"] = value->valXml->xsd;
-        xml["namespace"] = value->valXml->namespace;
+        xml["namespace"] = value->valXml->xml_namespace;
     }
 
     JsonArray stateArray = data.createNestedArray("state");

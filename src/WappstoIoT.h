@@ -93,12 +93,12 @@ typedef struct
     String name;
     String type;
     PERMISSION_e permission;
-    String namespace;
+    String xml_namespace;
     String xsd;
 } ValueXml_t;
 
-typedef Timestamp_t char[TIMESTAMP_LENGTH];
-typedef UUID_t char[UUID_LENGTH];
+typedef char[TIMESTAMP_LENGTH] Timestamp_t;
+typedef char[UUID_LENGTH] UUID_t;
 typedef void (*WappstoCallback)(void *object);
 
 typedef void (*WappstoNetworkDeleteCallback)(Network *network);
