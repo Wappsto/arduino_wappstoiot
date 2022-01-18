@@ -97,8 +97,8 @@ typedef struct
     String xsd;
 } ValueXml_t;
 
-typedef char[TIMESTAMP_LENGTH] Timestamp_t;
-typedef char[UUID_LENGTH] UUID_t;
+typedef char Timestamp_t[TIMESTAMP_LENGTH];
+typedef char UUID_t[UUID_LENGTH];
 typedef void (*WappstoCallback)(void *object);
 
 typedef void (*WappstoNetworkDeleteCallback)(Network *network);
