@@ -66,7 +66,7 @@ bool Wappsto::dataAvailable(void)
 {
     char tmpData[1200] = {0,};
     char tmpTimestamp[28] = {0,};
-    char tmpUuid[UUID_LENGTH];
+    UUID_t tmpUuid;
 
     if(!this->_client->connected()) {
         this->_wappstoLog->warning("Disconnected, trying reconnect");

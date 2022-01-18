@@ -34,18 +34,18 @@ class WappstoRpc
         WappstoRpc(const WappstoRpc&) = delete;
         WappstoRpc& operator=(const WappstoRpc&) = delete;
 
-        WappstoLog *_wappstoLog;
-        WiFiClientSecure *_client;
-        int _msgId;
-        int _getNextMsgId(void);
-        bool _jsonDebug;
-        uint8_t _readBuffer[JSON_STATIC_BUFFER_SIZE];
-        uint8_t _rspBuffer[JSON_STATIC_BUFFER_SIZE];
-        char _jsonTxBufferChar[JSON_TX_BUFFER_SIZE];
         bool _awaitResponse(void);
         bool _awaitUuidResponse(char *uuid);
         bool _awaitDataTimeResponse(String &data, String &timestamp);
         void _sendSuccessResponse(const char *id);
         bool _readJsonAwait(JsonDocument& root);
-        const char* _getUtcTime(void);
+        int _getNextMsgId(void);
+
+        WappstoLog *_wappstoLog;
+        WiFiClientSecure *_client;
+        int _msgId;
+        bool _jsonDebug;
+        uint8_t _readBuffer[JSON_STATIC_BUFFER_SIZE];
+        uint8_t _rspBuffer[JSON_STATIC_BUFFER_SIZE];
+        char _jsonTxBufferChar[JSON_TX_BUFFER_SIZE];
 };

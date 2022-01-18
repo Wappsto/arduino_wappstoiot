@@ -1,7 +1,6 @@
 #include "WappstoIoT.h"
 
 
-
 Device::Device(Network *network, DeviceDescription_t *deviceInfo)
 {
     this->_wappstoRpc = WappstoRpc::instance();
@@ -74,6 +73,30 @@ Value* Device::createValueBlob(ValueBlob_t *valBlob)
 
     values[currentNumberOfValues-1]->post();
     return values[currentNumberOfValues-1];
+}
+
+Value** Device::getFreeValue()
+{
+    if(currentNumberOfValues >= MAX_VALUES) {
+        this->_wappstoLog->error("Cannot create more values");
+        return NULL;
+    }
+
+    currentNumberOfValues++;
+    return &values[currentNumberOfValues-1];
+}
+
+Value* Device::createValueXml(ValueXml_t *valXml)
+{
+    Value** value = this->getFreeValue();
+    *value = new Value(this, valXml);
+
+    if(!this->_wappstoRpc->getValueUuidFromName(this, valXml->name, (*values)->uuid)) {
+        generateNewUuid((*value)->uuid);
+    }
+
+    *value->post();
+    return *value;
 }
 
 void Device::onDelete(WappstoCallback cb)

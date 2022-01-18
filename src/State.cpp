@@ -8,7 +8,7 @@ State::State(Value *value, StateType_e stateType, bool forceCreate)
     this->stateType = stateType;
     this->requiresPost = false;
     this->data = "";
-    this->timestamp = "";
+    memset(this->timestamp, 0, TIMESTAMP_LENGTH);
 
     if(forceCreate) {
         generateNewUuid(this->uuid);

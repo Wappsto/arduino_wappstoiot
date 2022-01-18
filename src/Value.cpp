@@ -9,7 +9,6 @@ Value::Value(Device *device, ValueNumber_t *valNumber) : parent(device)
     this->permission = valNumber->permission;
     this->valueType = NUMBER_VALUE;
     this->valNumber = valNumber;
-    this->valString = NULL;
 }
 
 Value::Value(Device *device, ValueString_t *valString) : parent(device)
@@ -19,7 +18,6 @@ Value::Value(Device *device, ValueString_t *valString) : parent(device)
     this->type = valString->type;
     this->permission = valString->permission;
     this->valueType = STRING_VALUE;
-    this->valNumber = NULL;
     this->valString = valString;
 }
 
@@ -30,9 +28,17 @@ Value::Value(Device *device, ValueBlob_t *valBlob) : parent(device)
     this->type = valBlob->type;
     this->permission = valBlob->permission;
     this->valueType = BLOB_VALUE;
-    this->valNumber = NULL;
-    this->valString = NULL;
     this->valBlob = valBlob;
+}
+
+Value::Value(Device *device, ValueXml_t *valXml) : parent(device)
+{
+    _init();
+    this->name = valBlob->name;
+    this->type = valBlob->type;
+    this->permission = valBlob->permission;
+    this->valueType = XML_VALUE;
+    this->valXml = valXml;
 }
 
 void Value::_init(void)
@@ -45,6 +51,10 @@ void Value::_init(void)
     this->_onControlNumberCb = NULL;
     this->_onRefreshCb = NULL;
     this->_onDeleteCb = NULL;
+    this->valNumber = NULL;
+    this->valString = NULL;
+    this->valBlob = NULL;
+    this->valXml = NULL;
 }
 
 void Value::post(void)
@@ -67,7 +77,7 @@ void Value::post(void)
 bool Value::report(const String &data)
 {
     if(this->reportState) {
-        this->reportState->timestamp = getUtcTime();
+        strcpy(this->reportState->timestamp, getUtcTime());
         this->reportState->data = data;
         this->_wappstoRpc->putState(this->reportState);
         return true;
@@ -88,7 +98,7 @@ bool Value::report(double data)
 bool Value::control(const String &data)
 {
     if(this->controlState) {
-        this->controlState->timestamp = getUtcTime();
+        strcpy(this->controlState->timestamp, getUtcTime());
         this->controlState->data = data;
         this->_wappstoRpc->putState(this->controlState);
         return true;
@@ -193,13 +203,13 @@ bool Value::handleStateCb(const char* tmpUuid, RequestType_e req, const char *tm
         if(req == REQUEST_PUT) {
             if(this->_onControlNumberCb) {
                 this->controlState->data = tmpData;
-                this->controlState->timestamp = tmpTimestamp;
+                strcpy(this->controlState->timestamp, tmpTimestamp);
                 double tmpDouble = this->controlState->data.toDouble();
                 this->_onControlNumberCb(this, tmpDouble,this->controlState->timestamp);
                 return true;
             } else if(this->_onControlStringCb) {
                 this->controlState->data = tmpData;
-                this->controlState->timestamp = tmpTimestamp;
+                strcpy(this->controlState->timestamp, tmpTimestamp);
                 this->_onControlStringCb(this, this->controlState->data, this->controlState->timestamp);
                 return true;
             }

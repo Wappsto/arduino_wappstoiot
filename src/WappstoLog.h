@@ -3,8 +3,6 @@
 #include <Arduino.h>
 #include <ArduinoJson.h>
 
-#define JSON_POST_BUFFER 2072
-
 typedef enum {
    VERBOSE,
    INFO,
@@ -19,6 +17,8 @@ class WappstoLog
     public:
         static WappstoLog* instance();
         void setLogLevel(LOG_LEVELS_e logLevel);
+        bool shouldPrintLevel(LOG_LEVELS_e logLevel);
+
         void error(const char* text);
         void error(const char* text, int data);
         void error(const char* text, const char* data);
@@ -35,7 +35,6 @@ class WappstoLog
         void verbose(const char* text, int data);
         void verbose(const char* text, const char* data);
         void verbose(const JsonDocument& root);
-        bool shouldPrintLevel(LOG_LEVELS_e logLevel);
 
 
     private:
@@ -45,7 +44,8 @@ class WappstoLog
         WappstoLog& operator=(const WappstoLog&) = delete;
 
         LOG_LEVELS_e _logLevel;
-        void _print(const char* text);
-        void _print(const char* text, const char* data);
-        void _print(const char* text, int data);
+        void _print(LOG_LEVELS_e level, const char* text);
+        void _print(LOG_LEVELS_e level, const char* text, const char* data);
+        void _print(LOG_LEVELS_e level, const char* text, int data);
+        void _print(LOG_LEVELS_e level, const JsonDocument& root);
 };

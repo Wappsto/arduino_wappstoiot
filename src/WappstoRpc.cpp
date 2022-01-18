@@ -226,9 +226,13 @@ bool WappstoRpc::postValue(Value *value)
         str["max"] = value->valString->max;
         str["encoding"] = value->valString->encoding;
     } else if(value->valueType == BLOB_VALUE) {
-        JsonObject str = data.createNestedObject("blob");
-        str["max"] = value->valBlob->max;
-        str["encoding"] = value->valBlob->encoding;
+        JsonObject blob = data.createNestedObject("blob");
+        blob["max"] = value->valBlob->max;
+        blob["encoding"] = value->valBlob->encoding;
+    } else if(value->valueType == XML_VALUE) {
+        JsonObject xml = data.createNestedObject("xml");
+        xml["xsd"] = value->valXml->xsd;
+        xml["namespace"] = value->valXml->namespace;
     }
 
     JsonArray stateArray = data.createNestedArray("state");

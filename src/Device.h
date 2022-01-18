@@ -12,11 +12,12 @@ public:
     Value* createValueNumber(ValueNumber_t *valNumber);
     Value* createValueString(ValueString_t *valString);
     Value* createValueBlob(ValueBlob_t *valBlob);
+    Value* createValueXml(ValueXml_t *valXml);
     void onDelete(WappstoCallback cb);
     void post(void);
 
     Network *parent;
-    char uuid[UUID_LENGTH];
+    UUID_t uuid;
     String name;
     DeviceDescription_t deviceInfo;
 

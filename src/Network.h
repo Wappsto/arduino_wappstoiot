@@ -17,7 +17,7 @@ public:
     void onDelete(WappstoNetworkDeleteCallback cb);
     WappstoNetworkDeleteCallback _onDeleteCb;
 
-    char uuid[UUID_LENGTH];
+    UUID_t uuid;
     String name;
     String description;
     int currentNumberOfDevices;
