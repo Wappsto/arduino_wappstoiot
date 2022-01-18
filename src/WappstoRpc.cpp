@@ -528,7 +528,7 @@ bool WappstoRpc::getStateUuidFromName(Value *value, StateType_e stateType, char 
     return(_awaitUuidResponse(uuid));
 }
 
-bool WappstoRpc::getStateDataTime(const char *stateUuid, String &data, Timetamp_t timestamp)
+bool WappstoRpc::getStateDataTime(const char *stateUuid, String &data, Timestamp_t timestamp)
 {
     char url[200] = {0,};
     StaticJsonDocument<JSON_POST_BUFFER> root;
