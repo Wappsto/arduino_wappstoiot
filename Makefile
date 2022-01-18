@@ -1,3 +1,6 @@
+test:
+	./bin/arduino-cli compile -b esp32:esp32:esp32 --libraries="." examples/esp32_wappsto/esp32_wappsto.ino
+
 all: build
 	./bin/arduino-cli compile -b esp32:esp32:esp32 examples/esp32_wappsto/esp32_wappsto.ino
 
