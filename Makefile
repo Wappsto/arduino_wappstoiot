@@ -7,9 +7,9 @@ bin/arduino-cli:
 	./bin/arduino-cli core update-index
 
 setup: bin/arduino-cli
-	./bin/arduino-cli core update-index --additional-urls https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
 	./bin/arduino-cli config set library.enable_unsafe_install true
-	set ARDUINO_LIBRARY_ENABLE_UNSAFE_INSTALL=true
+	./bin/arduino-cli config add board_manager.additional_urls https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
+	./bin/arduino-cli core update-index
 	./bin/arduino-cli core install esp32:esp32
 	./bin/arduino-cli lib install --git-url https://github.com/Wappsto/arduino_wappstoiot.git
 	./bin/arduino-cli lib install ArduinoJson
