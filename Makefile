@@ -1,12 +1,7 @@
-test:
+.PHONY: setup
+
+all:
 	./bin/arduino-cli compile -b esp32:esp32:esp32 --libraries="." examples/esp32_wappsto/esp32_wappsto.ino
-
-all: build
-	./bin/arduino-cli compile -b esp32:esp32:esp32 examples/esp32_wappsto/esp32_wappsto.ino
-
-build:
-	zip -r WappstoIoT.zip src
-	./bin/arduino-cli lib install --zip-path ./WappstoIoT.zip
 
 bin/arduino-cli:
 	curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | sh
@@ -20,6 +15,5 @@ setup: bin/arduino-cli
 	./bin/arduino-cli core update-index
 	./bin/arduino-cli core install esp32:esp32
 
-	./bin/arduino-cli lib install --git-url https://github.com/Wappsto/arduino_wappstoiot.git
 	./bin/arduino-cli lib install ArduinoJson
 	./bin/arduino-cli lib update-index
