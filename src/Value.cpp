@@ -3,7 +3,7 @@
 
 Value::Value(Device *device, ValueNumber_t *valNumber) : parent(device)
 {
-    _init();
+    this->_init();
     this->name = valNumber->name;
     this->type = valNumber->type;
     this->permission = valNumber->permission;
@@ -13,7 +13,7 @@ Value::Value(Device *device, ValueNumber_t *valNumber) : parent(device)
 
 Value::Value(Device *device, ValueString_t *valString) : parent(device)
 {
-    _init();
+    this->_init();
     this->name = valString->name;
     this->type = valString->type;
     this->permission = valString->permission;
@@ -23,7 +23,7 @@ Value::Value(Device *device, ValueString_t *valString) : parent(device)
 
 Value::Value(Device *device, ValueBlob_t *valBlob) : parent(device)
 {
-    _init();
+    this->_init();
     this->name = valBlob->name;
     this->type = valBlob->type;
     this->permission = valBlob->permission;
@@ -33,7 +33,7 @@ Value::Value(Device *device, ValueBlob_t *valBlob) : parent(device)
 
 Value::Value(Device *device, ValueXml_t *valXml) : parent(device)
 {
-    _init();
+    this->_init();
     this->name = valBlob->name;
     this->type = valBlob->type;
     this->permission = valBlob->permission;
@@ -59,16 +59,16 @@ void Value::_init(void)
 
 void Value::post(void)
 {
-    switch(permission) {
+    switch(this->permission) {
         case READ:
-            reportState = new State(this, TYPE_REPORT, this->valueCreated);
+            this->reportState = new State(this, TYPE_REPORT, this->valueCreated);
             break;
         case WRITE:
-            controlState = new State(this, TYPE_CONTROL, this->valueCreated);
+            this->controlState = new State(this, TYPE_CONTROL, this->valueCreated);
             break;
         case READ_WRITE:
-            reportState = new State(this, TYPE_REPORT, this->valueCreated);
-            controlState = new State(this, TYPE_CONTROL, this->valueCreated);
+            this->reportState = new State(this, TYPE_REPORT, this->valueCreated);
+            this->controlState = new State(this, TYPE_CONTROL, this->valueCreated);
             break;
     }
     this->_wappstoRpc->postValue(this);

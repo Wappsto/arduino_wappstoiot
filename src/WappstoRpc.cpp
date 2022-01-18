@@ -21,12 +21,12 @@ void WappstoRpc::init(WiFiClientSecure *client)
 {
     this->_client = client;
     this->_wappstoLog = WappstoLog::instance();
-    _msgId = random(0xFFFF);
+    this->_msgId = random(0xFFFF);
 }
 
 int WappstoRpc::_getNextMsgId(void)
 {
-    return ++_msgId;
+    return ++this->_msgId;
 }
 
 bool WappstoRpc::_readJsonAwait(JsonDocument& root)
@@ -54,9 +54,9 @@ bool WappstoRpc::_readJsonAwait(JsonDocument& root)
             }
 
             int msgId = root["id"];
-            if(msgId != _msgId) {
+            if(msgId != this->_msgId) {
                 this->_wappstoLog->warning("Msg id incorrect: ", msgId);
-                this->_wappstoLog->warning("Expected: ", _msgId);
+                this->_wappstoLog->warning("Expected: ", this->_msgId);
                 continue;
             }
 
@@ -65,10 +65,12 @@ bool WappstoRpc::_readJsonAwait(JsonDocument& root)
         delay(10);
         timeoutCounter++;
         if(timeoutCounter > 300) {
-            this->_wappstoLog->warning("Timeout waiting for reply");
+            this->_wappstoLog->warning("Timeout waiting for reply: ", this->_msgId);
             return false;
         }
     }
+
+    return false;
 }
 
 bool WappstoRpc::_awaitResponse(void)
@@ -90,7 +92,6 @@ bool WappstoRpc::_awaitUuidResponse(char *uuid)
     StaticJsonDocument<JSON_POST_BUFFER> root;
     if(this->_readJsonAwait(root)) {
         if(root["result"]["value"]["id"].size() > 0) {
-            char getId[UUID_LENGTH] = {0,};
             strcpy(uuid, root["result"]["value"]["id"][0]);
 
             this->_wappstoLog->verbose("Found UUID: ", uuid);
@@ -114,23 +115,23 @@ bool WappstoRpc::_awaitDataTimeResponse(String &data, Timestamp_t timestamp)
 void WappstoRpc::_sendSuccessResponse(const char *id)
 {
     StaticJsonDocument<JSON_CHAR_BUFFER> root;
-    memset(_jsonTxBufferChar, 0x00, JSON_CHAR_BUFFER);
+    memset(this->_jsonTxBufferChar, 0x00, JSON_CHAR_BUFFER);
 
     root["jsonrpc"] = "2.0";
     root["id"] = id;
     root["result"] = true;
 
-    serializeJson(root, _jsonTxBufferChar);
-    this->_client->print(_jsonTxBufferChar);
+    serializeJson(root, this->_jsonTxBufferChar);
+    this->_client->print(this->_jsonTxBufferChar);
 }
 
 bool WappstoRpc::postNetwork(const char *networkId, String &networkName)
 {
     StaticJsonDocument<JSON_POST_BUFFER> root;
-    memset(_jsonTxBufferChar, 0x00, JSON_TX_BUFFER_SIZE);
+    memset(this->_jsonTxBufferChar, 0x00, JSON_TX_BUFFER_SIZE);
 
     root["jsonrpc"] = "2.0";
-    root["id"] = _getNextMsgId();
+    root["id"] = this->_getNextMsgId();
     root["method"] = "POST";
     JsonObject params = root.createNestedObject("params");
     params["url"] = "/network";
@@ -141,21 +142,21 @@ bool WappstoRpc::postNetwork(const char *networkId, String &networkName)
     meta["type"] = "network";
     meta["version"] = "2.0";
 
-    serializeJson(root, _jsonTxBufferChar);
+    serializeJson(root, this->_jsonTxBufferChar);
     this->_wappstoLog->verbose(root);
-    this->_client->print(_jsonTxBufferChar);
+    this->_client->print(this->_jsonTxBufferChar);
 
-    return(_awaitResponse());
+    return(this->_awaitResponse());
 }
 
 bool WappstoRpc::postDevice(Device *device)
 {
     char url[200] = {0,};
     StaticJsonDocument<JSON_POST_BUFFER> root;
-    memset(_jsonTxBufferChar, 0x00, JSON_TX_BUFFER_SIZE);
+    memset(this->_jsonTxBufferChar, 0x00, JSON_TX_BUFFER_SIZE);
 
     root["jsonrpc"] = "2.0";
-    root["id"] = _getNextMsgId();
+    root["id"] = this->_getNextMsgId();
     root["method"] = "POST";
     JsonObject params = root.createNestedObject("params");
     sprintf(url, "/network/%s/device", &device->parent->uuid);
@@ -176,11 +177,11 @@ bool WappstoRpc::postDevice(Device *device)
     data["protocol"] = device->deviceInfo.protocol;
     data["communication"] = device->deviceInfo.communication;
 
-    serializeJson(root, _jsonTxBufferChar);
+    serializeJson(root, this->_jsonTxBufferChar);
     this->_wappstoLog->verbose(root);
-    this->_client->print(_jsonTxBufferChar);
+    this->_client->print(this->_jsonTxBufferChar);
 
-    return(_awaitResponse());
+    return(this->_awaitResponse());
 }
 
 bool WappstoRpc::postValue(Value *value)
@@ -188,10 +189,10 @@ bool WappstoRpc::postValue(Value *value)
     char url[200] = {0,};
     sprintf(url, "/device/%s/value", &value->parent->uuid);
     StaticJsonDocument<JSON_POST_BUFFER> root;
-    memset(_jsonTxBufferChar, 0x00, JSON_TX_BUFFER_SIZE);
+    memset(this->_jsonTxBufferChar, 0x00, JSON_TX_BUFFER_SIZE);
 
     root["jsonrpc"] = "2.0";
-    root["id"] = _getNextMsgId();
+    root["id"] = this->_getNextMsgId();
     root["method"] = "POST";
     JsonObject params = root.createNestedObject("params");
     sprintf(url, "/device/%s/value", &value->parent->uuid);
@@ -262,11 +263,11 @@ bool WappstoRpc::postValue(Value *value)
         }
     }
 
-    serializeJson(root, _jsonTxBufferChar);
+    serializeJson(root, this->_jsonTxBufferChar);
     this->_wappstoLog->verbose(root);
-    this->_client->print(_jsonTxBufferChar);
+    this->_client->print(this->_jsonTxBufferChar);
 
-    return(_awaitResponse());
+    return(this->_awaitResponse());
 }
 
 bool WappstoRpc::deleteValue(const char* networkId, const char* deviceId, int valueId)
@@ -274,7 +275,7 @@ bool WappstoRpc::deleteValue(const char* networkId, const char* deviceId, int va
     /*
     char url[200] = {0,};
     StaticJsonDocument<JSON_POST_BUFFER> root;
-    memset(_jsonTxBufferChar, 0x00, JSON_TX_BUFFER_SIZE);
+    memset(this->_jsonTxBufferChar, 0x00, JSON_TX_BUFFER_SIZE);
 
     root["jsonrpc"] = "2.0";
     root["id"] = 1;
@@ -283,11 +284,11 @@ bool WappstoRpc::deleteValue(const char* networkId, const char* deviceId, int va
     sprintf(url, "/network/%s/device/%s/value/%s", networkId, deviceId, _values[valueId-1].valueUuid);
     params["url"] = url;
 
-    serializeJson(root, _jsonTxBufferChar);
+    serializeJson(root, this->_jsonTxBufferChar);
     this->_wappstoLog->verbose(root);
-    this->_client->print(_jsonTxBufferChar);
+    this->_client->print(this->_jsonTxBufferChar);
 
-    return(_awaitResponse());
+    return(this->_awaitResponse());
     */
     return false;
 }
@@ -297,10 +298,10 @@ bool WappstoRpc::putValue(Value *value)
     /*
     char url[200] = {0,};
     StaticJsonDocument<JSON_POST_BUFFER> root;
-    memset(_jsonTxBufferChar, 0x00, JSON_TX_BUFFER_SIZE);
+    memset(this->_jsonTxBufferChar, 0x00, JSON_TX_BUFFER_SIZE);
 
     root["jsonrpc"] = "2.0";
-    root["id"] = _getNextMsgId();
+    root["id"] = this->_getNextMsgId();
     root["method"] = "PUT";
     JsonObject params = root.createNestedObject("params");
     sprintf(url, "/network/%s/device/%s/value/%s/state/%s", networkId, deviceId, _values[valueId-1].valueUuid, _values[valueId-1].reportUuid);
@@ -316,11 +317,11 @@ bool WappstoRpc::putValue(Value *value)
     data["data"] = _values[valueId-1].data;
     data["type"] = "Report";
 
-    serializeJson(root, _jsonTxBufferChar);
+    serializeJson(root, this->_jsonTxBufferChar);
     this->_wappstoLog->verbose(root);
-    this->_client->print(_jsonTxBufferChar);
+    this->_client->print(this->_jsonTxBufferChar);
 
-    return(_awaitResponse());
+    return(this->_awaitResponse());
     */
     return false;
 }
@@ -336,17 +337,17 @@ bool WappstoRpc::sendPing(void)
     }
 */
     StaticJsonDocument<JSON_POST_BUFFER> root;
-    memset(_jsonTxBufferChar, 0x00, JSON_TX_BUFFER_SIZE);
+    memset(this->_jsonTxBufferChar, 0x00, JSON_TX_BUFFER_SIZE);
 
     root["jsonrpc"] = "2.0";
-    root["id"] = _getNextMsgId();
+    root["id"] = this->_getNextMsgId();
     root["method"] = "HEAD";
     JsonObject params = root.createNestedObject("params");
     params["url"] = "/services/2.0/network";
-    serializeJson(root, _jsonTxBufferChar);
+    serializeJson(root, this->_jsonTxBufferChar);
     this->_wappstoLog->verbose(root);
-    this->_client->print(_jsonTxBufferChar);
-    return(_awaitResponse());
+    this->_client->print(this->_jsonTxBufferChar);
+    return(this->_awaitResponse());
 }
 
 bool WappstoRpc::putState(State *state)
@@ -360,10 +361,10 @@ bool WappstoRpc::putState(State *state)
 */
     char url[200] = {0,};
     StaticJsonDocument<JSON_POST_BUFFER> root;
-    memset(_jsonTxBufferChar, 0x00, JSON_TX_BUFFER_SIZE);
+    memset(this->_jsonTxBufferChar, 0x00, JSON_TX_BUFFER_SIZE);
 
     root["jsonrpc"] = "2.0";
-    root["id"] = _getNextMsgId();
+    root["id"] = this->_getNextMsgId();
     root["method"] = "PUT";
     JsonObject params = root.createNestedObject("params");
     sprintf(url, "/state/%s", state->uuid);
@@ -388,10 +389,10 @@ bool WappstoRpc::putState(State *state)
         data["type"] = "Control";
     }
 
-    serializeJson(root, _jsonTxBufferChar);
+    serializeJson(root, this->_jsonTxBufferChar);
     this->_wappstoLog->verbose(root);
-    this->_client->print(_jsonTxBufferChar);
-    return(_awaitResponse());
+    this->_client->print(this->_jsonTxBufferChar);
+    return(this->_awaitResponse());
 }
 
 RequestType_e WappstoRpc::readData(char* uuid, char *dataPtr, char *timestampPtr)
@@ -429,7 +430,7 @@ RequestType_e WappstoRpc::readData(char* uuid, char *dataPtr, char *timestampPtr
 
             this->_wappstoLog->verbose("GET: ", getId);
             strcpy(uuid, getId);
-            _sendSuccessResponse(msgId);
+            this->_sendSuccessResponse(msgId);
             return REQUEST_GET;
         } else if(strcmp(method, "PUT") == 0) {
             JsonObject data = params["data"];
@@ -441,7 +442,7 @@ RequestType_e WappstoRpc::readData(char* uuid, char *dataPtr, char *timestampPtr
             this->_wappstoLog->verbose("PUT: ",uuid);
             this->_wappstoLog->verbose(dataPtr);
 
-            _sendSuccessResponse(msgId);
+            this->_sendSuccessResponse(msgId);
             return REQUEST_PUT;
         } else if(strcmp(method, "DELETE") == 0) {
             const char* urlStr = params["url"];
@@ -452,7 +453,7 @@ RequestType_e WappstoRpc::readData(char* uuid, char *dataPtr, char *timestampPtr
 
             this->_wappstoLog->verbose("DELETE: ", getId);
             strcpy(uuid, getId);
-            _sendSuccessResponse(msgId);
+            this->_sendSuccessResponse(msgId);
             return REQUEST_DELETE;
         } else {
             this->_wappstoLog->verbose(method);
@@ -474,46 +475,46 @@ bool WappstoRpc::getDeviceUuidFromName(Network *network, String &name, char *uui
 {
     char url[200] = {0,};
     StaticJsonDocument<JSON_POST_BUFFER> root;
-    memset(_jsonTxBufferChar, 0x00, JSON_TX_BUFFER_SIZE);
+    memset(this->_jsonTxBufferChar, 0x00, JSON_TX_BUFFER_SIZE);
 
     root["jsonrpc"] = "2.0";
-    root["id"] = _getNextMsgId();
+    root["id"] = this->_getNextMsgId();
     root["method"] = "GET";
     JsonObject params = root.createNestedObject("params");
     sprintf(url, "/network/%s/device?this_name==%s", network->uuid, name.c_str());
     params["url"] = url;
-    serializeJson(root, _jsonTxBufferChar);
+    serializeJson(root, this->_jsonTxBufferChar);
     this->_wappstoLog->verbose(root);
-    this->_client->print(_jsonTxBufferChar);
-    return(_awaitUuidResponse(uuid));
+    this->_client->print(this->_jsonTxBufferChar);
+    return(this->_awaitUuidResponse(uuid));
 }
 
 bool WappstoRpc::getValueUuidFromName(Device *device, String name, char *uuid)
 {
     char url[200] = {0,};
     StaticJsonDocument<JSON_POST_BUFFER> root;
-    memset(_jsonTxBufferChar, 0x00, JSON_TX_BUFFER_SIZE);
+    memset(this->_jsonTxBufferChar, 0x00, JSON_TX_BUFFER_SIZE);
 
     root["jsonrpc"] = "2.0";
-    root["id"] = _getNextMsgId();
+    root["id"] = this->_getNextMsgId();
     root["method"] = "GET";
     JsonObject params = root.createNestedObject("params");
     sprintf(url, "/device/%s/value?this_name==%s", device->uuid, name.c_str());
     params["url"] = url;
-    serializeJson(root, _jsonTxBufferChar);
+    serializeJson(root, this->_jsonTxBufferChar);
     this->_wappstoLog->verbose(root);
-    this->_client->print(_jsonTxBufferChar);
-    return(_awaitUuidResponse(uuid));
+    this->_client->print(this->_jsonTxBufferChar);
+    return(this->_awaitUuidResponse(uuid));
 }
 
 bool WappstoRpc::getStateUuidFromName(Value *value, StateType_e stateType, char *uuid)
 {
     char url[200] = {0,};
     StaticJsonDocument<JSON_POST_BUFFER> root;
-    memset(_jsonTxBufferChar, 0x00, JSON_TX_BUFFER_SIZE);
+    memset(this->_jsonTxBufferChar, 0x00, JSON_TX_BUFFER_SIZE);
 
     root["jsonrpc"] = "2.0";
-    root["id"] = _getNextMsgId();
+    root["id"] = this->_getNextMsgId();
     root["method"] = "GET";
     JsonObject params = root.createNestedObject("params");
     if(stateType == TYPE_REPORT) {
@@ -522,26 +523,26 @@ bool WappstoRpc::getStateUuidFromName(Value *value, StateType_e stateType, char 
         sprintf(url, "/value/%s/state?this_type==Control", value->uuid);
     }
     params["url"] = url;
-    serializeJson(root, _jsonTxBufferChar);
+    serializeJson(root, this->_jsonTxBufferChar);
     this->_wappstoLog->verbose(root);
-    this->_client->print(_jsonTxBufferChar);
-    return(_awaitUuidResponse(uuid));
+    this->_client->print(this->_jsonTxBufferChar);
+    return(this->_awaitUuidResponse(uuid));
 }
 
 bool WappstoRpc::getStateDataTime(const char *stateUuid, String &data, Timestamp_t timestamp)
 {
     char url[200] = {0,};
     StaticJsonDocument<JSON_POST_BUFFER> root;
-    memset(_jsonTxBufferChar, 0x00, JSON_TX_BUFFER_SIZE);
+    memset(this->_jsonTxBufferChar, 0x00, JSON_TX_BUFFER_SIZE);
 
     root["jsonrpc"] = "2.0";
-    root["id"] = _getNextMsgId();
+    root["id"] = this->_getNextMsgId();
     root["method"] = "GET";
     JsonObject params = root.createNestedObject("params");
     sprintf(url, "/state/%s", stateUuid);
     params["url"] = url;
-    serializeJson(root, _jsonTxBufferChar);
+    serializeJson(root, this->_jsonTxBufferChar);
     this->_wappstoLog->verbose(root);
-    this->_client->print(_jsonTxBufferChar);
-    return(_awaitDataTimeResponse(data, timestamp));
+    this->_client->print(this->_jsonTxBufferChar);
+    return(this->_awaitDataTimeResponse(data, timestamp));
 }

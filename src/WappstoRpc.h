@@ -44,7 +44,6 @@ class WappstoRpc
         WappstoLog *_wappstoLog;
         WiFiClientSecure *_client;
         int _msgId;
-        bool _jsonDebug;
         uint8_t _readBuffer[JSON_STATIC_BUFFER_SIZE];
         uint8_t _rspBuffer[JSON_STATIC_BUFFER_SIZE];
         char _jsonTxBufferChar[JSON_TX_BUFFER_SIZE];

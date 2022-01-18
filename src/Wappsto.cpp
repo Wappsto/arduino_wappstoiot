@@ -1,7 +1,7 @@
 #include "WappstoIoT.h"
 
 #define WAPPSTO_PORT 443
-const char* wappsto_server = "collector.wappsto.com";
+#define WAPPSTO_SERVER "collector.wappsto.com";
 
 
 Wappsto::Wappsto(WiFiClientSecure *client)
@@ -32,7 +32,7 @@ void Wappsto::config(const char* network_id, const char* ca, const char* client_
 
 bool Wappsto::connect(void)
 {
-    if(this->_client->connect(wappsto_server, WAPPSTO_PORT)) {
+    if(this->_client->connect(WAPPSTO_SERVER, WAPPSTO_PORT)) {
         return true;
     }
     this->_wappstoLog->error("Could not connect to wappsto");
@@ -75,8 +75,8 @@ bool Wappsto::dataAvailable(void)
 
     if(!this->_client->available()) {
         unsigned long currentMillis = millis();
-        if(_pingIntervalMinutes != 0 && (currentMillis - _startPingMillis >= _pingIntervalMinutes*60*1000)) {
-            _startPingMillis = currentMillis;
+        if(this->_pingIntervalMinutes != 0 && (currentMillis - this->_startPingMillis >= this->_pingIntervalMinutes*60*1000)) {
+            this->_startPingMillis = currentMillis;
             this->_wappstoRpc->sendPing();
         }
         return false;
