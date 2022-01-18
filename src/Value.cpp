@@ -108,12 +108,12 @@ bool Value::control(const String &data)
 
 bool Value::control(int data)
 {
-    this->control(String(data));
+    return this->control(String(data));
 }
 
 bool Value::control(double data)
 {
-    this->control(String(data));
+    return this->control(String(data));
 }
 
 String Value::getControlData(void)

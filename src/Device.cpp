@@ -27,52 +27,42 @@ void Device::post(void)
 
 Value* Device::createValueNumber(ValueNumber_t *valNumber)
 {
-    if(currentNumberOfValues >= MAX_VALUES) {
-        this->_wappstoLog->error("Cannot create more values");
-        return NULL;
-    }
-    currentNumberOfValues++;
-    values[currentNumberOfValues-1] = new Value(this, valNumber);
+    Value** value = this->getFreeValue();
+    *value = new Value(this, valNumber);
 
-    if(!this->_wappstoRpc->getValueUuidFromName(this, valNumber->name, values[currentNumberOfValues-1]->uuid)) {
-        generateNewUuid(values[currentNumberOfValues-1]->uuid);
-        values[currentNumberOfValues-1]->valueCreated = true;
-    }
+    postValue(*value, valNumber->name);
 
-    values[currentNumberOfValues-1]->post();
-    return values[currentNumberOfValues-1];
+    return *value;
 }
 
 Value* Device::createValueString(ValueString_t *valString)
 {
-    if(currentNumberOfValues >= MAX_VALUES) {
-        _wappstoLog->error("Cannot create more values");
-        return NULL;
-    }
-    currentNumberOfValues++;
-    values[currentNumberOfValues-1] = new Value(this, valString);
-    if(!this->_wappstoRpc->getValueUuidFromName(this, valString->name, values[currentNumberOfValues-1]->uuid)) {
-        generateNewUuid(values[currentNumberOfValues-1]->uuid);
-    }
-    values[currentNumberOfValues-1]->post();
-    return values[currentNumberOfValues-1];
+    Value** value = this->getFreeValue();
+    *value = new Value(this, valString);
+
+    postValue(*value, valString->name);
+
+    return *value;
 }
 
 Value* Device::createValueBlob(ValueBlob_t *valBlob)
 {
-    if(currentNumberOfValues >= MAX_VALUES) {
-        this->_wappstoLog->error("Cannot create more values");
-        return NULL;
-    }
-    currentNumberOfValues++;
-    values[currentNumberOfValues-1] = new Value(this, valBlob);
+    Value** value = this->getFreeValue();
+    *value = new Value(this, valBlob);
 
-    if(!this->_wappstoRpc->getValueUuidFromName(this, valBlob->name, values[currentNumberOfValues-1]->uuid)) {
-        generateNewUuid(values[currentNumberOfValues-1]->uuid);
-    }
+    postValue(*value, valBlob->name);
 
-    values[currentNumberOfValues-1]->post();
-    return values[currentNumberOfValues-1];
+    return *value;
+}
+
+Value* Device::createValueXml(ValueXml_t *valXml)
+{
+    Value** value = this->getFreeValue();
+    *value = new Value(this, valXml);
+
+    postValue(*value, valXml->name);
+
+    return *value;
 }
 
 Value** Device::getFreeValue()
@@ -86,17 +76,14 @@ Value** Device::getFreeValue()
     return &values[currentNumberOfValues-1];
 }
 
-Value* Device::createValueXml(ValueXml_t *valXml)
+void Device::postValue(Value *value, String name)
 {
-    Value** value = this->getFreeValue();
-    *value = new Value(this, valXml);
-
-    if(!this->_wappstoRpc->getValueUuidFromName(this, valXml->name, (*values)->uuid)) {
-        generateNewUuid((*value)->uuid);
+    if(!this->_wappstoRpc->getValueUuidFromName(this, name, value->uuid)) {
+        generateNewUuid(value->uuid);
+        value->valueCreated = true;
     }
 
-    *value->post();
-    return *value;
+    value->post();
 }
 
 void Device::onDelete(WappstoCallback cb)

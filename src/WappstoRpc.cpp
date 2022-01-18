@@ -100,12 +100,12 @@ bool WappstoRpc::_awaitUuidResponse(char *uuid)
     return false;
 }
 
-bool WappstoRpc::_awaitDataTimeResponse(String &data, String &timestamp)
+bool WappstoRpc::_awaitDataTimeResponse(String &data, Timestamp_t timestamp)
 {
     StaticJsonDocument<JSON_POST_BUFFER> root;
     if(this->_readJsonAwait(root)) {
         data = String((const char*)root["result"]["value"]["data"]);
-        timestamp = String((const char*)root["result"]["value"]["timestamp"]);
+        strcpy(timestamp, root["result"]["value"]["timestamp"]);
         return true;
     }
     return false;
@@ -528,7 +528,7 @@ bool WappstoRpc::getStateUuidFromName(Value *value, StateType_e stateType, char 
     return(_awaitUuidResponse(uuid));
 }
 
-bool WappstoRpc::getStateDataTime(const char *stateUuid, String &data, String &timestamp)
+bool WappstoRpc::getStateDataTime(const char *stateUuid, String &data, Timetamp_t timestamp)
 {
     char url[200] = {0,};
     StaticJsonDocument<JSON_POST_BUFFER> root;

@@ -23,7 +23,7 @@ class WappstoRpc
         bool getDeviceUuidFromName(Network *network, String &name, char *uuid);
         bool getValueUuidFromName(Device *device, String name, char *uuid);
         bool getStateUuidFromName(Value *value, StateType_e stateType, char *uuid);
-        bool getStateDataTime(const char *stateUuid, String &data, String &timestamp);
+        bool getStateDataTime(const char *stateUuid, String &data, Timestamp_t timestamp);
         bool sendPing(void);
 
         RequestType_e readData(char* uuid, char* data, char *timestampPtr);
@@ -36,7 +36,7 @@ class WappstoRpc
 
         bool _awaitResponse(void);
         bool _awaitUuidResponse(char *uuid);
-        bool _awaitDataTimeResponse(String &data, String &timestamp);
+        bool _awaitDataTimeResponse(String &data, Timestamp_t timestamp);
         void _sendSuccessResponse(const char *id);
         bool _readJsonAwait(JsonDocument& root);
         int _getNextMsgId(void);
