@@ -25,8 +25,8 @@ public:
     Value* values[MAX_VALUES];
 
 private:
-    Value** Device::getFreeValue();
-    void Device::postValue(Value *value, String name);
+    Value** getFreeValue();
+    void postValue(Value *value, String name);
 
     WappstoRpc *_wappstoRpc;
     WappstoLog *_wappstoLog;
