@@ -1,7 +1,7 @@
 #include "WappstoIoT.h"
 
 #define WAPPSTO_PORT 443
-#define WAPPSTO_SERVER "collector.wappsto.com";
+#define WAPPSTO_SERVER "collector.wappsto.com"
 
 
 Wappsto::Wappsto(WiFiClientSecure *client)
