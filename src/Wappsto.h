@@ -17,7 +17,7 @@ public:
     bool connect(void);
     bool disconnect(void);
     bool dataAvailable();
-    char uuid[UUID_LENGTH];
+    UUID_t uuid;
 
 
 private:

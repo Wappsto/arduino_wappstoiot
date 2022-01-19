@@ -11,6 +11,7 @@
 #endif
 
 #define UUID_LENGTH 37
+#define TIMESTAMP_LENGTH 30
 
 void generateNewUuid(char* str);
 const char* getUtcTime(void);
@@ -54,6 +55,7 @@ typedef enum {
     NUMBER_VALUE,
     STRING_VALUE,
     BLOB_VALUE,
+    XML_VALUE,
 } VALUE_TYPE_e;
 
 typedef struct
@@ -86,6 +88,17 @@ typedef struct
     String encoding;
 } ValueBlob_t;
 
+typedef struct
+{
+    String name;
+    String type;
+    PERMISSION_e permission;
+    String xml_namespace;
+    String xsd;
+} ValueXml_t;
+
+typedef char Timestamp_t[TIMESTAMP_LENGTH];
+typedef char UUID_t[UUID_LENGTH];
 typedef void (*WappstoCallback)(void *object);
 
 typedef void (*WappstoNetworkDeleteCallback)(Network *network);

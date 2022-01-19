@@ -10,6 +10,7 @@ public:
     Value(Device *device, ValueNumber_t *valNumber);
     Value(Device *device, ValueString_t *valString);
     Value(Device *device, ValueBlob_t *valBlob);
+    Value(Device *device, ValueXml_t *valXml);
     bool report(const String &data);
     bool report(double data);
     bool report(int data);
@@ -25,7 +26,7 @@ public:
     bool handleStateCb(const char* tmpUuid, RequestType_e req, const char *tmpData, const char *tmpTimestamp);
 
     Device *parent;
-    char uuid[UUID_LENGTH];
+    UUID_t uuid;
     String name;
     String type;
     PERMISSION_e permission;
@@ -33,6 +34,7 @@ public:
     ValueNumber_t *valNumber;
     ValueString_t *valString;
     ValueBlob_t *valBlob;
+    ValueXml_t *valXml;
     bool valueCreated;
 
     State* reportState;
