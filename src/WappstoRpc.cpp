@@ -105,9 +105,13 @@ bool WappstoRpc::_awaitDataTimeResponse(String &data, Timestamp_t timestamp)
 {
     StaticJsonDocument<JSON_POST_BUFFER> root;
     if(this->_readJsonAwait(root)) {
-        data = String((const char*)root["result"]["value"]["data"]);
-        strcpy(timestamp, root["result"]["value"]["timestamp"]);
-        return true;
+        if(root["result"]["value"].containsKey("data")) {
+            data = String((const char*)root["result"]["value"]["data"]);
+            strcpy(timestamp, root["result"]["value"]["timestamp"]);
+            return true;
+        } else {
+            return false;
+        }
     }
     return false;
 }
