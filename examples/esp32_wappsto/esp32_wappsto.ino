@@ -4,9 +4,6 @@ https://randomnerdtutorials.com/installing-the-esp32-board-in-arduino-ide-window
 - Add to preferences, additional boards manager urls: https://dl.espressif.com/dl/package_esp32_index.json
 - Board manager, search for ESP32 and install
 
-WappstoIoT Libraries requirements
-ArduinoJson
-WiFiClientSecure
 **/
 
 #include <WiFiMulti.h>
@@ -24,32 +21,35 @@ const char* password = "";
 
 Network *myNetwork;
 Device *myDevice;
-Value *myTemperatureValue;
+Value *myLedValue;
+int myLed = 0;
+#define LED_PIN 2
 
 DeviceDescription_t myDeviceDescription = {
     .name = "My Device",
     .product = "ESP32 example",
     .manufacturer = "",
-    .description = "Example description",
+    .description = "ESP32 Example description",
     .version = "1.0",
     .serial = "00001",
     .protocol = "Json-RPC",
     .communication = "WiFi",
 };
-ValueNumber_t myTemperatureParameters = {   .name = "Temperature",
-                                            .type = "temperature",
-                                            .permission = READ,
-                                            .min = -20,
-                                            .max = 100,
-                                            .step = 0.1,
-                                            .unit = "°C",
+
+ValueNumber_t myLedParameters = {   .name = "Led",
+                                            .type = "light",
+                                            .permission = READ_WRITE,
+                                            .min = 0,
+                                            .max = 1,
+                                            .step = 1,
+                                            .unit = "",
                                             .si_conversion = ""};
 
-double myTemperatureReading = 21.3;
-
-void refreshTemperatureCallback(Value *value)
+void controlLedCallback(Value *value, double data, String timestamp)
 {
-    value->report(myTemperatureReading);
+    myLed = (int)data;
+    digitalWrite(LED_PIN, myLed);
+    value->report(myLed);
 }
 
 void initializeWifi(void)
@@ -64,9 +64,13 @@ void initializeWifi(void)
     Serial.println(WiFi.localIP());
 }
 
-void setup() {
+void setup()
+{
     Serial.begin(115200);
     randomSeed(analogRead(0));
+
+    pinMode(LED_PIN, OUTPUT);
+
     initializeWifi();
 
     initializeNtp();
@@ -79,27 +83,23 @@ void setup() {
     }
 
     // Create network
-    myNetwork = wappsto.createNetwork("Basic Example");
+    myNetwork = wappsto.createNetwork("ESP32 Basic Example");
 
     // Create device
     myDevice = myNetwork->createDevice(&myDeviceDescription);
 
-    // Create temperature value
-    myTemperatureValue = myDevice->createValueNumber(&myTemperatureParameters);
-    myTemperatureValue->onRefresh(&refreshTemperatureCallback);
+    // Create LED value
+    myLedValue = myDevice->createValueNumber(&myLedParameters);
+    myLedValue->onControl(&controlLedCallback);
+
+    // Get the last control request, and set the led to this value
+    myLed = myLedValue->getControlData().toInt();
+    digitalWrite(LED_PIN, myLed);
+    myLedValue->report(myLed);
 }
 
-unsigned long startMillis = 0;
-unsigned long currentMillis = 0;
-#define UPDATE_INTERVAL_MILLIS 2*60*1000
-
-void loop() {
-    delay(500);
+void loop()
+{
+    delay(200);
     wappsto.dataAvailable();
-
-    currentMillis = millis();
-    if(currentMillis - startMillis >= UPDATE_INTERVAL_MILLIS) {
-        startMillis = currentMillis;
-        myTemperatureValue->report(myTemperatureReading);
-    }
 }
