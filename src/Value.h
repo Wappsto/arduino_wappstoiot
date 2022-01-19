@@ -54,5 +54,6 @@ public:
 
 private:
     WappstoRpc *_wappstoRpc;
+    WappstoLog *_wappstoLog;
     void _init(void);
 };

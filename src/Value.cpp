@@ -43,6 +43,7 @@ Value::Value(Device *device, ValueXml_t *valXml) : parent(device)
 
 void Value::_init(void)
 {
+    this->_wappstoLog = WappstoLog::instance();
     this->_wappstoRpc = WappstoRpc::instance();
     this->valueCreated = false;
     this->reportState = NULL;
@@ -92,6 +93,20 @@ bool Value::report(int data)
 
 bool Value::report(double data)
 {
+    uint8_t count = 0;
+    if(this->valueType == NUMBER_VALUE) {
+        double num = this->valNumber->step;
+        num = abs(num);
+        num = num - (int)num;
+        while (abs(num) >= 0.0000001) {
+            num = num * 10;
+            count = count + 1;
+            num = num - int(num);
+        }
+        if(count > 0) {
+            return this->report(String(data, count));
+        }
+    }
     return this->report(String(data));
 }
 
