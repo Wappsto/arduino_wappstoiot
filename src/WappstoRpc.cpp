@@ -86,7 +86,7 @@ bool WappstoRpc::_readJsonAwait(JsonDocument& root)
     while (this->_client->connected()) {
         int ret;
         memset(this->_rspBuffer, 0x00, sizeof(this->_rspBuffer));
-        ret = this->_client->read(this->_rspBuffer, sizeof(this->_rspBuffer));
+        ret = this->_client->read(this->_rspBuffer, sizeof(this->_rspBuffer) - 1);
         if (ret > 0) {
             this->_wappstoLog->verbose("Read bytes: ", ret);
             this->_wappstoLog->verbose((const char*)this->_rspBuffer);
