@@ -11,6 +11,10 @@
     #define MAX_DEVICES 5
 #endif
 
+class Network;
+
+typedef void (*WappstoNetworkCallback)(Network *network);
+
 class Network: public WappstoModel
 {
 public:
@@ -19,14 +23,21 @@ public:
     void post(void);
     Device* createDevice(DeviceDescription_t *deviceInfo);
 
+    void onRefresh(WappstoNetworkCallback cb);
+    void onDelete(WappstoNetworkCallback cb);
+
     String name;
     String description;
     int currentNumberOfDevices;
     Device* devices[MAX_DEVICES];
 
 private:
-    void toJSON(JsonObject data);
+    WappstoNetworkCallback _onRefreshCb;
+    WappstoNetworkCallback _onDeleteCb;
+    bool handleRefresh();
+    bool handleDelete();
     bool handleUpdate(JsonObject doc);
     bool handleChildren(const char* tmpUuid, RequestType_e req, JsonObject doc);
     void getFindQuery(char *url);
+    void toJSON(JsonObject data);
 };

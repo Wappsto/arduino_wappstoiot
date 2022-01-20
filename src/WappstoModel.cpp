@@ -6,8 +6,6 @@ WappstoModel::WappstoModel(WappstoModel *parent, const char *type) {
     this->type = type;
     this->parent = parent;
     this->newModel = false;
-    this->_onDeleteCb = NULL;
-    this->_onRefreshCb = NULL;
     memset(this->uuid, 0, UUID_LENGTH);
 }
 
@@ -15,23 +13,11 @@ bool WappstoModel::handleRequest(const char* tmpUuid, RequestType_e req, JsonObj
     if(strcmp(this->uuid, tmpUuid) == 0) {
         switch(req) {
             case REQUEST_GET:
-                this->_wappstoLog->verbose("handle GET", this->type);
-                if(this->_onRefreshCb) {
-                    this->_wappstoLog->verbose("call refresh callback");
-                    this->_onRefreshCb(this);
-                    return true;
-                } else if(strcmp(this->type, "state") == 0 && this->parent) {
-                    this->parent->
-                }
-                return false;
+                return this->handleRefresh();
             case REQUEST_PUT:
                 return this->handleUpdate(obj);
-                break;
             case REQUEST_DELETE:
-                if(this->_onDeleteCb) {
-                    this->_onDeleteCb(this);
-                    return true;
-                }
+                return this->handleDelete();
                 return false;
         }
 
@@ -39,16 +25,6 @@ bool WappstoModel::handleRequest(const char* tmpUuid, RequestType_e req, JsonObj
     }
 
     return this->handleChildren(tmpUuid, req, obj);
-}
-
-void WappstoModel::onRefresh(WappstoRefreshCallback cb)
-{
-    this->_onRefreshCb = cb;
-}
-
-void WappstoModel::onDelete(WappstoDeleteCallback cb)
-{
-    this->_onDeleteCb = cb;
 }
 
 const char* WappstoModel::getUUID()

@@ -59,6 +59,7 @@ typedef struct
 
 class Value;
 
+typedef void (*WappstoValueCallback)(Value *value);
 typedef void (*WappstoValueControlStringCallback)(Value *value, String data, String timestamp);
 typedef void (*WappstoValueControlNumberCallback)(Value *value, double data, String timestamp);
 
@@ -99,9 +100,12 @@ public:
     double getReportNumberData(void);
     String getReportTimestamp(void);
 
-    void onRefresh(WappstoRefreshCallback cb);
+    void onRefresh(WappstoValueCallback cb);
+    void onDelete(WappstoValueCallback cb);
 
 private:
+    WappstoValueCallback _onRefreshCb;
+    WappstoValueCallback _onDeleteCb;
     State* reportState;
     State* controlState;
     WappstoValueControlStringCallback _onControlStringCb;
@@ -110,6 +114,8 @@ private:
     void _init(void);
 
     void toJSON(JsonObject data);
+    bool handleRefresh();
+    bool handleDelete();
     bool handleUpdate(JsonObject obj);
     bool handleChildren(const char* tmpUuid, RequestType_e req, JsonObject obj);
     void getFindQuery(char *url);

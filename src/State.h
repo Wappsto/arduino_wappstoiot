@@ -4,6 +4,10 @@
 #include "WappstoModel.h"
 #include "WappstoIoT.h"
 
+class State;
+
+typedef void (*WappstoStateCallback)(State *state);
+
 class State: public WappstoModel
 {
 public:
@@ -15,6 +19,8 @@ public:
 
 private:
     void toJSON(JsonObject data);
+    bool handleRefresh();
+    bool handleDelete();
     bool handleUpdate(JsonObject doc);
     bool handleChildren(const char* tmpUuid, RequestType_e req, JsonObject doc);
     void getFindQuery(char *url);

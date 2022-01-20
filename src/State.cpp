@@ -6,6 +6,7 @@ State::State(WappstoModel *parent, StateType_e stateType, bool forceCreate): Wap
     this->parent = parent;
     this->stateType = stateType;
     this->data = "";
+
     memset(this->timestamp, 0, TIMESTAMP_LENGTH);
 
     if(forceCreate) {
@@ -57,5 +58,21 @@ bool State::handleUpdate(JsonObject obj)
 
 bool State::handleChildren(const char* tmpUuid, RequestType_e req, JsonObject obj)
 {
+    return false;
+}
+
+bool State::handleRefresh()
+{
+    if(this->parent) {
+        return this->parent->handleRefresh();
+    }
+    return false;
+}
+
+bool State::handleDelete()
+{
+    if(this->parent) {
+        return this->parent->handleDelete();
+    }
     return false;
 }

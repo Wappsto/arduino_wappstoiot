@@ -6,6 +6,8 @@ Network::Network(const char* uuid, String name, String description): WappstoMode
     this->name = name;
     this->description = description;
     this->currentNumberOfDevices = 0;
+    this->_onDeleteCb = NULL;
+    this->_onRefreshCb = NULL;
 }
 
 void Network::toJSON(JsonObject data)
@@ -53,3 +55,31 @@ bool Network::handleChildren(const char* tmpUuid, RequestType_e req, JsonObject 
 }
 
 void Network::getFindQuery(char *url) {}
+
+void Network::onRefresh(WappstoNetworkCallback cb)
+{
+    this->_onRefreshCb = cb;
+}
+
+void Network::onDelete(WappstoNetworkCallback cb)
+{
+    this->_onDeleteCb = cb;
+}
+
+bool Network::handleRefresh()
+{
+    if(this->_onRefreshCb) {
+        this->_onRefreshCb(this);
+        return true;
+    }
+    return false;
+}
+
+bool Network::handleDelete()
+{
+    if(this->_onDeleteCb) {
+        this->_onDeleteCb(this);
+        return true;
+    }
+    return false;
+}

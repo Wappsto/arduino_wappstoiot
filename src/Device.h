@@ -21,6 +21,10 @@ typedef struct {
     String communication;
 } DeviceDescription_t;
 
+class Device;
+
+typedef void (*WappstoDeviceCallback)(Device *device);
+
 class Device: public WappstoModel
 {
 public:
@@ -34,15 +38,23 @@ public:
     String name;
     DeviceDescription_t deviceInfo;
 
+    void onRefresh(WappstoDeviceCallback cb);
+    void onDelete(WappstoDeviceCallback cb);
+
 private:
+    WappstoDeviceCallback _onRefreshCb;
+    WappstoDeviceCallback _onDeleteCb;
+
     int currentNumberOfValues;
     Value* values[MAX_VALUES];
 
     Value** getFreeValue();
     Value* sendValue(Value* value);
 
-    void toJSON(JsonObject data);
+    bool handleRefresh();
+    bool handleDelete();
     bool handleUpdate(JsonObject obj);
     bool handleChildren(const char* tmpUuid, RequestType_e req, JsonObject obj);
     void getFindQuery(char *url);
+    void toJSON(JsonObject data);
 };

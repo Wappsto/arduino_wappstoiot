@@ -12,6 +12,8 @@ Device::Device(WappstoModel *network, DeviceDescription_t *deviceInfo): WappstoM
     this->deviceInfo.serial = deviceInfo->serial;
 
     this->currentNumberOfValues = 0;
+    this->_onDeleteCb = NULL;
+    this->_onRefreshCb = NULL;
 }
 
 void Device::toJSON(JsonObject data)
@@ -110,5 +112,33 @@ bool Device::handleChildren(const char* tmpUuid, RequestType_e req, JsonObject o
         }
     }
 
+    return false;
+}
+
+void Device::onRefresh(WappstoDeviceCallback cb)
+{
+    this->_onRefreshCb = cb;
+}
+
+void Device::onDelete(WappstoDeviceCallback cb)
+{
+    this->_onDeleteCb = cb;
+}
+
+bool Device::handleRefresh()
+{
+    if(this->_onRefreshCb) {
+        this->_onRefreshCb(this);
+        return true;
+    }
+    return false;
+}
+
+bool Device::handleDelete()
+{
+    if(this->_onDeleteCb) {
+        this->_onDeleteCb(this);
+        return true;
+    }
     return false;
 }

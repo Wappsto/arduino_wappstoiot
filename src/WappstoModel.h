@@ -4,11 +4,6 @@
 #include "WappstoRpc.h"
 #include "WappstoLog.h"
 
-class WappstoModel;
-
-typedef void (*WappstoDeleteCallback)(WappstoModel *model);
-typedef void (*WappstoRefreshCallback)(WappstoModel *model);
-
 class WappstoModel
 {
 public:
@@ -20,18 +15,20 @@ public:
     const char* getType();
 
     bool handleRequest(const char* tmpUuid, RequestType_e req, JsonObject obj);
-    void onDelete(WappstoDeleteCallback cb);
-    void onRefresh(WappstoRefreshCallback cb);
     void generateUUID();
     bool loadFromWappsto();
     bool create();
     bool update();
     bool fetch();
 
-    virtual void toJSON(JsonObject data) = 0;
+    virtual bool handleRefresh() = 0;
+    virtual bool handleDelete() = 0;
+
+protected:
     virtual bool handleUpdate(JsonObject obj) = 0;
     virtual bool handleChildren(const char* tmpUuid, RequestType_e req, JsonObject obj) = 0;
     virtual void getFindQuery(char *url) = 0;
+    virtual void toJSON(JsonObject data) = 0;
 
 protected:
     WappstoRpc *_wappstoRpc;
@@ -42,6 +39,4 @@ protected:
 
 private:
     void getUrl(char *url);
-    WappstoRefreshCallback _onRefreshCb;
-    WappstoDeleteCallback _onDeleteCb;
 };

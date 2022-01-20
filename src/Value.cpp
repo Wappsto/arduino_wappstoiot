@@ -52,6 +52,8 @@ void Value::_init(void)
     this->valString = NULL;
     this->valBlob = NULL;
     this->valXml = NULL;
+    this->_onDeleteCb = NULL;
+    this->_onRefreshCb = NULL;
 }
 
 void Value::toJSON(JsonObject data)
@@ -244,10 +246,30 @@ void Value::getFindQuery(char *url)
     sprintf(url, "?this_name==%s", this->name);
 }
 
-void Value::onRefresh(WappstoRefreshCallback cb)
+void Value::onRefresh(WappstoValueCallback cb)
 {
-    WappstoModel::onRefresh(cb);
-    if(reportState) {
-        reportState->onRefresh(cb);
+    this->_onRefreshCb = cb;
+}
+
+void Value::onDelete(WappstoValueCallback cb)
+{
+    this->_onDeleteCb = cb;
+}
+
+bool Value::handleRefresh()
+{
+    if(this->_onRefreshCb) {
+        this->_onRefreshCb(this);
+        return true;
     }
+    return false;
+}
+
+bool Value::handleDelete()
+{
+    if(this->_onDeleteCb) {
+        this->_onDeleteCb(this);
+        return true;
+    }
+    return false;
 }
