@@ -25,20 +25,6 @@ public:
     bool sendPing(void);
     RequestType_e readData(char* uuid, JsonDocument &root);
 
-/*
-        bool postNetwork(const char *networkId, String &networkName);
-        bool postDevice(Device *device);
-        bool postValue(Value *value);
-        bool putValue(Value *value);
-        bool putState(State *state);
-        bool deleteValue(const char* networkId, const char* deviceId, int valueId);
-        bool getDeviceUuidFromName(WappstoModel *network, String &name, char *uuid);
-        bool getValueUuidFromName(WappstoModel *device, String name, char *uuid);
-        bool getStateUuidFromName(Value *value, StateType_e stateType, char *uuid);
-        bool getStateDataTime(const char *stateUuid, String &data, Timestamp_t timestamp);
-*/
-
-
 private:
     WappstoRpc() = default;
     ~WappstoRpc() {};
