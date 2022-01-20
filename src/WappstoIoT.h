@@ -11,11 +11,6 @@ typedef enum {
     REQUEST_UNKNOWN,
 } RequestType_e;
 
-typedef enum {
-    TYPE_REPORT,
-    TYPE_CONTROL,
-} StateType_e;
-
 typedef char UUID_t[UUID_LENGTH];
 typedef char Timestamp_t[TIMESTAMP_LENGTH];
 

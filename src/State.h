@@ -4,6 +4,11 @@
 #include "WappstoModel.h"
 #include "WappstoIoT.h"
 
+typedef enum {
+    TYPE_REPORT,
+    TYPE_CONTROL,
+} StateType_e;
+
 class State;
 
 typedef void (*WappstoStateCallback)(State *state);
