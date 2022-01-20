@@ -1,19 +1,19 @@
-#include "WappstoIoT.h"
-#include "WappstoRpc.h"
+#include "Network.h"
 
-Network::Network(const char* uuid, String name, String description)
+Network::Network(const char* uuid, String name, String description): WappstoModel{NULL, "network"}
 {
-    this->_wappstoRpc = WappstoRpc::instance();
-    this->_wappstoLog = WappstoLog::instance();
-    this->name = name;
     strcpy(this->uuid, uuid);
+    this->name = name;
     this->description = description;
     this->currentNumberOfDevices = 0;
 }
 
-void Network::post(void)
+void Network::toJSON(JsonObject data)
 {
-    this->_wappstoRpc->postNetwork(this->uuid, this->name);
+    data["name"] = this->name;
+    if(this->description) {
+        data["description"] = this->description;
+    }
 }
 
 Device* Network::createDevice(DeviceDescription_t *deviceInfo)
@@ -22,18 +22,34 @@ Device* Network::createDevice(DeviceDescription_t *deviceInfo)
         this->_wappstoLog->error("Cannot create more devices");
         return NULL;
     }
-    this->currentNumberOfDevices++;
-    this->devices[this->currentNumberOfDevices-1] = new Device(this, deviceInfo);
+    Device *device = new Device(this, deviceInfo);
+    this->devices[this->currentNumberOfDevices++] = device;
 
-    if(!this->_wappstoRpc->getDeviceUuidFromName(this, deviceInfo->name, this->devices[this->currentNumberOfDevices-1]->uuid)) {
-            generateNewUuid(this->devices[this->currentNumberOfDevices-1]->uuid);
+    device->loadFromWappsto();
+    device->create();
+
+    return device;
+}
+
+bool Network::handleUpdate(JsonObject obj) {
+    this->_wappstoLog->error("Update on network not supported");
+    return false;
+}
+
+bool Network::handleChildren(const char* tmpUuid, RequestType_e req, JsonObject obj) {
+    for(int devs=0; devs < this->currentNumberOfDevices; devs++) {
+        if(this->devices[devs] == NULL) {
+            continue;
+        }
+
+        bool res = this->devices[devs]->handleRequest(tmpUuid, req, obj);
+        if(res) {
+            return res;
+
+        }
     }
 
-    this->devices[this->currentNumberOfDevices-1]->post();
-    return this->devices[this->currentNumberOfDevices-1];
+    return false;
 }
 
-void Network::onDelete(WappstoNetworkDeleteCallback cb)
-{
-    this->_onDeleteCb = cb;
-}
+void Network::getFindQuery(char *url) {}

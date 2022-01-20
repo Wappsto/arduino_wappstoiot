@@ -2,28 +2,31 @@
 
 #include <Arduino.h>
 #include <WiFiClientSecure.h>
-
+#include "WappstoModel.h"
 #include "WappstoIoT.h"
 #include "WappstoRpc.h"
+#include "Device.h"
 
+#ifndef MAX_DEVICES
+    #define MAX_DEVICES 5
+#endif
 
-class Network
+class Network: public WappstoModel
 {
 public:
     Network(const char* uuid, String name, String description);
 
     void post(void);
     Device* createDevice(DeviceDescription_t *deviceInfo);
-    void onDelete(WappstoNetworkDeleteCallback cb);
-    WappstoNetworkDeleteCallback _onDeleteCb;
 
-    UUID_t uuid;
     String name;
     String description;
     int currentNumberOfDevices;
     Device* devices[MAX_DEVICES];
 
 private:
-    WappstoRpc *_wappstoRpc;
-    WappstoLog *_wappstoLog;
+    void toJSON(JsonObject data);
+    bool handleUpdate(JsonObject doc);
+    bool handleChildren(const char* tmpUuid, RequestType_e req, JsonObject doc);
+    void getFindQuery(char *url);
 };

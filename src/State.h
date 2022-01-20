@@ -1,21 +1,23 @@
 #pragma once
 
 #include <Arduino.h>
+#include "WappstoModel.h"
 #include "WappstoIoT.h"
-#include "WappstoRpc.h"
 
-class State
+class State: public WappstoModel
 {
 public:
-    State(Value *value, StateType_e stateType, bool forceCreate);
+    State(WappstoModel *parent, StateType_e stateType, bool forceCreate);
 
-    Value *parent;
     StateType_e stateType;
-    UUID_t uuid;
     String data;
     Timestamp_t timestamp;
-    bool requiresPost;
 
 private:
-    WappstoRpc *_wappstoRpc;
+    void toJSON(JsonObject data);
+    bool handleUpdate(JsonObject doc);
+    bool handleChildren(const char* tmpUuid, RequestType_e req, JsonObject doc);
+    void getFindQuery(char *url);
+
+    const char* typeToString();
 };

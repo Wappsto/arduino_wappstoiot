@@ -1,22 +1,61 @@
-#include "WappstoIoT.h"
+#include "State.h"
 
-
-State::State(Value *value, StateType_e stateType, bool forceCreate)
+State::State(WappstoModel *parent, StateType_e stateType, bool forceCreate): WappstoModel(parent, "state")
 {
     this->_wappstoRpc = WappstoRpc::instance();
-    this->parent = value;
+    this->parent = parent;
     this->stateType = stateType;
-    this->requiresPost = false;
     this->data = "";
     memset(this->timestamp, 0, TIMESTAMP_LENGTH);
 
     if(forceCreate) {
         generateNewUuid(this->uuid);
-        this->requiresPost = true;
-    } else if(_wappstoRpc->getStateUuidFromName(value, stateType, this->uuid)) {
-        this->_wappstoRpc->getStateDataTime(this->uuid, this->data, this->timestamp);
     } else {
-        generateNewUuid(this->uuid);
-        this->requiresPost = true;
+        if(this->loadFromWappsto()) {
+            this->fetch();
+            return;
+        }
     }
+    strcpy(this->timestamp, getUtcTime());
+    this->create();
+}
+
+const char* State::typeToString() {
+    if(this->stateType == TYPE_REPORT) {
+        return "Report";
+    } else {
+        return "Control";
+    }
+}
+
+void State::toJSON(JsonObject data)
+{
+    data["timestamp"] = this->timestamp;
+    data["data"] = this->data;
+    data["type"] = this->typeToString();
+}
+
+void State::getFindQuery(char *url) {
+    sprintf(url, "?this_type==%s", this->typeToString());
+}
+
+bool State::handleUpdate(JsonObject obj)
+{
+    this->_wappstoLog->verbose("State update");
+
+    if(obj["data"]) {
+        this->data = String((const char*)obj["data"]);
+    }
+    if(obj["timestamp"]) {
+        strcpy(this->timestamp, obj["timestamp"]);
+    }
+
+    this->_wappstoLog->verbose("State update data: ", this->data.c_str());
+    this->_wappstoLog->verbose("State update timestamp: ", this->timestamp);
+    return true;
+}
+
+bool State::handleChildren(const char* tmpUuid, RequestType_e req, JsonObject obj)
+{
+    return false;
 }
