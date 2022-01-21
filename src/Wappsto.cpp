@@ -6,15 +6,25 @@
 
 Wappsto::Wappsto(WiFiClientSecure *client)
 {
+    this->_wappstoLog = WappstoLog::instance();
+    if(!client) {
+        this->_wappstoLog->error("Client is a NULL pointer");
+        return;
+    }
+
     this->_client = client;
     this->_network = NULL;
-    this->_wappstoLog = WappstoLog::instance();
+
     this->_wappstoRpc = WappstoRpc::instance();
     this->_wappstoRpc->init(this->_client);
 }
 
 void Wappsto::config(const char* network_id, const char* ca, const char* client_crt, const char* client_key, int pingInterval, LOG_LEVELS_e logLevel)
 {
+    if(!network_id || strlen(network_id) != 47) {
+        this->_wappstoLog->error("Network ID is invalid. It should be an UUID");
+        return;
+    }
     strcpy(this->uuid, network_id);
 
     this->_client->setCACert(ca);
