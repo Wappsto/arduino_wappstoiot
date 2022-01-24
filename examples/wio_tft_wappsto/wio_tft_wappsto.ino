@@ -42,7 +42,7 @@ Device *myDevice;
 Value *displayStrValue;
 Value *backgroundColorValue;
 
-int backgroundColor = 0x000000;
+int backgroundColor = 0x00FF00;
 
 DeviceDescription_t myDeviceDescription = {
     .name = "My Demo Device",
