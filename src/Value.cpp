@@ -243,7 +243,7 @@ bool Value::handleChildren(const char* tmpUuid, RequestType_e req, JsonObject ob
 
 void Value::getFindQuery(char *url)
 {
-    sprintf(url, "?this_name==%s", this->name);
+    sprintf(url, "?this_name==%s", this->name.c_str());
 }
 
 void Value::onRefresh(WappstoValueCallback cb)
