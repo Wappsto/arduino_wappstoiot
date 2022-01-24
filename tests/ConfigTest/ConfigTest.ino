@@ -1,12 +1,6 @@
 #include <AUnit.h>
 #include <Wappsto.h>
 
-static char strfTimeBuffer[21] = "";
-const char* getUtcTime(void)
-{
-    return strfTimeBuffer;
-}
-
 test(InvalidWifiClient) {
     Wappsto wappsto(0);
 }
@@ -14,13 +8,20 @@ test(InvalidWifiClient) {
 test(InvalidParametersShort) {
     WiFiClientSecure client;
     Wappsto wappsto(&client);
-    wappsto.config(0,0,0,0);
+
+    int r = wappsto.config(0,0,0,0);
+    assertEqual(r, -1);
+
+    r = wappsto.config("",0,0,0);
+    assertEqual(r, -1);
 }
 
 test(InvalidParametersLong) {
     WiFiClientSecure client;
     Wappsto wappsto(&client);
-    wappsto.config(0,0,0,0,0,VERBOSE);
+
+    int r = wappsto.config(0,0,0,0,0,VERBOSE);
+    assertEqual(r, -1);
 }
 
 void setup() {

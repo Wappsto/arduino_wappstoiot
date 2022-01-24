@@ -1,19 +1,15 @@
 #include <AUnit.h>
 #include <Wappsto.h>
 
-static char strfTimeBuffer[21] = "";
-const char* getUtcTime(void)
-{
-    return strfTimeBuffer;
-}
 
 test(createNetwork) {
     WiFiClientSecure client;
     Wappsto wappsto(&client);
+    wappsto.config("4906c6be-cc7f-4c4d-8806-60a38c5fcef5", "", "", "");
     Network *myNetwork = wappsto.createNetwork("Basic Example");
     assertEqual(myNetwork->name, "Basic Example");
     int len = strlen(myNetwork->uuid);
-    assertEqual(len, 47);
+    assertEqual(len, 36);
 }
 
 void setup() {
