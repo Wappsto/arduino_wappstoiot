@@ -15,9 +15,6 @@ Seeed_Arduino_mbedtls - search for "seeed mbedtls"
 Seeed_Arduino_FS - search for "seeed fs"
 Seeed_Arduino_SFUD - search for "seeed sfud"
 
-WappstoIoT Libraries requirements
-ArduinoJson
-WiFiClientSecure
 **/
 
 #include "rpcWiFi.h"
@@ -26,6 +23,8 @@ WiFiClientSecure
 
 #include "Wappsto.h"
 #include "wappsto_config.h"
+
+#define BUZZER_PIN WIO_BUZZER
 
 WiFiMulti WiFiMulti;
 WiFiClientSecure client;
@@ -36,7 +35,8 @@ const char* password = "";
 
 Network *myNetwork;
 Device *myDevice;
-Value *myTemperatureValue;
+Value *myNumberValue;
+Value *buttonValue;
 
 DeviceDescription_t myDeviceDescription = {
     .name = "My Device",
@@ -48,20 +48,56 @@ DeviceDescription_t myDeviceDescription = {
     .protocol = "Json-RPC",
     .communication = "WiFi",
 };
-ValueNumber_t myTemperatureParameters = {   .name = "Temperature",
-                                            .type = "temperature",
-                                            .permission = READ,
-                                            .min = -20,
-                                            .max = 100,
-                                            .step = 0.1,
-                                            .unit = "°C",
+ValueNumber_t myNumberValueParameters = {   .name = "Beep number",
+                                            .type = "audio number",
+                                            .permission = READ_WRITE,
+                                            .min = 100,
+                                            .max = 4000,
+                                            .step = 1,
+                                            .unit = "",
                                             .si_conversion = ""};
+ValueString_t buttonStringParameters = {    .name = "Button direction",
+                                            .type = "string",
+                                            .permission = READ,
+                                            .max = 6,
+                                            .encoding = ""};
 
-double myTemperatureReading = 21.3;
 
-void refreshTemperatureCallback(Value *value)
+void controlNumberCallback(Value *value, double data, String timestamp)
 {
-    value->report(myTemperatureReading);
+    playTone((int)data, 1000);
+    value->report(data);
+}
+
+void refreshNumberCallback(Value *value)
+{
+    Serial.print("Refresh callback: ");
+    value->report(value->getReportData());
+}
+
+void buttonRefresh(Value *value)
+{
+    value->report(String(""));
+}
+
+void playTone(int tone, int duration)
+{
+    for (long i = 0; i < duration * 1000L; i += tone * 2) {
+        digitalWrite(BUZZER_PIN, HIGH);
+        delayMicroseconds(tone);
+        digitalWrite(BUZZER_PIN, LOW);
+        delayMicroseconds(tone);
+    }
+}
+
+void initialiseWioOutput(void)
+{
+    pinMode(WIO_5S_UP, INPUT_PULLUP);
+    pinMode(WIO_5S_DOWN, INPUT_PULLUP);
+    pinMode(WIO_5S_LEFT, INPUT_PULLUP);
+    pinMode(WIO_5S_RIGHT, INPUT_PULLUP);
+    pinMode(WIO_5S_PRESS, INPUT_PULLUP);
+    pinMode(BUZZER_PIN, OUTPUT);
 }
 
 void initializeWifi(void)
@@ -76,9 +112,12 @@ void initializeWifi(void)
     Serial.println(WiFi.localIP());
 }
 
-void setup() {
+void setup()
+{
     Serial.begin(115200);
     randomSeed(analogRead(0));
+    initialiseWioOutput();
+
     initializeWifi();
 
     initializeNtp();
@@ -96,22 +135,30 @@ void setup() {
     // Create device
     myDevice = myNetwork->createDevice(&myDeviceDescription);
 
-    // Create temperature value
-    myTemperatureValue = myDevice->createValueNumber(&myTemperatureParameters);
-    myTemperatureValue->onRefresh(&refreshTemperatureCallback);
+    // Create r/w number to play tone
+    myNumberValue = myDevice->createValueNumber(&myNumberValueParameters);
+    myNumberValue->onControl(&controlNumberCallback);
+    myNumberValue->onRefresh(&refreshNumberCallback);
+
+    // Create r value for button output
+    buttonValue = myDevice->createValueString(&buttonStringParameters);
+    buttonValue->onRefresh(&buttonRefresh);
 }
 
-unsigned long startMillis = 0;
-unsigned long currentMillis = 0;
-#define UPDATE_INTERVAL_MILLIS 2*60*1000
-
-void loop() {
-    delay(500);
+void loop()
+{
     wappsto.dataAvailable();
 
-    currentMillis = millis();
-    if(currentMillis - startMillis >= UPDATE_INTERVAL_MILLIS) {
-        startMillis = currentMillis;
-        myTemperatureValue->report(myTemperatureReading);
+    if (digitalRead(WIO_5S_UP) == LOW) {
+        buttonValue->report("Up");
+    } else if (digitalRead(WIO_5S_DOWN) == LOW) {
+        buttonValue->report("Down");
+    } else if (digitalRead(WIO_5S_LEFT) == LOW) {
+        buttonValue->report("Left");
+    } else if (digitalRead(WIO_5S_RIGHT) == LOW) {
+        buttonValue->report("Right");
+    } else if (digitalRead(WIO_5S_PRESS) == LOW) {
+        buttonValue->report("Press");
     }
+    delay(200);
 }

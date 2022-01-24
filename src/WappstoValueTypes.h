@@ -44,3 +44,11 @@ ValueNumber_t defaultBooleanParameter = { \
     .unit = "",
     .si_conversion = ""
 };
+
+ValueBlob_t defaultColorParameter = { \
+    .name = "Color",
+    .type = "color",
+    .permission = READ_WRITE,
+    .max = 8,
+    .encoding = "color_int"
+};
