@@ -6,3 +6,5 @@ EpoxyDuino
 *~
 *.o
 *.out
+\#*
+.\#*
