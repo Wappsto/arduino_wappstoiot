@@ -1,10 +1,12 @@
 .PHONY: setup test
 
-all:
-	./bin/arduino-cli compile -b esp32:esp32:esp32 --libraries="." examples/esp32_wappsto/esp32_wappsto.ino
+all: example test
 
 lint:
 	./bin/arduino-lint --compliance strict --library-manager submit --project-type library
+
+example:
+	./bin/arduino-cli compile -b esp32:esp32:esp32 --libraries="." examples/esp32_wappsto/esp32_wappsto.ino
 
 test:
 	$(MAKE) -C tests tests

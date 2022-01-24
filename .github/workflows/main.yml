@@ -36,7 +36,7 @@ jobs:
 
       - name: Verify examples
         run: |
-          make -C examples
+          make example
 
       - name: Run tests
         run: |
