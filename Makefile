@@ -10,6 +10,9 @@ test:
 	$(MAKE) -C tests tests
 	$(MAKE) -C tests runtests
 
+clean-test:
+	$(MAKE) -C tests clean
+
 EpoxyDuino:
 	git clone https://github.com/seluxit/EpoxyDuino.git
 
