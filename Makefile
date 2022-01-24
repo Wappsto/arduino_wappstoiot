@@ -11,9 +11,7 @@ test:
 	$(MAKE) -C tests runtests
 
 EpoxyDuino:
-	git clone https://github.com/bxparks/EpoxyDuino.git
-	cd EpoxyDuino
-	git checkout master
+	git clone https://github.com/seluxit/EpoxyDuino.git
 
 bin/arduino-cli:
 	curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | sh
