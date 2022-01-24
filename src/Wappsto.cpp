@@ -12,6 +12,7 @@ Wappsto::Wappsto(WiFiClientSecure *client)
         return;
     }
 
+    memset(this->uuid, 0, UUID_LENGTH);
     this->_client = client;
     this->_network = NULL;
 
@@ -19,11 +20,11 @@ Wappsto::Wappsto(WiFiClientSecure *client)
     this->_wappstoRpc->init(this->_client);
 }
 
-void Wappsto::config(const char* network_id, const char* ca, const char* client_crt, const char* client_key, int pingInterval, LOG_LEVELS_e logLevel)
+int Wappsto::config(const char* network_id, const char* ca, const char* client_crt, const char* client_key, int pingInterval, LOG_LEVELS_e logLevel)
 {
-    if(!network_id || strlen(network_id) != 47) {
+    if(!network_id || strlen(network_id) != 36) {
         this->_wappstoLog->error("Network ID is invalid. It should be an UUID");
-        return;
+        return -1;
     }
     strcpy(this->uuid, network_id);
 
@@ -33,11 +34,13 @@ void Wappsto::config(const char* network_id, const char* ca, const char* client_
     this->_pingIntervalMinutes = pingInterval;
     this->_startPingMillis = millis();
     this->_wappstoLog->setLogLevel(logLevel);
+
+    return 0;
 }
 
-void Wappsto::config(const char* network_id, const char* ca, const char* client_crt, const char* client_key)
+int Wappsto::config(const char* network_id, const char* ca, const char* client_crt, const char* client_key)
 {
-    this->config(network_id, ca, client_crt, client_key, 0, NO_LOGS);
+    return this->config(network_id, ca, client_crt, client_key, 0, NO_LOGS);
 }
 
 bool Wappsto::connect(void)
