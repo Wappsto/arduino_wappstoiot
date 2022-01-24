@@ -31,8 +31,8 @@ jobs:
           git clone https://github.com/bxparks/EpoxyDuino
           git clone https://github.com/bxparks/AUnit
 
-      - name: Setup Arduino CLI
-        uses: arduino/setup-arduino-cli@v1.1.1
+          #      - name: Setup Arduino CLI
+          #        uses: arduino/setup-arduino-cli@v1.1.1
 
       - name: arduino/arduino-lint-action
         uses: arduino/arduino-lint-action@v1.0.0
