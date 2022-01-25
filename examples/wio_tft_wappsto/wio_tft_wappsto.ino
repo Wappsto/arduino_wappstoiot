@@ -43,6 +43,7 @@ Value *displayStrValue;
 Value *backgroundColorValue;
 
 int backgroundColor = 0x00FF00;
+String textString = "";
 
 DeviceDescription_t myDeviceDescription = {
     .name = "My Demo Device",
@@ -60,18 +61,37 @@ ValueString_t displayStrValueParameters = { .name = "Display Sting",
                                             .max = 200,
                                             .encoding = ""};
 
+const uint16_t red_mask = 0xF800;
+const uint16_t green_mask = 0x7E0;
+const uint16_t blue_mask = 0x1F;
+
+uint16_t convert24bitColorTo16bit(uint32_t color)
+{
+    uint16_t color565;
+    uint8_t red_value = (backgroundColor & 0xFF0000) >> 16;
+    uint8_t green_value = (backgroundColor & 0x00FF00) >> 8;
+    uint8_t blue_value = (backgroundColor & 0xFF);
+    red_value = (uint8_t)(red_value * 31 / 0xFF);
+    green_value = (uint8_t)(green_value * 63 / 0xFF);
+    blue_value = (uint8_t)(blue_value * 31 / 0xFF);
+    color565 = (red_value << 11) | (green_value << 5) | blue_value;
+    return color565;
+}
+
 void controlStringCallback(Value *value, String data, String timestamp)
 {
-    tft.fillScreen(TFT_GREEN);
-    tft.drawString(data, 10, 10);
+    tft.fillScreen(convert24bitColorTo16bit(backgroundColor));
+    textString = data;
+    tft.drawString(textString, 10, 10);
     value->report(data);
 }
 
 void refreshStringCallback(Value *value)
 {
-    tft.fillScreen(TFT_GREEN);
-    tft.drawString("Value was refreshed", 10, 10);
-    value->report(String("Refresh"));
+    tft.fillScreen(convert24bitColorTo16bit(backgroundColor));
+    textString = "Refreshed";
+    tft.drawString(textString, 10, 10);
+    value->report(textString);
 }
 
 void backgroundColorRefresh(Value *value)
@@ -84,21 +104,11 @@ void deleteNetworkCallback(Network *network)
     Serial.println("Network deleted, need to restart device, and claim network again");
 }
 
-const uint16_t red_mask = 0xF800;
-const uint16_t green_mask = 0x7E0;
-const uint16_t blue_mask = 0x1F;
-
 void backgroundColorControl(Value *value, String data, String timestamp)
 {
     backgroundColor = data.toInt();
-    uint8_t red_value = (backgroundColor & 0xFF0000) >> 16;
-    uint8_t green_value = (backgroundColor & 0x00FF00) >> 8;
-    uint8_t blue_value = (backgroundColor & 0xFF);
-    red_value = (uint8_t)(red_value * 31 / 0xFF);
-    green_value = (uint8_t)(green_value * 63 / 0xFF);
-    blue_value = (uint8_t)(blue_value * 31 / 0xFF);
-    uint16_t color565 = (red_value << 11) | (green_value << 5) | blue_value;
-    tft.fillScreen(color565);
+    tft.fillScreen(convert24bitColorTo16bit(backgroundColor));
+    tft.drawString(textString, 10, 10);
     value->report(backgroundColor);
 }
 
@@ -162,7 +172,8 @@ void setup()
     displayStrValue = myDevice->createValueString(&displayStrValueParameters);
     displayStrValue->onControl(&controlStringCallback);
     displayStrValue->onRefresh(&refreshStringCallback);
-    displayStrValue->report("Connected");
+    textString = "Connected";
+    displayStrValue->report(textString);
 
     backgroundColorValue = myDevice->createValueBlob(&defaultColorParameter);
     backgroundColorValue->onRefresh(&backgroundColorRefresh);
@@ -171,8 +182,8 @@ void setup()
     backgroundColorValue->control(backgroundColor);
 
     // Screen update
-    tft.fillScreen(TFT_GREEN);
-    tft.drawString("Connected", 10, 10);
+    tft.fillScreen(convert24bitColorTo16bit(backgroundColor));
+    tft.drawString(textString, 10, 10);
 }
 
 void loop()
