@@ -1,5 +1,6 @@
+#pragma once
 
-#include "Wappsto.h"
+#include "WappstoIoT.h"
 
 ValueNumber_t defaultTemperatureParameter = { \
     .name = "Temperature",

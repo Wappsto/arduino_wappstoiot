@@ -67,9 +67,12 @@ JsonObject WappstoRpc::generateRPCRequest(const char* method, const char* url, b
     params["url"] = url;
 
 #ifndef DISABLE_FAST_SENDING
-    JsonObject metaFast = params.createNestedObject("meta");
-    metaFast["fast"] = true;
+    if(strcmp(method, "GET") != 0) {
+        JsonObject metaFast = params.createNestedObject("meta");
+        metaFast["fast"] = true;
+    }
 #endif
+
     if(data) {
         return params.createNestedObject("data");
     } else {
