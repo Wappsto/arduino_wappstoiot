@@ -126,7 +126,9 @@ void WappstoLog::_print(LOG_LEVELS_e level, const char* text, int data)
 void WappstoLog::_print(LOG_LEVELS_e level, const JsonDocument& root)
 {
     if(shouldPrintLevel(level)) {
+        Serial.print("\e[1;31m");
         serializeJsonPretty(root, Serial);
         Serial.println("");
+        Serial.print("\e[1;37m");
     }
 }

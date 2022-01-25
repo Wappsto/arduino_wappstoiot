@@ -1,7 +1,7 @@
-#include "WappstoIoT.h"
+#include "Value.h"
 
 
-Value::Value(Device *device, ValueNumber_t *valNumber) : parent(device)
+Value::Value(WappstoModel *device, ValueNumber_t *valNumber) : WappstoModel(device, "value")
 {
     this->_init();
     this->name = valNumber->name;
@@ -11,7 +11,7 @@ Value::Value(Device *device, ValueNumber_t *valNumber) : parent(device)
     this->valNumber = valNumber;
 }
 
-Value::Value(Device *device, ValueString_t *valString) : parent(device)
+Value::Value(WappstoModel *device, ValueString_t *valString) : WappstoModel(device, "value")
 {
     this->_init();
     this->name = valString->name;
@@ -21,7 +21,7 @@ Value::Value(Device *device, ValueString_t *valString) : parent(device)
     this->valString = valString;
 }
 
-Value::Value(Device *device, ValueBlob_t *valBlob) : parent(device)
+Value::Value(WappstoModel *device, ValueBlob_t *valBlob) : WappstoModel(device, "value")
 {
     this->_init();
     this->name = valBlob->name;
@@ -31,7 +31,7 @@ Value::Value(Device *device, ValueBlob_t *valBlob) : parent(device)
     this->valBlob = valBlob;
 }
 
-Value::Value(Device *device, ValueXml_t *valXml) : parent(device)
+Value::Value(WappstoModel *device, ValueXml_t *valXml) : WappstoModel(device, "value")
 {
     this->_init();
     this->name = valBlob->name;
@@ -43,23 +43,56 @@ Value::Value(Device *device, ValueXml_t *valXml) : parent(device)
 
 void Value::_init(void)
 {
-    this->_wappstoLog = WappstoLog::instance();
-    this->_wappstoRpc = WappstoRpc::instance();
     this->valueCreated = false;
     this->reportState = NULL;
     this->controlState = NULL;
     this->_onControlStringCb = NULL;
     this->_onControlNumberCb = NULL;
-    this->_onRefreshCb = NULL;
-    this->_onDeleteCb = NULL;
     this->valNumber = NULL;
     this->valString = NULL;
     this->valBlob = NULL;
     this->valXml = NULL;
+    this->_onDeleteCb = NULL;
+    this->_onRefreshCb = NULL;
 }
 
-void Value::post(void)
+void Value::toJSON(JsonObject data)
 {
+    data["name"] = this->name;
+    if(this->permission == READ_WRITE) {
+        data["permission"] = "rw";
+    } else if(this->permission == READ) {
+        data["permission"] = "r";
+    } else if(this->permission == WRITE) {
+        data["permission"] = "w";
+    }
+
+    data["type"] = this->type;
+
+    if(this->valueType == NUMBER_VALUE) {
+        JsonObject number = data.createNestedObject("number");
+        number["min"] = this->valNumber->min;
+        number["max"] = this->valNumber->max;
+        number["step"] = this->valNumber->step;
+        number["unit"] = "";
+    } else if(this->valueType == STRING_VALUE) {
+        JsonObject str = data.createNestedObject("string");
+        str["max"] = this->valString->max;
+        str["encoding"] = this->valString->encoding;
+    } else if(this->valueType == BLOB_VALUE) {
+        JsonObject blob = data.createNestedObject("blob");
+        blob["max"] = this->valBlob->max;
+        blob["encoding"] = this->valBlob->encoding;
+    } else if(this->valueType == XML_VALUE) {
+        JsonObject xml = data.createNestedObject("xml");
+        xml["xsd"] = this->valXml->xsd;
+        xml["namespace"] = this->valXml->xml_namespace;
+    }
+}
+
+void Value::createStates(void)
+{
+    this->_wappstoLog->verbose("Creating states: ", this->permission);
     switch(this->permission) {
         case READ:
             this->reportState = new State(this, TYPE_REPORT, this->valueCreated);
@@ -72,7 +105,6 @@ void Value::post(void)
             this->controlState = new State(this, TYPE_CONTROL, this->valueCreated);
             break;
     }
-    this->_wappstoRpc->postValue(this);
 }
 
 bool Value::report(const String &data)
@@ -80,7 +112,7 @@ bool Value::report(const String &data)
     if(this->reportState) {
         strcpy(this->reportState->timestamp, getUtcTime());
         this->reportState->data = data;
-        this->_wappstoRpc->putState(this->reportState);
+        this->reportState->update();
         return true;
     }
     return false;
@@ -115,7 +147,7 @@ bool Value::control(const String &data)
     if(this->controlState) {
         strcpy(this->controlState->timestamp, getUtcTime());
         this->controlState->data = data;
-        this->_wappstoRpc->putState(this->controlState);
+        this->controlState->update();
         return true;
     }
     return false;
@@ -195,40 +227,63 @@ void Value::onControl(WappstoValueControlNumberCallback cb)
     this->_onControlNumberCb = cb;
 }
 
-void Value::onRefresh(WappstoValueRefreshCallback cb)
+bool Value::handleUpdate(JsonObject obj)
+{
+    this->_wappstoLog->error("Update of value is not implemeted");
+    return false;
+}
+
+bool Value::handleChildren(const char* tmpUuid, RequestType_e req, JsonObject obj)
+{
+    if(this->controlState) {
+        if(this->controlState->handleRequest(tmpUuid, req, obj)) {
+            if(this->_onControlNumberCb) {
+                double tmpDouble = this->controlState->data.toDouble();
+                this->_onControlNumberCb(this, tmpDouble, this->controlState->timestamp);
+            }
+            if(this->_onControlStringCb) {
+                this->_onControlStringCb(this, this->controlState->data, this->controlState->timestamp);
+            }
+            return true;
+        }
+    }
+    if(this->reportState) {
+        if(this->reportState->handleRequest(tmpUuid, req, obj)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void Value::getFindQuery(char *url)
+{
+    sprintf(url, "?this_name==%s", this->name.c_str());
+}
+
+void Value::onRefresh(WappstoValueCallback cb)
 {
     this->_onRefreshCb = cb;
 }
 
-void Value::onDelete(WappstoCallback cb)
+void Value::onDelete(WappstoValueCallback cb)
 {
     this->_onDeleteCb = cb;
 }
 
-bool Value::handleStateCb(const char* tmpUuid, RequestType_e req, const char *tmpData, const char *tmpTimestamp)
+bool Value::handleRefresh()
 {
-    if(this->reportState && strcmp(this->reportState->uuid, tmpUuid) == 0) {
-        if(req == REQUEST_GET) {
-            if(this->_onRefreshCb) {
-                this->_onRefreshCb(this);
-                return true;
-            }
-        }
-    } else if(this->controlState && strcmp(this->controlState->uuid, tmpUuid) == 0) {
-        if(req == REQUEST_PUT) {
-            if(this->_onControlNumberCb) {
-                this->controlState->data = tmpData;
-                strcpy(this->controlState->timestamp, tmpTimestamp);
-                double tmpDouble = this->controlState->data.toDouble();
-                this->_onControlNumberCb(this, tmpDouble,this->controlState->timestamp);
-                return true;
-            } else if(this->_onControlStringCb) {
-                this->controlState->data = tmpData;
-                strcpy(this->controlState->timestamp, tmpTimestamp);
-                this->_onControlStringCb(this, this->controlState->data, this->controlState->timestamp);
-                return true;
-            }
-        }
+    if(this->_onRefreshCb) {
+        this->_onRefreshCb(this);
+        return true;
+    }
+    return false;
+}
+
+bool Value::handleDelete()
+{
+    if(this->_onDeleteCb) {
+        this->_onDeleteCb(this);
+        return true;
     }
     return false;
 }

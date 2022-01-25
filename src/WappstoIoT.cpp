@@ -1,5 +1,6 @@
 #include "Arduino.h"
 #include "WappstoIoT.h"
+#include "WappstoRpc.h"
 
 void generateNewUuid(char *str)
 {
