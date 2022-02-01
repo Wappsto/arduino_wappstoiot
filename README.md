@@ -33,8 +33,17 @@ python3 main.py --type arduino
 ```
 Then you will be asked to login using email and password for your user on Wappsto.
 
+#### Claiming and ownership - Not allowed to access values
 
-# This library
+If you get a "not allowed to access" values on the device you have created, it is because you either have not claimed it, or the ownership have been reset. 
+Since you would be the manfactorer you will still see the device on your list of networks, you can see it is online, but you will not be able to see values or control the device.
+
+To claim a device, go to the "IoT Devices" tab on https://wappsto.com/devices click the "+ Add an IoT device" button in the top right corner, and enter the network UUID int the box.
+
+If you click the delete button for a network, it will remove the ownership of the device, so it can be claimed by another user. Once a device have been claimed it can not be claimed by another.
+
+
+# This Wappsto library
 
 ## Required structure
 
