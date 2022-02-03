@@ -1,4 +1,5 @@
 #include "WappstoIoT.h"
+#include "Wappsto.h"
 
 #define WAPPSTO_PORT 443
 #define WAPPSTO_SERVER "collector.wappsto.com"
@@ -64,21 +65,19 @@ bool Wappsto::disconnect(void)
 Network *Wappsto::createNetwork(String name, String description)
 {
     this->_network = new Network(this->uuid, name, description);
-    this->_network->post();
+    this->_network->create();
     return this->_network;
 }
 
 Network *Wappsto::createNetwork(String name)
 {
     this->_network = new Network(this->uuid, name, "");
-    this->_network->post();
+    this->_network->create();
     return this->_network;
 }
 
 bool Wappsto::dataAvailable(void)
 {
-    char tmpData[1200] = {0,};
-    char tmpTimestamp[28] = {0,};
     UUID_t tmpUuid;
 
     if(!this->_client->connected()) {
@@ -94,7 +93,14 @@ bool Wappsto::dataAvailable(void)
         }
         return false;
     }
-    RequestType_e req = this->_wappstoRpc->readData(tmpUuid, tmpData, tmpTimestamp);
+
+    StaticJsonDocument<JSON_STATIC_BUFFER_SIZE> obj;
+    RequestType_e req = this->_wappstoRpc->readData(tmpUuid, obj);
+
+    if(req == REQUEST_UNKNOWN) {
+        this->_wappstoLog->warning("Unknown request - not handled");
+        return false;
+    }
 
     if(tmpUuid && strlen(tmpUuid) > 0) {
         //Serial.print("UUID: ");
@@ -104,37 +110,5 @@ bool Wappsto::dataAvailable(void)
         return false;
     }
 
-    if(req == REQUEST_DELETE) {
-        if(strcmp(this->uuid, tmpUuid) == 0 && this->_network->_onDeleteCb) {
-            this->_network->_onDeleteCb(this->_network);
-            return true;
-        }
-        this->_wappstoLog->warning("Delete not handled yet");
-        return false;
-    } else if(req == REQUEST_UNKNOWN) {
-        this->_wappstoLog->warning("Unknown request - not handled");
-        return false;
-    }
-
-    for(int devs=0; devs < this->_network->currentNumberOfDevices; devs++) {
-
-        if(this->_network->devices[devs] == NULL) {
-            continue;
-        }
-        if(strcmp(this->_network->devices[devs]->uuid, tmpUuid) == 0) {
-            this->_wappstoLog->warning("Found device requested UUID - not handled");
-        }
-        for(int vals=0; vals < this->_network->devices[devs]->currentNumberOfValues; vals++) {
-            if(this->_network->devices[devs]->values[vals] == NULL) {
-                continue;
-            }
-            if(strcmp(this->_network->devices[devs]->values[vals]->uuid, tmpUuid) == 0) {
-                return true;
-            }
-            if(this->_network->devices[devs]->values[vals]->handleStateCb(tmpUuid, req, tmpData, tmpTimestamp)) {
-                return true;
-            }
-        }
-    }
-    return false;
+    return this->_network->handleRequest(tmpUuid, req, obj.as<JsonObject>());
 }

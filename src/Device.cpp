@@ -1,11 +1,7 @@
-#include "WappstoIoT.h"
+#include "Device.h"
 
-
-Device::Device(Network *network, DeviceDescription_t *deviceInfo)
+Device::Device(WappstoModel *network, DeviceDescription_t *deviceInfo): WappstoModel(network, "device")
 {
-    this->_wappstoRpc = WappstoRpc::instance();
-    this->_wappstoLog = WappstoLog::instance();
-    this->parent = network;
     this->name = deviceInfo->name;
     this->deviceInfo.product = deviceInfo->product;
     this->deviceInfo.manufacturer = deviceInfo->manufacturer;
@@ -14,13 +10,35 @@ Device::Device(Network *network, DeviceDescription_t *deviceInfo)
     this->deviceInfo.communication = deviceInfo->communication;
     this->deviceInfo.version = deviceInfo->version;
     this->deviceInfo.serial = deviceInfo->serial;
-    this->_onDeleteCb = NULL;
+
     this->currentNumberOfValues = 0;
+    this->_onDeleteCb = NULL;
+    this->_onRefreshCb = NULL;
 }
 
-void Device::post(void)
+void Device::toJSON(JsonObject data)
 {
-    this->_wappstoRpc->postDevice(this);
+    data["name"] = this->name;
+    data["manufacturer"] = this->deviceInfo.manufacturer;
+    data["product"] = this->deviceInfo.product;
+    data["version"] = this->deviceInfo.version;
+    data["serial"] = this->deviceInfo.serial;
+    data["description"] = this->deviceInfo.description;
+    data["protocol"] = this->deviceInfo.protocol;
+    data["communication"] = this->deviceInfo.communication;
+}
+
+void Device::getFindQuery(char *url)
+{
+    sprintf(url, "?this_name==%s", this->name.c_str());
+}
+
+Value* Device::sendValue(Value* value)
+{
+    value->loadFromWappsto();
+    value->create();
+    value->createStates();
+    return value;
 }
 
 Value* Device::createValueNumber(ValueNumber_t *valNumber)
@@ -31,8 +49,7 @@ Value* Device::createValueNumber(ValueNumber_t *valNumber)
     }
 
     *value = new Value(this, valNumber);
-    this->postValue(*value, valNumber->name);
-    return *value;
+    return this->sendValue(*value);
 }
 
 Value* Device::createValueString(ValueString_t *valString)
@@ -43,8 +60,7 @@ Value* Device::createValueString(ValueString_t *valString)
     }
 
     *value = new Value(this, valString);
-    this->postValue(*value, valString->name);
-    return *value;
+    return this->sendValue(*value);
 }
 
 Value* Device::createValueBlob(ValueBlob_t *valBlob)
@@ -55,8 +71,7 @@ Value* Device::createValueBlob(ValueBlob_t *valBlob)
     }
 
     *value = new Value(this, valBlob);
-    this->postValue(*value, valBlob->name);
-    return *value;
+    return this->sendValue(*value);
 }
 
 Value* Device::createValueXml(ValueXml_t *valXml)
@@ -67,8 +82,7 @@ Value* Device::createValueXml(ValueXml_t *valXml)
     }
 
     *value = new Value(this, valXml);
-    this->postValue(*value, valXml->name);
-    return *value;
+    return this->sendValue(*value);
 }
 
 Value** Device::getFreeValue()
@@ -78,21 +92,53 @@ Value** Device::getFreeValue()
         return NULL;
     }
 
-    this->currentNumberOfValues++;
-    return &this->values[this->currentNumberOfValues-1];
+    return &this->values[this->currentNumberOfValues++];
 }
 
-void Device::postValue(Value *value, String name)
-{
-    if(!this->_wappstoRpc->getValueUuidFromName(this, name, value->uuid)) {
-        generateNewUuid(value->uuid);
-        value->valueCreated = true;
+bool Device::handleUpdate(JsonObject obj) {
+    return false;
+}
+
+bool Device::handleChildren(const char* tmpUuid, RequestType_e req, JsonObject obj) {
+    for(int vals=0; vals < this->currentNumberOfValues; vals++) {
+        if(this->values[vals] == NULL) {
+            continue;
+        }
+
+        bool res = this->values[vals]->handleRequest(tmpUuid, req, obj);
+        if(res) {
+            return res;
+
+        }
     }
 
-    value->post();
+    return false;
 }
 
-void Device::onDelete(WappstoCallback cb)
+void Device::onRefresh(WappstoDeviceCallback cb)
+{
+    this->_onRefreshCb = cb;
+}
+
+void Device::onDelete(WappstoDeviceCallback cb)
 {
     this->_onDeleteCb = cb;
+}
+
+bool Device::handleRefresh()
+{
+    if(this->_onRefreshCb) {
+        this->_onRefreshCb(this);
+        return true;
+    }
+    return false;
+}
+
+bool Device::handleDelete()
+{
+    if(this->_onDeleteCb) {
+        this->_onDeleteCb(this);
+        return true;
+    }
+    return false;
 }

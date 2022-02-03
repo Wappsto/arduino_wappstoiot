@@ -5,6 +5,11 @@
 
 #include "WappstoIoT.h"
 #include "WappstoRpc.h"
+#include "WappstoModel.h"
+#include "Network.h"
+#include "Device.h"
+#include "Value.h"
+#include "State.h"
 
 class Wappsto
 {

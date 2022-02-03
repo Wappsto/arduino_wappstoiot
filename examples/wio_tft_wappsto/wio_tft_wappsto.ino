@@ -15,9 +15,6 @@ Seeed_Arduino_mbedtls - search for "seeed mbedtls"
 Seeed_Arduino_FS - search for "seeed fs"
 Seeed_Arduino_SFUD - search for "seeed sfud"
 
-WappstoIoT Libraries requirements
-ArduinoJson
-WiFiClientSecure
 **/
 
 #include "rpcWiFi.h"
@@ -29,7 +26,8 @@ WiFiClientSecure
 #include "Wappsto.h"
 #include "wappsto_config.h"
 
-#define BUZZER_PIN WIO_BUZZER
+#include "WappstoValueTypes.h"
+
 
 TFT_eSPI tft;
 WiFiMulti WiFiMulti;
@@ -41,9 +39,11 @@ const char* password = "";
 
 Network *myNetwork;
 Device *myDevice;
-Value *myNumberValue;
 Value *displayStrValue;
-Value *buttonValue;
+Value *backgroundColorValue;
+
+int backgroundColor = 0x00FF00;
+String textString = "";
 
 DeviceDescription_t myDeviceDescription = {
     .name = "My Demo Device",
@@ -55,60 +55,61 @@ DeviceDescription_t myDeviceDescription = {
     .protocol = "Json-RPC",
     .communication = "WiFi",
 };
-ValueNumber_t myNumberValueParameters = {   .name = "Beep number",
-                                            .type = "audio number",
-                                            .permission = READ_WRITE,
-                                            .min = 100,
-                                            .max = 4000,
-                                            .step = 1,
-                                            .unit = "",
-                                            .si_conversion = ""};
 ValueString_t displayStrValueParameters = { .name = "Display Sting",
                                             .type = "string",
                                             .permission = READ_WRITE,
                                             .max = 200,
                                             .encoding = ""};
-ValueString_t buttonStringParameters = {    .name = "Button direction",
-                                            .type = "string",
-                                            .permission = READ,
-                                            .max = 6,
-                                            .encoding = ""};
 
+const uint16_t red_mask = 0xF800;
+const uint16_t green_mask = 0x7E0;
+const uint16_t blue_mask = 0x1F;
 
-void controlNumberCallback(Value *value, double data, String timestamp)
+uint16_t convert24bitColorTo16bit(uint32_t color)
 {
-    playTone((int)data, 1000);
-    value->report(data);
-}
-
-void refreshNumberCallback(Value *value)
-{
-    Serial.print("Refresh callback: ");
-    value->report(value->getReportData());
+    uint16_t color565;
+    uint8_t red_value = (backgroundColor & 0xFF0000) >> 16;
+    uint8_t green_value = (backgroundColor & 0x00FF00) >> 8;
+    uint8_t blue_value = (backgroundColor & 0xFF);
+    red_value = (uint8_t)(red_value * 31 / 0xFF);
+    green_value = (uint8_t)(green_value * 63 / 0xFF);
+    blue_value = (uint8_t)(blue_value * 31 / 0xFF);
+    color565 = (red_value << 11) | (green_value << 5) | blue_value;
+    return color565;
 }
 
 void controlStringCallback(Value *value, String data, String timestamp)
 {
-    tft.fillScreen(TFT_GREEN);
-    tft.drawString(data, 10, 10);
+    tft.fillScreen(convert24bitColorTo16bit(backgroundColor));
+    textString = data;
+    tft.drawString(textString, 10, 10);
     value->report(data);
 }
 
 void refreshStringCallback(Value *value)
 {
-    tft.fillScreen(TFT_GREEN);
-    tft.drawString("Value was refreshed", 10, 10);
-    value->report(String("Refresh"));
+    tft.fillScreen(convert24bitColorTo16bit(backgroundColor));
+    textString = "Refreshed";
+    tft.drawString(textString, 10, 10);
+    value->report(textString);
 }
 
-void buttonRefresh(Value *value)
+void backgroundColorRefresh(Value *value)
 {
-    value->report(String(""));
+    value->report(backgroundColor);
 }
 
 void deleteNetworkCallback(Network *network)
 {
     Serial.println("Network deleted, need to restart device, and claim network again");
+}
+
+void backgroundColorControl(Value *value, String data, String timestamp)
+{
+    backgroundColor = data.toInt();
+    tft.fillScreen(convert24bitColorTo16bit(backgroundColor));
+    tft.drawString(textString, 10, 10);
+    value->report(backgroundColor);
 }
 
 void initializeWifi(void)
@@ -123,26 +124,6 @@ void initializeWifi(void)
     Serial.println(WiFi.localIP());
 }
 
-void playTone(int tone, int duration)
-{
-    for (long i = 0; i < duration * 1000L; i += tone * 2) {
-        digitalWrite(BUZZER_PIN, HIGH);
-        delayMicroseconds(tone);
-        digitalWrite(BUZZER_PIN, LOW);
-        delayMicroseconds(tone);
-    }
-}
-
-void initialiseWioOutput(void)
-{
-    pinMode(WIO_5S_UP, INPUT_PULLUP);
-    pinMode(WIO_5S_DOWN, INPUT_PULLUP);
-    pinMode(WIO_5S_LEFT, INPUT_PULLUP);
-    pinMode(WIO_5S_RIGHT, INPUT_PULLUP);
-    pinMode(WIO_5S_PRESS, INPUT_PULLUP);
-    pinMode(BUZZER_PIN, OUTPUT);
-}
-
 void setup()
 {
     Serial.begin(115200);
@@ -155,7 +136,6 @@ void setup()
     tft.fillScreen(TFT_RED);
 
     randomSeed(analogRead(0));
-    initialiseWioOutput();
 
     // Screen update
     tft.drawString("Connecting to WiFi", 10, 10);
@@ -188,39 +168,26 @@ void setup()
     // Create device
     myDevice = myNetwork->createDevice(&myDeviceDescription);
 
-    // Create r/w number to play tone
-    myNumberValue = myDevice->createValueNumber(&myNumberValueParameters);
-    myNumberValue->onControl(&controlNumberCallback);
-    myNumberValue->onRefresh(&refreshNumberCallback);
-
     // Create r/w value for display string
     displayStrValue = myDevice->createValueString(&displayStrValueParameters);
     displayStrValue->onControl(&controlStringCallback);
     displayStrValue->onRefresh(&refreshStringCallback);
+    textString = "Connected";
+    displayStrValue->report(textString);
 
-    // Create r value for button output
-    buttonValue = myDevice->createValueString(&buttonStringParameters);
-    buttonValue->onRefresh(&buttonRefresh);
+    backgroundColorValue = myDevice->createValueBlob(&defaultColorParameter);
+    backgroundColorValue->onRefresh(&backgroundColorRefresh);
+    backgroundColorValue->onControl(&backgroundColorControl);
+    backgroundColorValue->report(backgroundColor);
+    backgroundColorValue->control(backgroundColor);
 
     // Screen update
-    tft.fillScreen(TFT_GREEN);
-    tft.drawString("Connected", 10, 10);
+    tft.fillScreen(convert24bitColorTo16bit(backgroundColor));
+    tft.drawString(textString, 10, 10);
 }
 
 void loop()
 {
-    wappsto.dataAvailable(); // Required to receive data from Wappsto
-
-    if (digitalRead(WIO_5S_UP) == LOW) {
-        buttonValue->report("Up");
-    } else if (digitalRead(WIO_5S_DOWN) == LOW) {
-        buttonValue->report("Down");
-    } else if (digitalRead(WIO_5S_LEFT) == LOW) {
-        buttonValue->report("Left");
-    } else if (digitalRead(WIO_5S_RIGHT) == LOW) {
-        buttonValue->report("Right");
-    } else if (digitalRead(WIO_5S_PRESS) == LOW) {
-        buttonValue->report("Press");
-    }
     delay(200);
+    wappsto.dataAvailable(); // Required to receive data from Wappsto
 }

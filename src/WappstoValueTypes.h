@@ -1,5 +1,6 @@
+#pragma once
 
-#include "Wappsto.h"
+#include "WappstoIoT.h"
 
 ValueNumber_t defaultTemperatureParameter = { \
     .name = "Temperature",
@@ -43,4 +44,12 @@ ValueNumber_t defaultBooleanParameter = { \
     .step = 1,
     .unit = "",
     .si_conversion = ""
+};
+
+ValueBlob_t defaultColorParameter = { \
+    .name = "Color",
+    .type = "color",
+    .permission = READ_WRITE,
+    .max = 8,
+    .encoding = "color_int"
 };

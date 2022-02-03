@@ -1,8 +1,6 @@
-/** Getting started with ESP32
+/** Generic relay example without a target defined
 
-https://randomnerdtutorials.com/installing-the-esp32-board-in-arduino-ide-windows-instructions/
-- Add to preferences, additional boards manager urls: https://dl.espressif.com/dl/package_esp32_index.json
-- Board manager, search for ESP32 and install
+To run on a target see the examples for ESP32 and WIO terminal.
 
 **/
 
@@ -21,23 +19,23 @@ const char* password = "";
 
 Network *myNetwork;
 Device *myDevice;
-Value *myLedValue;
-int myLed = 0;
-#define LED_PIN 2
+Value *myRelayValue;
+int myRelay = 0;
+#define RELAY_PIN 2
 
 DeviceDescription_t myDeviceDescription = {
-    .name = "My Device",
-    .product = "ESP32 example",
+    .name = "My Relay Device",
+    .product = "",
     .manufacturer = "",
-    .description = "ESP32 Example description",
+    .description = "Example controlling a relay",
     .version = "1.0",
     .serial = "00001",
     .protocol = "Json-RPC",
     .communication = "WiFi",
 };
 
-ValueNumber_t myLedParameters = {   .name = "Led",
-                                            .type = "light",
+ValueNumber_t myRelayParameters = {   .name = "Relay",
+                                            .type = "relay",
                                             .permission = READ_WRITE,
                                             .min = 0,
                                             .max = 1,
@@ -45,11 +43,11 @@ ValueNumber_t myLedParameters = {   .name = "Led",
                                             .unit = "",
                                             .si_conversion = ""};
 
-void controlLedCallback(Value *value, double data, String timestamp)
+void controlRelayCallback(Value *value, double data, String timestamp)
 {
-    myLed = (int)data;
-    digitalWrite(LED_PIN, myLed);
-    value->report(myLed);
+    myRelay = (int)data;
+    digitalWrite(RELAY_PIN, myRelay);
+    value->report(myRelay);
 }
 
 void initializeWifi(void)
@@ -69,7 +67,7 @@ void setup()
     Serial.begin(115200);
     randomSeed(analogRead(0));
 
-    pinMode(LED_PIN, OUTPUT);
+    pinMode(RELAY_PIN, OUTPUT);
 
     initializeWifi();
 
@@ -83,19 +81,19 @@ void setup()
     }
 
     // Create network
-    myNetwork = wappsto.createNetwork("ESP32 Basic Example");
+    myNetwork = wappsto.createNetwork("Relay Example");
 
     // Create device
     myDevice = myNetwork->createDevice(&myDeviceDescription);
 
     // Create LED value
-    myLedValue = myDevice->createValueNumber(&myLedParameters);
-    myLedValue->onControl(&controlLedCallback);
+    myRelayValue = myDevice->createValueNumber(&myRelayParameters);
+    myRelayValue->onControl(&controlRelayCallback);
 
     // Get the last control request, and set the led to this value
-    myLed = myLedValue->getControlData().toInt();
-    digitalWrite(LED_PIN, myLed);
-    myLedValue->report(myLed);
+    myRelay = myRelayValue->getControlData().toInt();
+    digitalWrite(RELAY_PIN, myRelay);
+    myRelayValue->report(myRelay);
 }
 
 void loop()
