@@ -96,6 +96,7 @@ Value** Device::getFreeValue()
 }
 
 bool Device::handleUpdate(JsonObject obj) {
+    (void)obj;
     return false;
 }
 

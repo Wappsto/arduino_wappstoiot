@@ -229,6 +229,7 @@ void Value::onControl(WappstoValueControlNumberCallback cb)
 
 bool Value::handleUpdate(JsonObject obj)
 {
+    (void)obj;
     this->_wappstoLog->error("Update of value is not implemeted");
     return false;
 }
