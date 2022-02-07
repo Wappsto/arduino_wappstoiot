@@ -6,5 +6,7 @@ EpoxyDuino
 *~
 *.o
 *.out
+*.gcda
+*.gcno
 \#*
 .\#*
