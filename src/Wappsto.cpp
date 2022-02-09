@@ -65,15 +65,16 @@ bool Wappsto::disconnect(void)
 Network *Wappsto::createNetwork(String name, String description)
 {
     this->_network = new Network(this->uuid, name, description);
-    this->_network->create();
+    if(!this->_network->create()) {
+        this->_wappstoLog->error("Could not create Network");
+        this->_network = NULL;
+    }
     return this->_network;
 }
 
 Network *Wappsto::createNetwork(String name)
 {
-    this->_network = new Network(this->uuid, name, "");
-    this->_network->create();
-    return this->_network;
+    return this->createNetwork(name, "");
 }
 
 bool Wappsto::dataAvailable(void)
