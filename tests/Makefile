@@ -2,7 +2,7 @@ tests:
 	set -e; \
 	for i in *Test/Makefile; do \
 		echo '==== Making:' $$(dirname $$i); \
-		$(MAKE) -C $$(dirname $$i) -j; \
+		$(MAKE) -C $$(dirname $$i) -j EXTRA_CXXFLAGS+=-DARDUINOJSON_ENABLE_ARDUINO_STRING; \
 	done
 
 runtests:
