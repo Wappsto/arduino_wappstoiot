@@ -8,6 +8,7 @@ Network::Network(const char* uuid, String name, String description): WappstoMode
     this->currentNumberOfDevices = 0;
     this->_onDeleteCb = NULL;
     this->_onRefreshCb = NULL;
+    this->newModel = true;
 }
 
 void Network::toJSON(JsonObject data)
