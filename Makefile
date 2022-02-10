@@ -16,7 +16,7 @@ clean-test:
 	$(MAKE) -C tests clean
 
 EpoxyDuino:
-	git clone https://github.com/seluxit/EpoxyDuino.git
+       git clone https://github.com/seluxit/EpoxyDuino.git
 
 bin/arduino-cli:
 	curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | sh
@@ -28,12 +28,14 @@ bin/arduino-lint:
 
 setup: bin/arduino-cli bin/arduino-lint EpoxyDuino
 	./bin/arduino-cli config set library.enable_unsafe_install true
+	# ESP32 core version 2
 	./bin/arduino-cli config add board_manager.additional_urls https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
+	# ESP32 core version 1
+	#./bin/arduino-cli config add board_manager.additional_urls https://dl.espressif.com/dl/package_esp32_index.json
 	./bin/arduino-cli config set directories.user .
 
 	./bin/arduino-cli core update-index
 	./bin/arduino-cli core install esp32:esp32
 
 	./bin/arduino-cli lib install ArduinoJson
-	./bin/arduino-cli lib install AUnit
 	./bin/arduino-cli lib update-index
