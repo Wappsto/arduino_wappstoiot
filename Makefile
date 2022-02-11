@@ -15,6 +15,11 @@ test:
 clean-test:
 	$(MAKE) -C tests clean
 
+clean-cov:
+	find . -type f -name '*.gcda' -delete
+	find . -type f -name '*.gcno' -delete
+	find . -type f -name '*.gcov.*' -delete
+
 EpoxyDuino:
        git clone https://github.com/seluxit/EpoxyDuino.git
 
