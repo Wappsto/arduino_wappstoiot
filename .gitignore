@@ -8,5 +8,6 @@ EpoxyDuino
 *.out
 *.gcda
 *.gcno
+*.gcov.*
 \#*
 .\#*
