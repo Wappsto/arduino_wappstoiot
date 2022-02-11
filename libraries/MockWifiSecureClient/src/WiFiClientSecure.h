@@ -24,6 +24,8 @@
 //#include <WiFi.h>
 //#include "ssl_client.h"
 
+#include "JsonMockContainer.h"
+
 class WiFiClientSecure //: public Print//Stream//: public WiFiClient
 {
 protected:
@@ -97,6 +99,8 @@ public:
     {
         return -1;//return sslclient->socket = -1;
     }
+
+    JsonMockContainer *mockContainer;
 
 private:
     char *_streamLoad(Stream& stream, size_t size);
