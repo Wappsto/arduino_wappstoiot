@@ -6,7 +6,11 @@ static bool receivedRefresh = false;
 
 void controlLedCallback(Value *value, double data, String timestamp)
 {
-    receivedControl = true;
+    if(data == 1) {
+        receivedControl = true;
+    } else {
+        receivedControl = false;
+    }
 }
 
 void refreshCallback(Value *value)
@@ -17,12 +21,12 @@ void refreshCallback(Value *value)
 test(callbackTest) {
     WiFiClientSecure client;
 
+    // Test setup
     client.addDeviceUuid("42b7bb41-bf32-4648-1102-aea6fca55641");
-
     client.addValueUuid("42b7bb41-bf32-4648-1102-aea6fca55642");
-
     client.addReportUuid("42b7bb41-bf32-4648-1102-aea6fca55643", "0");
     client.addControlUuid("42b7bb41-bf32-4648-1102-aea6fca55644", "0");
+
 
     Wappsto wappsto(&client);
     wappsto.config("4906c6be-cc7f-4c4d-8806-60a38c5fcef5", "", "", "", 0, NO_LOGS);
@@ -57,13 +61,19 @@ test(callbackTest) {
     myLedValue->onControl(&controlLedCallback);
     myLedValue->onRefresh(&refreshCallback);
 
+    // Test refresh
     client.testRefresh("42b7bb41-bf32-4648-1102-aea6fca55643", "/network/4906c6be-cc7f-4c4d-8806-60a38c5fcef5/device/42b7bb41-bf32-4648-1102-aea6fca55641/value/42b7bb41-bf32-4648-1102-aea6fca55642/state/");
     wappsto.dataAvailable();
     assertEqual(receivedRefresh, true);
 
+    // Test control
     client.testControl("42b7bb41-bf32-4648-1102-aea6fca55644", "/network/4906c6be-cc7f-4c4d-8806-60a38c5fcef5/device/42b7bb41-bf32-4648-1102-aea6fca55641/value/42b7bb41-bf32-4648-1102-aea6fca55642/state/", "1");
     wappsto.dataAvailable();
     assertEqual(receivedControl, true);
+
+    client.testControl("42b7bb41-bf32-4648-1102-aea6fca55644", "/network/4906c6be-cc7f-4c4d-8806-60a38c5fcef5/device/42b7bb41-bf32-4648-1102-aea6fca55641/value/42b7bb41-bf32-4648-1102-aea6fca55642/state/", "2");
+    wappsto.dataAvailable();
+    assertEqual(receivedControl, false);
 
     //myLedValue->report(1);
 }
