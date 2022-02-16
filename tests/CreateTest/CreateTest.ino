@@ -15,6 +15,16 @@ test(createNetwork) {
     assertEqual(myNetwork->name, "Basic Example");
 }
 
+test(createNetworkFailNotConnected) {
+    WiFiClientSecure client;
+
+    Wappsto wappsto(&client);
+    wappsto.config("4906c6be-cc7f-4c4d-8806-60a38c5fcef5", "", "", "", 0, NO_LOGS);
+
+    Network *myNetwork = wappsto.createNetwork("Basic Example", "");
+    assertEqual(myNetwork, NULL);
+}
+
 test(createDevice) {
     WiFiClientSecure client;
 
