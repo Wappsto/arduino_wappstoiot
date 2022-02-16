@@ -4,13 +4,48 @@
 #undef write
 #undef read
 
+#define REPLY_MAX_SIZE 2500
+
+// EpoxyDuino/cores/epoxy/Print.cpp change #define PRINTF_BUFFER_SIZE 250 to higher number for full debug
+#define WIFI_PRINTF(...) Serial.print("\e[1;35m[WIFI] "); Serial.printf(__VA_ARGS__); Serial.print("\e[1;37m");
+//#define WIFI_PRINTF(...)
+
 WiFiClientSecure::WiFiClientSecure()
 {
     _connected = false;
     this->mockContainer = new JsonMockContainer();
-    this->mockContainer->addResponse("{\"jsonrpc\":\"2.0\",\"id\":45299,\"result\":{\"value\":true,\"time\":\"2022-01-25T09:13:01.858212Z\"}}");
+    memset(this->_nextReply, 0x00, REPLY_MAX_SIZE);
 }
 
+void WiFiClientSecure::addDeviceUuid(const char* uuid)
+{
+    this->mockContainer->addDeviceUuid(uuid);
+}
+
+void WiFiClientSecure::addValueUuid(const char* uuid)
+{
+    this->mockContainer->addValueUuid(uuid);
+}
+
+void WiFiClientSecure::addReportUuid(const char* uuid, const char* data)
+{
+    this->mockContainer->addStateUuid(uuid, data, true);
+}
+
+void WiFiClientSecure::addControlUuid(const char* uuid, const char* data)
+{
+    this->mockContainer->addStateUuid(uuid, data, false);
+}
+
+void WiFiClientSecure::testRefresh(const char* uuid, const char* url)
+{
+    this->mockContainer->testRefresh(uuid, url, this->_nextReply);
+}
+
+void WiFiClientSecure::testControl(const char* uuid, const char* url, const char* data)
+{
+    this->mockContainer->testControl(uuid, url, data, this->_nextReply);
+}
 
 WiFiClientSecure::WiFiClientSecure(int sock)
 {
@@ -21,7 +56,6 @@ WiFiClientSecure::WiFiClientSecure(int sock)
 WiFiClientSecure::~WiFiClientSecure()
 {
     stop();
-    //delete this->mockContainer;
 }
 
 int WiFiClientSecure::connect(IPAddress ip, uint16_t port)
@@ -114,18 +148,14 @@ int WiFiClientSecure::read()
 
 int WiFiClientSecure::read(uint8_t *buf, size_t size)
 {
-    (void)buf;
     (void)size;
-    char *nextResponse = this->mockContainer->getNextResponse();
-    if(nextResponse) {
-        strcpy((char*)buf, nextResponse);
-        Serial.println(nextResponse);
-        //strcpy((char*)buf, "{\"jsonrpc\":\"2.0\",\"id\":45299,\"result\":{\"value\":true,\"time\":\"2022-01-25T09:13:01.858212Z\"}}");
+    if(strlen(this->_nextReply) > 0) {
+        strcpy((char*)buf, this->_nextReply);
+        memset(this->_nextReply, 0x00, REPLY_MAX_SIZE);
+        //WIFI_PRINTF("_nextReply: %s\n", buf);
         return strlen((const char*)buf);
-    } else {
-        Serial.println("No response to send in read");
-        return -1;
     }
+    return -1;
 }
 
 size_t WiFiClientSecure::write(unsigned char) {
@@ -144,10 +174,8 @@ size_t WiFiClientSecure::write(const uint8_t *buf, size_t size)
 
 size_t WiFiClientSecure::print(const char* data)
 {
-    (void)data;
-    Serial.println("START socket write: !!!!!!!!!!!!!!!!!");
-    Serial.println(data);
-    Serial.println("END socket write: !!!!!!!!!!!!!!!!!");
+    this->mockContainer->receiveData(data, this->_nextReply);
+    WIFI_PRINTF("WRITE print: next: %s\n", this->_nextReply);
     return 0;
 }
 
@@ -169,8 +197,8 @@ void WiFiClientSecure::setPrivateKey (const char *private_key) {
 }
 
 int WiFiClientSecure::available() {
-    Serial.println("test available");
-    return 0;
+    WIFI_PRINTF("available [%d]\n", strlen(this->_nextReply));
+    return strlen(this->_nextReply);
 }
 
 int WiFiClientSecure::peek() {

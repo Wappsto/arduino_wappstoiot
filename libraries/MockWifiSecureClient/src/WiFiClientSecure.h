@@ -100,10 +100,18 @@ public:
         return -1;//return sslclient->socket = -1;
     }
 
-    JsonMockContainer *mockContainer;
+    void addDeviceUuid(const char* uuid);
+    void addValueUuid(const char* uuid);
+    void addReportUuid(const char* uuid, const char* data);
+    void addControlUuid(const char* uuid, const char* data);
+    void testRefresh(const char* uuid, const char* url);
+    void testControl(const char* uuid, const char* url, const char* data);
+
 
 private:
     char *_streamLoad(Stream& stream, size_t size);
+    JsonMockContainer *mockContainer;
+    char _nextReply[2500];
 
 };
 
