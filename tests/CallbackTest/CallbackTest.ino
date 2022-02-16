@@ -6,6 +6,8 @@ static bool receivedRefresh = false;
 
 void controlLedCallback(Value *value, double data, String timestamp)
 {
+    (void)value;
+    (void)timestamp;
     if(data == 1) {
         receivedControl = true;
     } else {
@@ -15,6 +17,7 @@ void controlLedCallback(Value *value, double data, String timestamp)
 
 void refreshCallback(Value *value)
 {
+    (void)value;
     receivedRefresh = true;
 }
 
@@ -26,6 +29,10 @@ test(callbackTest) {
     client.addValueUuid("42b7bb41-bf32-4648-1102-aea6fca55642");
     client.addReportUuid("42b7bb41-bf32-4648-1102-aea6fca55643", "0");
     client.addControlUuid("42b7bb41-bf32-4648-1102-aea6fca55644", "0");
+
+    client.addValueUuid("42b7bb41-bf32-4648-1102-aea6fca55645");
+    client.addReportUuid("42b7bb41-bf32-4648-1102-aea6fca55646", "0.987");
+    client.addControlUuid("42b7bb41-bf32-4648-1102-aea6fca55647", "0.987");
 
 
     Wappsto wappsto(&client);
@@ -56,10 +63,21 @@ test(callbackTest) {
                                         .unit = "",
                                         .si_conversion = ""};
 
+    ValueNumber_t myDoubleParam = {   .name = "float",
+                                        .type = "number",
+                                        .permission = READ_WRITE,
+                                        .min = -180,
+                                        .max = 180,
+                                        .step = 0.000001,
+                                        .unit = "",
+                                        .si_conversion = ""};
+
 
     Value *myLedValue = myDevice->createValueNumber(&myLedParameters);
     myLedValue->onControl(&controlLedCallback);
     myLedValue->onRefresh(&refreshCallback);
+
+    Value *myDoubleValue = myDevice->createValueNumber(&myDoubleParam);
 
     // Test refresh
     client.testRefresh("42b7bb41-bf32-4648-1102-aea6fca55643", "/network/4906c6be-cc7f-4c4d-8806-60a38c5fcef5/device/42b7bb41-bf32-4648-1102-aea6fca55641/value/42b7bb41-bf32-4648-1102-aea6fca55642/state/");
@@ -75,7 +93,18 @@ test(callbackTest) {
     wappsto.dataAvailable();
     assertEqual(receivedControl, false);
 
-    //myLedValue->report(1);
+    // Test report
+    myLedValue->report(123);
+    assertEqual("123", myLedValue->getReportData());
+
+    Serial.println("Testing step size 1 - max .00");
+    double myLatitude = 57.019660;
+    myLedValue->report(myLatitude);
+    assertEqual("57.02", myLedValue->getReportData());
+
+    Serial.println("Testing step size 0.000001");
+    myDoubleValue->report(myLatitude);
+    assertEqual("57.019660", myDoubleValue->getReportData());
 }
 
 void setup() {
