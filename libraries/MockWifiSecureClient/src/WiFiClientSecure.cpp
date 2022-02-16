@@ -7,8 +7,8 @@
 #define REPLY_MAX_SIZE 2500
 
 // EpoxyDuino/cores/epoxy/Print.cpp change #define PRINTF_BUFFER_SIZE 250 to higher number for full debug
-#define WIFI_PRINTF(...) Serial.print("\e[1;35m[WIFI] "); Serial.printf(__VA_ARGS__); Serial.print("\e[1;37m");
-//#define WIFI_PRINTF(...)
+//#define WIFI_PRINTF(...) Serial.print("\e[1;35m[WIFI] "); Serial.printf(__VA_ARGS__); Serial.print("\e[1;37m");
+#define WIFI_PRINTF(...)
 
 WiFiClientSecure::WiFiClientSecure()
 {

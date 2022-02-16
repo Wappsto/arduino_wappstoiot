@@ -4,8 +4,8 @@
 #define UUID_LENGTH 37
 
 // EpoxyDuino/cores/epoxy/Print.cpp change #define PRINTF_BUFFER_SIZE 250 to higher number for full debug
-#define MOCK_PRINTF(...) Serial.print("\e[1;36m[MOCK] "); Serial.printf(__VA_ARGS__); Serial.print("\e[1;37m");
-//#define MOCK_PRINTF(...)
+//#define MOCK_PRINTF(...) Serial.print("\e[1;36m[MOCK] "); Serial.printf(__VA_ARGS__); Serial.print("\e[1;37m");
+#define MOCK_PRINTF(...)
 
 JsonMockContainer::JsonMockContainer()
 {
