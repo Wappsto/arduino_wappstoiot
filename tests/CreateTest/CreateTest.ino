@@ -4,12 +4,13 @@
 
 test(createNetwork) {
     WiFiClientSecure client;
+
     Wappsto wappsto(&client);
     wappsto.config("4906c6be-cc7f-4c4d-8806-60a38c5fcef5", "", "", "", 0, VERBOSE);
 
     wappsto.connect();
 
-    Network *myNetwork = wappsto.createNetwork("Basic Example", "hest");
+    Network *myNetwork = wappsto.createNetwork("Basic Example", "");
     assertNotEqual(myNetwork, NULL);
     assertEqual(myNetwork->name, "Basic Example");
     int len = 36; //strlen(myNetwork->uuid);
