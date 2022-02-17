@@ -25,43 +25,8 @@ test(createNetworkFailNotConnected) {
     assertEqual(myNetwork, NULL);
 }
 
-test(createDevice) {
+test(createFirstConnect) {
     WiFiClientSecure client;
-
-    // Test setup
-    client.addDeviceUuid("42b7bb41-bf32-4648-1102-aea6fca55641");
-
-    Wappsto wappsto(&client);
-    wappsto.config("4906c6be-cc7f-4c4d-8806-60a38c5fcef5", "", "", "", 0, NO_LOGS);
-
-    wappsto.connect();
-
-    Network *myNetwork = wappsto.createNetwork("Basic Example", "");
-    assertNotEqual(myNetwork, NULL);
-
-    DeviceDescription_t myDeviceDescription = {
-        .name = "My Test Device",
-        .product = "CreateTest",
-        .manufacturer = "",
-        .description = "description",
-        .version = "1.0",
-        .serial = "00001",
-        .protocol = "Json-RPC",
-        .communication = "WiFi",
-    };
-    Device *myDevice = myNetwork->createDevice(&myDeviceDescription);
-    assertNotEqual(myDevice, NULL);
-
-}
-
-test(createValueNumber) {
-    WiFiClientSecure client;
-
-    // Test setup
-    client.addDeviceUuid("42b7bb41-bf32-4648-1102-aea6fca55641");
-    client.addValueUuid("42b7bb41-bf32-4648-1102-aea6fca55642");
-    client.addReportUuid("42b7bb41-bf32-4648-1102-aea6fca55643", "0");
-    client.addControlUuid("42b7bb41-bf32-4648-1102-aea6fca55644", "0");
 
     Wappsto wappsto(&client);
     wappsto.config("4906c6be-cc7f-4c4d-8806-60a38c5fcef5", "", "", "", 0, NO_LOGS);
@@ -98,14 +63,91 @@ test(createValueNumber) {
     assertNotEqual(myNumberValue, NULL);
 }
 
+test(createDevice) {
+    WiFiClientSecure client;
+
+    // Test setup
+    client.addDeviceUuid("42b7bb41-bf32-4648-1102-aea6fca55641");
+
+    Wappsto wappsto(&client);
+    wappsto.config("4906c6be-cc7f-4c4d-8806-60a38c5fcef5", "", "", "", 0, NO_LOGS);
+
+    wappsto.connect();
+
+    Network *myNetwork = wappsto.createNetwork("Basic Example", "");
+    assertNotEqual(myNetwork, NULL);
+
+    DeviceDescription_t myDeviceDescription = {
+        .name = "My Test Device",
+        .product = "CreateTest",
+        .manufacturer = "",
+        .description = "description",
+        .version = "1.0",
+        .serial = "00001",
+        .protocol = "Json-RPC",
+        .communication = "WiFi",
+    };
+    Device *myDevice = myNetwork->createDevice(&myDeviceDescription);
+    assertNotEqual(myDevice, NULL);
+}
+
+test(createValueNumber) {
+    WiFiClientSecure client;
+
+    // Test setup
+    client.addDeviceUuid("42b7bb41-bf32-4648-1102-aea6fca55641");
+    client.addValueUuid("42b7bb41-bf32-4648-1102-aea6fca55642");
+    client.addReportUuid("42b7bb41-bf32-4648-1102-aea6fca55643", "0");
+    client.addControlUuid("42b7bb41-bf32-4648-1102-aea6fca55644", "0");
+
+    Wappsto wappsto(&client);
+    wappsto.config("4906c6be-cc7f-4c4d-8806-60a38c5fcef5", "", "", "", 0, NO_LOGS);
+
+    wappsto.connect();
+
+    Network *myNetwork = wappsto.createNetwork("Basic Example", "");
+    assertNotEqual(myNetwork, NULL);
+
+    DeviceDescription_t myDeviceDescription = {
+        .name = "My Test Device",
+        .product = "CreateTest",
+        .manufacturer = "",
+        .description = "description",
+        .version = "1.0",
+        .serial = "00001",
+        .protocol = "Json-RPC",
+        .communication = "WiFi",
+    };
+    Device *myDevice = myNetwork->createDevice(&myDeviceDescription);
+    assertNotEqual(myDevice, NULL);
+
+    assertEqual("42b7bb41-bf32-4648-1102-aea6fca55641", myDevice->getUUID());
+
+    ValueNumber_t numberParams = {  .name = "Test number",
+                                    .type = "test type",
+                                    .permission = READ_WRITE,
+                                    .min = 0,
+                                    .max = 1,
+                                    .step = 1,
+                                    .unit = "",
+                                    .si_conversion = ""};
+
+
+    Value *myNumberValue = myDevice->createValueNumber(&numberParams);
+    assertNotEqual(myNumberValue, NULL);
+    assertEqual("42b7bb41-bf32-4648-1102-aea6fca55642", myNumberValue->getUUID());
+    assertEqual("0", myNumberValue->getReportData());
+    assertEqual("0", myNumberValue->getControlData());
+}
+
 test(createValueString) {
     WiFiClientSecure client;
 
     // Test setup
     client.addDeviceUuid("42b7bb41-bf32-4648-1102-aea6fca55641");
     client.addValueUuid("42b7bb41-bf32-4648-1102-aea6fca55642");
-    client.addReportUuid("42b7bb41-bf32-4648-1102-aea6fca55643", "Test data");
-    client.addControlUuid("42b7bb41-bf32-4648-1102-aea6fca55644", "Test data");
+    client.addReportUuid("42b7bb41-bf32-4648-1102-aea6fca55643", "Test data Report");
+    client.addControlUuid("42b7bb41-bf32-4648-1102-aea6fca55644", "Test data Control");
 
     Wappsto wappsto(&client);
     wappsto.config("4906c6be-cc7f-4c4d-8806-60a38c5fcef5", "", "", "", 0, NO_LOGS);
@@ -137,6 +179,8 @@ test(createValueString) {
 
     Value *myStringValue = myDevice->createValueString(&stringParams);
     assertNotEqual(myStringValue, NULL);
+    assertEqual("Test data Report", myStringValue->getReportData());
+    assertEqual("Test data Control", myStringValue->getControlData());
 }
 
 test(createValueBlob) {
@@ -146,7 +190,7 @@ test(createValueBlob) {
     client.addDeviceUuid("42b7bb41-bf32-4648-1102-aea6fca55641");
     client.addValueUuid("42b7bb41-bf32-4648-1102-aea6fca55642");
     client.addReportUuid("42b7bb41-bf32-4648-1102-aea6fca55643", "04FFEA");
-    client.addControlUuid("42b7bb41-bf32-4648-1102-aea6fca55644", "04FFEA");
+    client.addControlUuid("42b7bb41-bf32-4648-1102-aea6fca55644", "AEFF40");
 
     Wappsto wappsto(&client);
     wappsto.config("4906c6be-cc7f-4c4d-8806-60a38c5fcef5", "", "", "", 0, NO_LOGS);
@@ -178,6 +222,8 @@ test(createValueBlob) {
 
     Value *myBlobValue = myDevice->createValueBlob(&blobParams);
     assertNotEqual(myBlobValue, NULL);
+    assertEqual("04FFEA", myBlobValue->getReportData());
+    assertEqual("AEFF40", myBlobValue->getControlData());
 }
 
 test(createValueXml) {
@@ -187,10 +233,10 @@ test(createValueXml) {
     client.addDeviceUuid("42b7bb41-bf32-4648-1102-aea6fca55641");
     client.addValueUuid("42b7bb41-bf32-4648-1102-aea6fca55642");
     client.addReportUuid("42b7bb41-bf32-4648-1102-aea6fca55643", "04FFEA");
-    client.addControlUuid("42b7bb41-bf32-4648-1102-aea6fca55644", "04FFEA");
+    client.addControlUuid("42b7bb41-bf32-4648-1102-aea6fca55644", "AEFF40");
 
     Wappsto wappsto(&client);
-    wappsto.config("4906c6be-cc7f-4c4d-8806-60a38c5fcef5", "", "", "", 0, VERBOSE);
+    wappsto.config("4906c6be-cc7f-4c4d-8806-60a38c5fcef5", "", "", "", 0, NO_LOGS);
 
     wappsto.connect();
 
@@ -219,6 +265,8 @@ test(createValueXml) {
 
     Value *myXmlValue = myDevice->createValueXml(&xmlParams);
     assertNotEqual(myXmlValue, NULL);
+    assertEqual("04FFEA", myXmlValue->getReportData());
+    assertEqual("AEFF40", myXmlValue->getControlData());
 }
 
 
