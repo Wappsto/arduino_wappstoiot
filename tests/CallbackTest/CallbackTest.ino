@@ -93,18 +93,33 @@ test(callbackTest) {
     wappsto.dataAvailable();
     assertEqual(receivedControl, false);
 
+    double myLatitude = 57.019660;
+    int testInt = 123;
+
     // Test report
-    myLedValue->report(123);
+    myLedValue->report(testInt);
     assertEqual("123", myLedValue->getReportData());
 
-    Serial.println("Testing step size 1 - max .00");
-    double myLatitude = 57.019660;
+    Serial.println("Report step size 1 - max .00");
     myLedValue->report(myLatitude);
     assertEqual("57.02", myLedValue->getReportData());
 
-    Serial.println("Testing step size 0.000001");
+    Serial.println("Report step size 0.000001");
     myDoubleValue->report(myLatitude);
     assertEqual("57.019660", myDoubleValue->getReportData());
+
+
+    // Test control
+    myLedValue->control(testInt);
+    assertEqual("123", myLedValue->getControlData());
+
+    Serial.println("Control step size 1 - max .00");
+    myLedValue->control(myLatitude);
+    assertEqual("57.02", myLedValue->getControlData());
+
+    Serial.println("Control  step size 0.000001");
+    myDoubleValue->control(myLatitude);
+    assertEqual("57.019660", myDoubleValue->getControlData());
 }
 
 void setup() {
