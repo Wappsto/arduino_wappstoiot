@@ -180,6 +180,48 @@ test(createValueBlob) {
     assertNotEqual(myBlobValue, NULL);
 }
 
+test(createValueXml) {
+    WiFiClientSecure client;
+
+    // Test setup
+    client.addDeviceUuid("42b7bb41-bf32-4648-1102-aea6fca55641");
+    client.addValueUuid("42b7bb41-bf32-4648-1102-aea6fca55642");
+    client.addReportUuid("42b7bb41-bf32-4648-1102-aea6fca55643", "04FFEA");
+    client.addControlUuid("42b7bb41-bf32-4648-1102-aea6fca55644", "04FFEA");
+
+    Wappsto wappsto(&client);
+    wappsto.config("4906c6be-cc7f-4c4d-8806-60a38c5fcef5", "", "", "", 0, VERBOSE);
+
+    wappsto.connect();
+
+    Network *myNetwork = wappsto.createNetwork("Basic Example", "");
+    assertNotEqual(myNetwork, NULL);
+
+    DeviceDescription_t myDeviceDescription = {
+        .name = "My Test Device",
+        .product = "CreateTest",
+        .manufacturer = "",
+        .description = "description",
+        .version = "1.0",
+        .serial = "00001",
+        .protocol = "Json-RPC",
+        .communication = "WiFi",
+    };
+    Device *myDevice = myNetwork->createDevice(&myDeviceDescription);
+    assertNotEqual(myDevice, NULL);
+
+    ValueXml_t xmlParams = {  .name = "Test XML",
+                                    .type = "test type",
+                                    .permission = READ_WRITE,
+                                    .xml_namespace = "namespace",
+                                    .xsd = "xsd"};
+
+
+    Value *myXmlValue = myDevice->createValueXml(&xmlParams);
+    assertNotEqual(myXmlValue, NULL);
+}
+
+
 void setup() {
 #if ! defined(EPROXY_DUINO)
     delay(1000);
