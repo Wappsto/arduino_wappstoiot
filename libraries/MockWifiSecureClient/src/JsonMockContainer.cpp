@@ -263,6 +263,44 @@ void JsonMockContainer::testControl(const char* uuid, const char* url, const cha
     strcpy(returnBuffer, buffer);
 }
 
+void JsonMockContainer::testDelete(const char* url, char* returnBuffer)
+{
+/*
+{
+  "jsonrpc": "2.0",
+  "id": "9445be821c10b8baf0ef1e39d7ee1399",
+  "method": "DELETE",
+  "params": {
+    "url": "/network/e3e395db-2a13-4416-ae2a-dd27d7ec42b8"
+  }
+}
+
+{
+  "jsonrpc": "2.0",
+  "id": "fc4349f17faac0a63f2926fac6845de0",
+  "method": "DELETE",
+  "params": {
+    "url": "/network/e3e395db-2a13-4416-ae2a-dd27d7ec42b8/device/8b1b2621-af40-4b02-00bd-551537752434",
+    "meta": {
+      "identifier": "t1jE1317sy"
+    }
+  }
+}
+*/
+
+    StaticJsonDocument<1000> response;
+    response["jsonrpc"] = "2.0";
+    response["id"] = "TestControl";
+    response["method"] = "DELETE";
+    JsonObject params = response.createNestedObject("params");
+    params["url"] = url;
+
+    char buffer[2000] = {0,};
+    serializeJson(response, buffer);
+    MOCK_PRINTF("delete: %s\n", buffer);
+    strcpy(returnBuffer, buffer);
+}
+
 bool JsonMockContainer::receiveData(const char* data, char* returnBuffer)
 {
     StaticJsonDocument<MOCK_JSON_BUFFER> root;

@@ -106,6 +106,7 @@ public:
     void addControlUuid(const char* uuid, const char* data);
     void testRefresh(const char* uuid, const char* url);
     void testControl(const char* uuid, const char* url, const char* data);
+    void testDelete(const char* url);
 
 
 private:

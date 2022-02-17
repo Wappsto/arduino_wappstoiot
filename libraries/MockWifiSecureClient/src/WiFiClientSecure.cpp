@@ -47,6 +47,11 @@ void WiFiClientSecure::testControl(const char* uuid, const char* url, const char
     this->mockContainer->testControl(uuid, url, data, this->_nextReply);
 }
 
+void WiFiClientSecure::testDelete(const char* url)
+{
+    this->mockContainer->testDelete(url, this->_nextReply);
+}
+
 WiFiClientSecure::WiFiClientSecure(int sock)
 {
     (void)sock;

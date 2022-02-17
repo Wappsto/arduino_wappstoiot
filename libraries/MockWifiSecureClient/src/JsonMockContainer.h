@@ -20,7 +20,7 @@ public:
 
     void testRefresh(const char* uuid, const char* url, char* returnBuffer);
     void testControl(const char* uuid, const char* url, const char* data, char* returnBuffer);
-
+    void testDelete(const char* url, char* returnBuffer);
     bool receiveData(const char* data, char* returnBuffer);
 
 private:
