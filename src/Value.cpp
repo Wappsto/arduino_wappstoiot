@@ -160,6 +160,20 @@ bool Value::control(int data)
 
 bool Value::control(double data)
 {
+    uint8_t count = 0;
+    if(this->valueType == NUMBER_VALUE) {
+        double num = this->valNumber->step;
+        num = abs(num);
+        num = num - (int)num;
+        while (abs(num) >= 0.0000001) {
+            num = num * 10;
+            count = count + 1;
+            num = num - int(num);
+        }
+        if(count > 0) {
+            return this->control(String(data, count));
+        }
+    }
     return this->control(String(data));
 }
 
