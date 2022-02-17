@@ -34,9 +34,9 @@ Value::Value(WappstoModel *device, ValueBlob_t *valBlob) : WappstoModel(device, 
 Value::Value(WappstoModel *device, ValueXml_t *valXml) : WappstoModel(device, "value")
 {
     this->_init();
-    this->name = valBlob->name;
-    this->type = valBlob->type;
-    this->permission = valBlob->permission;
+    this->name = valXml->name;
+    this->type = valXml->type;
+    this->permission = valXml->permission;
     this->valueType = XML_VALUE;
     this->valXml = valXml;
 }
