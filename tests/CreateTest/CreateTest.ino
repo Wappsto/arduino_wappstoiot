@@ -176,7 +176,6 @@ test(createValueString) {
                                     .max = 25,
                                     .encoding = ""};
 
-
     Value *myStringValue = myDevice->createValueString(&stringParams);
     assertNotEqual(myStringValue, NULL);
     assertEqual("Test data Report", myStringValue->getReportData());
@@ -267,6 +266,115 @@ test(createValueXml) {
     assertNotEqual(myXmlValue, NULL);
     assertEqual("04FFEA", myXmlValue->getReportData());
     assertEqual("AEFF40", myXmlValue->getControlData());
+}
+
+test(createValueReadOnly) {
+    WiFiClientSecure client;
+
+    // Test setup
+    client.addDeviceUuid("42b7bb41-bf32-4648-1102-aea6fca55641");
+    client.addValueUuid("42b7bb41-bf32-4648-1102-aea6fca55642");
+    client.addReportUuid("42b7bb41-bf32-4648-1102-aea6fca55643", "0");
+
+    Wappsto wappsto(&client);
+    wappsto.config("4906c6be-cc7f-4c4d-8806-60a38c5fcef5", "", "", "", 0, NO_LOGS);
+
+    wappsto.connect();
+
+    Network *myNetwork = wappsto.createNetwork("Basic Example", "");
+    assertNotEqual(myNetwork, NULL);
+
+    DeviceDescription_t myDeviceDescription = {
+        .name = "My Test Device",
+        .product = "CreateTest",
+        .manufacturer = "",
+        .description = "description",
+        .version = "1.0",
+        .serial = "00001",
+        .protocol = "Json-RPC",
+        .communication = "WiFi",
+    };
+    Device *myDevice = myNetwork->createDevice(&myDeviceDescription);
+    assertNotEqual(myDevice, NULL);
+
+    assertEqual("42b7bb41-bf32-4648-1102-aea6fca55641", myDevice->getUUID());
+
+    ValueNumber_t numberParams = {  .name = "Test number",
+                                    .type = "test type",
+                                    .permission = READ,
+                                    .min = 0,
+                                    .max = 1,
+                                    .step = 1,
+                                    .unit = "",
+                                    .si_conversion = ""};
+
+
+    Value *myNumberValue = myDevice->createValueNumber(&numberParams);
+    assertNotEqual(myNumberValue, NULL);
+    assertEqual("42b7bb41-bf32-4648-1102-aea6fca55642", myNumberValue->getUUID());
+    assertEqual("0", myNumberValue->getReportData());
+
+    assertEqual("", myNumberValue->getControlData());
+
+    bool result = myNumberValue->report(1);
+    assertEqual(result, true);
+
+    result = myNumberValue->control(1);
+    assertEqual(result, false);
+}
+
+test(createValueWriteOnly) {
+    WiFiClientSecure client;
+
+    // Test setup
+    client.addDeviceUuid("42b7bb41-bf32-4648-1102-aea6fca55641");
+    client.addValueUuid("42b7bb41-bf32-4648-1102-aea6fca55642");
+    client.addControlUuid("42b7bb41-bf32-4648-1102-aea6fca55644", "0");
+
+    Wappsto wappsto(&client);
+    wappsto.config("4906c6be-cc7f-4c4d-8806-60a38c5fcef5", "", "", "", 0, NO_LOGS);
+
+    wappsto.connect();
+
+    Network *myNetwork = wappsto.createNetwork("Basic Example", "");
+    assertNotEqual(myNetwork, NULL);
+
+    DeviceDescription_t myDeviceDescription = {
+        .name = "My Test Device",
+        .product = "CreateTest",
+        .manufacturer = "",
+        .description = "description",
+        .version = "1.0",
+        .serial = "00001",
+        .protocol = "Json-RPC",
+        .communication = "WiFi",
+    };
+    Device *myDevice = myNetwork->createDevice(&myDeviceDescription);
+    assertNotEqual(myDevice, NULL);
+
+    assertEqual("42b7bb41-bf32-4648-1102-aea6fca55641", myDevice->getUUID());
+
+    ValueNumber_t numberParams = {  .name = "Test number",
+                                    .type = "test type",
+                                    .permission = WRITE,
+                                    .min = 0,
+                                    .max = 1,
+                                    .step = 1,
+                                    .unit = "",
+                                    .si_conversion = ""};
+
+    Value *myNumberValue = myDevice->createValueNumber(&numberParams);
+    assertNotEqual(myNumberValue, NULL);
+    assertEqual("42b7bb41-bf32-4648-1102-aea6fca55642", myNumberValue->getUUID());
+    assertEqual("0", myNumberValue->getControlData());
+
+    assertEqual("", myNumberValue->getReportData());
+
+    bool result = myNumberValue->control(1);
+    assertEqual(result, true);
+
+    result = myNumberValue->report(1);
+    assertEqual(result, false);
 }
 
 
