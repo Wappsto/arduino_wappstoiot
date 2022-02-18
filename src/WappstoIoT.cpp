@@ -4,7 +4,6 @@
 
 void generateNewUuid(char *str)
 {
-    printf("Generate new UUID\n");
     sprintf(str, "%04x%04x-%04x-%04x-%04x-%04x%04x%04x",
             (int)(random(0xFFFF) & 0xFFFF),
             (int)(random(0xFFFF) & 0xFFFF),
