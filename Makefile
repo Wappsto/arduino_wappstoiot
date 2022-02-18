@@ -13,7 +13,7 @@ test:
 	$(MAKE) -C extras/tests runtests
 
 clean-test:
-	$(MAKE) -C tests clean
+	$(MAKE) -C extras/tests clean
 
 clean-cov:
 	find . -type f -name '*.gcda' -delete
