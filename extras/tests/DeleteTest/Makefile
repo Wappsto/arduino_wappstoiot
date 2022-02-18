@@ -1,4 +1,4 @@
 APP_NAME := DeleteTest
 ARDUINO_LIBS := AUnit ArduinoJson MockWifiSecureClient MockUTCTime .
-ARDUINO_LIB_DIRS := ../../libraries
-include ../../EpoxyDuino/EpoxyDuino.mk
+ARDUINO_LIB_DIRS := ../../../libraries
+include ../../../EpoxyDuino/EpoxyDuino.mk

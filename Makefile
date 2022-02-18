@@ -9,8 +9,8 @@ example:
 	./bin/arduino-cli compile -b esp32:esp32:esp32 --libraries="." examples/esp32_wappsto/esp32_wappsto.ino
 
 test:
-	$(MAKE) -C tests tests
-	$(MAKE) -C tests runtests
+	$(MAKE) -C extras/tests tests
+	$(MAKE) -C extras/tests runtests
 
 clean-test:
 	$(MAKE) -C tests clean
