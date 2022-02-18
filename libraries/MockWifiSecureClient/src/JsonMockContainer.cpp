@@ -265,35 +265,14 @@ void JsonMockContainer::testControl(const char* uuid, const char* url, const cha
 
 void JsonMockContainer::testDelete(const char* url, char* returnBuffer)
 {
-/*
-{
-  "jsonrpc": "2.0",
-  "id": "9445be821c10b8baf0ef1e39d7ee1399",
-  "method": "DELETE",
-  "params": {
-    "url": "/network/e3e395db-2a13-4416-ae2a-dd27d7ec42b8"
-  }
-}
-
-{
-  "jsonrpc": "2.0",
-  "id": "fc4349f17faac0a63f2926fac6845de0",
-  "method": "DELETE",
-  "params": {
-    "url": "/network/e3e395db-2a13-4416-ae2a-dd27d7ec42b8/device/8b1b2621-af40-4b02-00bd-551537752434",
-    "meta": {
-      "identifier": "t1jE1317sy"
-    }
-  }
-}
-*/
-
     StaticJsonDocument<1000> response;
     response["jsonrpc"] = "2.0";
     response["id"] = "TestControl";
     response["method"] = "DELETE";
     JsonObject params = response.createNestedObject("params");
     params["url"] = url;
+    JsonObject meta = params.createNestedObject("meta");
+    meta["identifier"] = "t1jE1317sy";
 
     char buffer[2000] = {0,};
     serializeJson(response, buffer);
@@ -343,7 +322,6 @@ bool JsonMockContainer::receiveData(const char* data, char* returnBuffer)
                 MOCK_PRINTF("Unhandled GET!!! - %s\n", data);
             }
 
-
             if(foundUuid) {
                 this->_getDeviceResponse(typeStr, msgId, foundUuid, returnBuffer, true);
             } else {
@@ -351,29 +329,11 @@ bool JsonMockContainer::receiveData(const char* data, char* returnBuffer)
             }
         } else if(strcmp(method, "PUT") == 0) {
             MOCK_PRINTF("receive data: PUT\n");
+            //MOCK_PRINTF("DATA: %s\n", data);
+
             JsonObject params = root["params"];
             const char* urlStr = params["url"];
             bool uuidInList = this->_verfifyStateId(urlStr);
-
-            /* report from application
-            {
-              "jsonrpc": "2.0",
-              "id": 4477,
-              "method": "PUT",
-              "params": {
-                "url": "/state/076a1128-223d-4b19-8a89-e0ed632ecc8b",
-                "meta": {
-                  "fast": true
-                },
-                "data": {
-                  "timestamp": "2022-02-16T09:30:18Z",
-                  "data": "1",
-                  "type": "Report"
-                }
-              }
-            }
-            */
-
             this->_sendResponse(msgId, returnBuffer, uuidInList);
         } else if(strcmp(method, "POST") == 0) {
             MOCK_PRINTF("receive data: POST\n");
