@@ -107,6 +107,8 @@ public:
     void testRefresh(const char* uuid, const char* url);
     void testControl(const char* uuid, const char* url, const char* data);
     void testDelete(const char* url);
+    void testPrintAllReceivedData(void);
+    bool testCompareTestData(const char* data);
 
 
 private:

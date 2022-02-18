@@ -280,10 +280,27 @@ void JsonMockContainer::testDelete(const char* url, char* returnBuffer)
     strcpy(returnBuffer, buffer);
 }
 
+bool JsonMockContainer::compareWithReceived(const char* data)
+{
+    if(strcmp(this->_allReceivedFromTestcase, data) == 0) {
+        return true;
+    }
+    return false;
+}
+
+void JsonMockContainer::printAllReceivedData(void)
+{
+    Serial.print("\e[1;36m");
+    Serial.println(this->_allReceivedFromTestcase);
+    Serial.print("\e[1;37m");
+}
+
 bool JsonMockContainer::receiveData(const char* data, char* returnBuffer)
 {
     StaticJsonDocument<MOCK_JSON_BUFFER> root;
     MOCK_PRINTF("Receive data\n");
+
+    sprintf(this->_allReceivedFromTestcase + strlen(this->_allReceivedFromTestcase), "%s", data);
 
     DeserializationError err = deserializeJson(root, data);
     if(err) {
@@ -373,6 +390,7 @@ void JsonMockContainer::_clearAll(void)
     memset(this->_stateControlUuidList, 0x00, sizeof(_stateControlUuidList));
     memset(this->_stateReportDataList, 0x00, sizeof(_stateReportDataList));
     memset(this->_stateControlDataList, 0x00, sizeof(_stateControlDataList));
+    memset(this->_allReceivedFromTestcase, 0x00, sizeof(_allReceivedFromTestcase));
 
     this->_numberDevices = 0;
     this->_numberValues = 0;

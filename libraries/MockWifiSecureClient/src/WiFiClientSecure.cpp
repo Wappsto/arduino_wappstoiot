@@ -52,6 +52,16 @@ void WiFiClientSecure::testDelete(const char* url)
     this->mockContainer->testDelete(url, this->_nextReply);
 }
 
+void WiFiClientSecure::testPrintAllReceivedData(void)
+{
+    this->mockContainer->printAllReceivedData();
+}
+
+bool WiFiClientSecure::testCompareTestData(const char* data)
+{
+    return this->mockContainer->compareWithReceived(data);
+}
+
 WiFiClientSecure::WiFiClientSecure(int sock)
 {
     (void)sock;

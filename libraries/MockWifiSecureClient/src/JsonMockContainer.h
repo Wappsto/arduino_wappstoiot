@@ -7,6 +7,7 @@
 #define MAX_DEVICES 5
 #define MAX_VALUES 10
 #define MAX_STATES MAX_VALUES
+#define MAX_TOTAL_RECV_BUFFER 50000
 
 class JsonMockContainer
 {
@@ -22,6 +23,8 @@ public:
     void testControl(const char* uuid, const char* url, const char* data, char* returnBuffer);
     void testDelete(const char* url, char* returnBuffer);
     bool receiveData(const char* data, char* returnBuffer);
+    bool compareWithReceived(const char* data);
+    void printAllReceivedData(void);
 
 private:
     void _clearAll(void);
@@ -42,6 +45,8 @@ private:
     char* _stateControlUuidList[MAX_STATES];
     char* _stateReportDataList[MAX_STATES];
     char* _stateControlDataList[MAX_STATES];
+
+    char _allReceivedFromTestcase[MAX_TOTAL_RECV_BUFFER];
 
     // total
     int _numberDevices;
