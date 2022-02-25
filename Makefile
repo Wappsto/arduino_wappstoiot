@@ -12,16 +12,25 @@ test:
 	$(MAKE) -C extras/tests tests
 	$(MAKE) -C extras/tests runtests
 
-clean-test:
-	$(MAKE) -C extras/tests clean
+testcov:
+	$(MAKE) -C extras/tests testscov
+	$(MAKE) -C extras/tests runtests
+	(cd extras/tests/CreateTest; gcov ../../../src/*.cpp | grep '/home/karsten/git/wappsto/arduino_wappstoiot/src/' -A 1)
 
 clean-cov:
 	find . -type f -name '*.gcda' -delete
 	find . -type f -name '*.gcno' -delete
 	find . -type f -name '*.gcov.*' -delete
+	find . -type f -name '*.*.gcov' -delete
+	find . -type f -name '*.gz' -delete
+
+clean-test: clean-cov
+	$(MAKE) -C extras/tests clean
 
 EpoxyDuino:
-       git clone https://github.com/seluxit/EpoxyDuino.git extras
+	git clone https://github.com/seluxit/EpoxyDuino.git extras
+	cp epoxy_local.patch extras/EpoxyDuino
+	(cd extras/EpoxyDuino; git apply epoxy_local.patch)
 
 bin/arduino-cli:
 	curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | sh
