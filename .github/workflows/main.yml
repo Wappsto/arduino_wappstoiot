@@ -27,9 +27,6 @@ jobs:
 
       - name: Setup
         run: |
-          #cd ..
-          #git clone https://github.com/bxparks/EpoxyDuino
-          #git clone https://github.com/bxparks/AUnit
           make setup
 
       - name: Setup Arduino CLI
@@ -41,5 +38,4 @@ jobs:
 
       - name: Run tests
         run: |
-          make -C tests
-          make -C tests runtests
+          make testcov
