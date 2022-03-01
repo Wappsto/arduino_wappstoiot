@@ -29,7 +29,7 @@ clean-test: clean-cov
 
 EpoxyDuino:
 	git clone https://github.com/seluxit/EpoxyDuino.git extras/EpoxyDuino
-	cp epoxy_local.patch extras/EpoxyDuino
+	cp extras/epoxy_local.patch extras/EpoxyDuino
 	(cd extras/EpoxyDuino; git apply epoxy_local.patch)
 
 bin/arduino-cli:
