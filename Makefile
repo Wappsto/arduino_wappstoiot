@@ -28,7 +28,7 @@ clean-test: clean-cov
 	$(MAKE) -C extras/tests clean
 
 EpoxyDuino:
-	git clone https://github.com/seluxit/EpoxyDuino.git extras
+	git clone https://github.com/seluxit/EpoxyDuino.git extras/EpoxyDuino
 	cp epoxy_local.patch extras/EpoxyDuino
 	(cd extras/EpoxyDuino; git apply epoxy_local.patch)
 
