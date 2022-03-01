@@ -15,7 +15,7 @@ test:
 testcov:
 	$(MAKE) -C extras/tests testscov
 	$(MAKE) -C extras/tests runtests
-	(cd extras/tests/CreateTest; gcov ../../../src/*.cpp | grep '/home/karsten/git/wappsto/arduino_wappstoiot/src/' -A 1)
+	(cd extras/tests/CreateTest; gcov ../../../src/*.cpp | grep 'arduino_wappstoiot/src/' -A 1)
 
 clean-cov:
 	find . -type f -name '*.gcda' -delete
