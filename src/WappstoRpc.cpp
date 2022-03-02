@@ -8,11 +8,6 @@
 
 //#define DISABLE_FAST_SENDING 1
 
-
-bool convertToJson(const String& s, JsonVariant& variant) {
-  return variant.set(s.c_str());
-}
-
 WappstoRpc* WappstoRpc::instance()
 {
     static WappstoRpc instance_;
