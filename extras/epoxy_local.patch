@@ -1,0 +1,25 @@
+diff --git a/cores/epoxy/Print.cpp b/cores/epoxy/Print.cpp
+index 3d2bb20..5135290 100644
+--- a/cores/epoxy/Print.cpp
++++ b/cores/epoxy/Print.cpp
+@@ -30,7 +30,7 @@
+ #include "Print.h"
+ 
+ // Size of the internal printf() buffer
+-#define PRINTF_BUFFER_SIZE 250
++#define PRINTF_BUFFER_SIZE 50000
+ 
+ // Public Methods //////////////////////////////////////////////////////////////
+ 
+diff --git a/cores/epoxy/WMath.cpp b/cores/epoxy/WMath.cpp
+index c7fc4ee..4251103 100644
+--- a/cores/epoxy/WMath.cpp
++++ b/cores/epoxy/WMath.cpp
+@@ -36,6 +36,7 @@ long random(long howbig) {
+   if (howbig == 0) {
+     return 0;
+   }
++  return 0xDEAD;
+   uint32_t val = rand();
+   return val % howbig;
+ }

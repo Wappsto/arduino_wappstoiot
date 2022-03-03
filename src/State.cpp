@@ -58,6 +58,9 @@ bool State::handleUpdate(JsonObject obj)
 
 bool State::handleChildren(const char* tmpUuid, RequestType_e req, JsonObject obj)
 {
+    (void)tmpUuid;
+    (void)req;
+    (void)obj;
     return false;
 }
 

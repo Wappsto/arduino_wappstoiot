@@ -18,7 +18,10 @@ bool WappstoModel::handleRequest(const char* tmpUuid, RequestType_e req, JsonObj
                 return this->handleUpdate(obj);
             case REQUEST_DELETE:
                 return this->handleDelete();
-                return false;
+            case REQUEST_SUCCESS:
+            case REQUEST_UNKNOWN:
+            default:
+                break;
         }
 
         return false;
@@ -121,7 +124,7 @@ bool WappstoModel::fetch()
     char url[200] = {0,};
     this->getUrl(url);
 
-    JsonObject data = this->_wappstoRpc->generateRPCRequest("GET", url, false);
+    this->_wappstoRpc->generateRPCRequest("GET", url, false);
 
     StaticJsonDocument<JSON_STATIC_BUFFER_SIZE> doc;
     if(this->_wappstoRpc->send(&doc)) {

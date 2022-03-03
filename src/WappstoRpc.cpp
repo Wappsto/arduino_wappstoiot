@@ -8,7 +8,6 @@
 
 //#define DISABLE_FAST_SENDING 1
 
-
 WappstoRpc* WappstoRpc::instance()
 {
     static WappstoRpc instance_;
@@ -29,6 +28,10 @@ int WappstoRpc::_getNextMsgId(void)
 
 bool WappstoRpc::send(JsonDocument *doc, bool waitForResponse)
 {
+    if(!_client->connected()) {
+        this->_wappstoLog->error("Cannot send, not connected");
+        return false;
+    }
     memset(this->_jsonTxBufferChar, 0x00, JSON_TX_BUFFER_SIZE);
     serializeJson(this->root, this->_jsonTxBufferChar);
     this->_wappstoLog->verbose(this->root);

@@ -35,6 +35,7 @@ Device* Network::createDevice(DeviceDescription_t *deviceInfo)
 }
 
 bool Network::handleUpdate(JsonObject obj) {
+    (void)obj;
     this->_wappstoLog->error("Update on network not supported");
     return false;
 }
@@ -55,7 +56,10 @@ bool Network::handleChildren(const char* tmpUuid, RequestType_e req, JsonObject 
     return false;
 }
 
-void Network::getFindQuery(char *url) {}
+void Network::getFindQuery(char *url)
+{
+    (void)url;
+}
 
 void Network::onRefresh(WappstoNetworkCallback cb)
 {

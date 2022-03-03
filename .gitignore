@@ -1,3 +1,13 @@
-*~
 bin
+generate_config_header/wappsto_config.h
+EpoxyDuino
+
 *.zip
+*~
+*.o
+*.out
+*.gcda
+*.gcno
+*.gcov.*
+\#*
+.\#*
