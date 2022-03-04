@@ -52,6 +52,17 @@ Value* Device::createValueNumber(ValueNumber_t *valNumber)
     return this->sendValue(*value);
 }
 
+Value* Device::createValueNumber(ValueNumberFull_t *valNumber)
+{
+    Value** value = this->getFreeValue();
+    if(value == NULL) {
+        return NULL;
+    }
+
+    *value = new Value(this, valNumber);
+    return this->sendValue(*value);
+}
+
 Value* Device::createValueString(ValueString_t *valString)
 {
     Value** value = this->getFreeValue();

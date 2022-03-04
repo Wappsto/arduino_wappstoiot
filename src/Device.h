@@ -30,6 +30,7 @@ class Device: public WappstoModel
 public:
     Device(WappstoModel *network, DeviceDescription_t *deviceInfo);
     Value* createValueNumber(ValueNumber_t *valNumber);
+    Value* createValueNumber(ValueNumberFull_t *valNumber);
     Value* createValueString(ValueString_t *valString);
     Value* createValueBlob(ValueBlob_t *valBlob);
     Value* createValueXml(ValueXml_t *valXml);

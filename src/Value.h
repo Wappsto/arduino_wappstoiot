@@ -16,7 +16,18 @@ typedef enum {
     STRING_VALUE,
     BLOB_VALUE,
     XML_VALUE,
+    NUMBER_VALUE_FULL,
 } VALUE_TYPE_e;
+
+typedef struct {
+    const char* key;
+    const char* value;
+} KEY_VALUE_t;
+
+typedef struct {
+    const int size;
+    const KEY_VALUE_t *map;
+} NUMBER_MAPPING_t;
 
 typedef struct
 {
@@ -29,6 +40,21 @@ typedef struct
     String unit;
     String si_conversion;
 } ValueNumber_t;
+
+typedef struct
+{
+    String name;
+    String type;
+    PERMISSION_e permission;
+    double min;
+    double max;
+    double step;
+    String unit;
+    String si_conversion;
+    bool ordered_map;
+    bool meaningful_zero;
+    const NUMBER_MAPPING_t *mapping;
+} ValueNumberFull_t;
 
 typedef struct
 {
@@ -67,6 +93,7 @@ class Value: public WappstoModel
 {
 public:
     Value(WappstoModel *device, ValueNumber_t *valNumber);
+    Value(WappstoModel *device, ValueNumberFull_t *valNumber);
     Value(WappstoModel *device, ValueString_t *valString);
     Value(WappstoModel *device, ValueBlob_t *valBlob);
     Value(WappstoModel *device, ValueXml_t *valXml);
@@ -88,6 +115,7 @@ public:
     PERMISSION_e permission;
     VALUE_TYPE_e valueType;
     ValueNumber_t *valNumber;
+    ValueNumberFull_t *valNumberFull;
     ValueString_t *valString;
     ValueBlob_t *valBlob;
     ValueXml_t *valXml;

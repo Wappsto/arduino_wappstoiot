@@ -11,6 +11,16 @@ Value::Value(WappstoModel *device, ValueNumber_t *valNumber) : WappstoModel(devi
     this->valNumber = valNumber;
 }
 
+Value::Value(WappstoModel *device, ValueNumberFull_t *valNumber) : WappstoModel(device, "value")
+{
+    this->_init();
+    this->name = valNumber->name;
+    this->type = valNumber->type;
+    this->permission = valNumber->permission;
+    this->valueType = NUMBER_VALUE_FULL;
+    this->valNumberFull = valNumber;
+}
+
 Value::Value(WappstoModel *device, ValueString_t *valString) : WappstoModel(device, "value")
 {
     this->_init();
@@ -74,7 +84,7 @@ void Value::toJSON(JsonObject data)
         number["min"] = this->valNumber->min;
         number["max"] = this->valNumber->max;
         number["step"] = this->valNumber->step;
-        number["unit"] = "";
+        number["unit"] = this->valNumber->unit;
     } else if(this->valueType == STRING_VALUE) {
         JsonObject str = data.createNestedObject("string");
         str["max"] = this->valString->max;
@@ -87,6 +97,20 @@ void Value::toJSON(JsonObject data)
         JsonObject xml = data.createNestedObject("xml");
         xml["xsd"] = this->valXml->xsd;
         xml["namespace"] = this->valXml->xml_namespace;
+    } else if(this->valueType == NUMBER_VALUE_FULL) {
+        JsonObject number = data.createNestedObject("number");
+        number["min"] = this->valNumberFull->min;
+        number["max"] = this->valNumberFull->max;
+        number["step"] = this->valNumberFull->step;
+        number["unit"] = this->valNumberFull->unit;
+        //number["meaningful_zero"] = this->valNumberFull->meaningful_zero;
+        number["ordered_mapping"] = this->valNumberFull->ordered_map;
+        if(this->valNumberFull->mapping) {
+            JsonObject mapping = number.createNestedObject("mapping");
+            for(int i = 0; i< this->valNumberFull->mapping->size; i++) {
+                mapping[this->valNumberFull->mapping->map[i].key] = this->valNumberFull->mapping->map[i].value;
+            }
+        }
     }
 }
 
