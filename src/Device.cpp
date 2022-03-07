@@ -36,9 +36,13 @@ void Device::getFindQuery(char *url)
 Value* Device::sendValue(Value* value)
 {
     value->loadFromWappsto();
-    value->create();
-    value->createStates();
-    return value;
+    if(value->create()) {
+        value->createStates();
+        return value;
+    } else {
+        this->_wappstoLog->error("Failed to create Value, error from server");
+        return NULL;
+    }
 }
 
 Value* Device::createValueNumber(ValueNumber_t *valNumber)

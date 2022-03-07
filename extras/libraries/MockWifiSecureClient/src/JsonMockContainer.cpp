@@ -81,6 +81,38 @@ char* JsonMockContainer::_getNextControlStateUuid(void)
     return this->_stateControlUuidList[this->_currentControlState-1];
 }
 
+bool JsonMockContainer::_verfifyDeviceId(const char* urlStr)
+{
+    String url(urlStr);
+    char uuid[UUID_LENGTH] = {0,};
+    int lastSlash = url.lastIndexOf('/');
+    url.substring(lastSlash+1).toCharArray(uuid, UUID_LENGTH);
+
+    for(int i=0; i < this->_numberDevices; i++) {
+        if(strcmp(uuid, this->_deviceUuidList[i]) == 0) {
+            MOCK_PRINTF("Found Device: %s - [%d]\n", uuid, i);
+            return true;
+        }
+    }
+    return false;
+}
+
+bool JsonMockContainer::_verfifyValueId(const char* urlStr)
+{
+    String url(urlStr);
+    char uuid[UUID_LENGTH] = {0,};
+    int lastSlash = url.lastIndexOf('/');
+    url.substring(lastSlash+1).toCharArray(uuid, UUID_LENGTH);
+
+    for(int i=0; i < this->_numberValues; i++) {
+        if(strcmp(uuid, this->_valueUuidList[i]) == 0) {
+            MOCK_PRINTF("Found value: %s - [%d]\n", uuid, i);
+            return true;
+        }
+    }
+    return false;
+}
+
 bool JsonMockContainer::_verfifyStateId(const char* urlStr)
 {
     String url(urlStr);
@@ -347,10 +379,18 @@ bool JsonMockContainer::receiveData(const char* data, char* returnBuffer)
         } else if(strcmp(method, "PUT") == 0) {
             MOCK_PRINTF("receive data: PUT\n");
             //MOCK_PRINTF("DATA: %s\n", data);
+            bool uuidInList = false;
 
             JsonObject params = root["params"];
             const char* urlStr = params["url"];
-            bool uuidInList = this->_verfifyStateId(urlStr);
+
+            if(strstr(urlStr, "device") != NULL) {
+                uuidInList = this->_verfifyDeviceId(urlStr);
+            } else if(strstr(urlStr, "value") != NULL) {
+                uuidInList = this->_verfifyValueId(urlStr);
+            } else if(strstr(urlStr, "state") != NULL) {
+                uuidInList = this->_verfifyStateId(urlStr);
+            }
             this->_sendResponse(msgId, returnBuffer, uuidInList);
         } else if(strcmp(method, "POST") == 0) {
             MOCK_PRINTF("receive data: POST\n");

@@ -67,6 +67,7 @@ test(callbackNumberTest) {
         .communication = "WiFi",
     };
     Device *myDevice = myNetwork->createDevice(&myDeviceDescription);
+    assertNotEqual(myDevice, NULL);
 
     ValueNumber_t myIntParameters = {   .name = "Int",
                                         .type = "bool",
@@ -171,7 +172,7 @@ test(callbackStringTest) {
         .communication = "WiFi",
     };
     Device *myDevice = myNetwork->createDevice(&myDeviceDescription);
-
+    assertNotEqual(myDevice, NULL);
 
     ValueString_t stringParameters = {  .name = "String",
                                         .type = "text",

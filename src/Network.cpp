@@ -29,9 +29,13 @@ Device* Network::createDevice(DeviceDescription_t *deviceInfo)
     this->devices[this->currentNumberOfDevices++] = device;
 
     device->loadFromWappsto();
-    device->create();
+    if(device->create()) {
+        return device;
+    } else {
+        this->_wappstoLog->error("Failed to create device, error from server");
+        return NULL;
+    }
 
-    return device;
 }
 
 bool Network::handleUpdate(JsonObject obj) {

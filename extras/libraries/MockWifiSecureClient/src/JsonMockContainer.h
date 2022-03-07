@@ -37,6 +37,8 @@ private:
     void _sendResponse(int msgId, char* returnBuffer, bool success);
     void _sendStateData(int msgId, const char* uuid, bool isReport, const char* data, char* returnBuffer);
     void _getDeviceResponse(const char* state, int msgId, char* uuid, char* returnBuffer, bool success);
+    bool _verfifyDeviceId(const char* urlStr);
+    bool _verfifyValueId(const char* urlStr);
     bool _verfifyStateId(const char* urlStr);
 
     char* _deviceUuidList[MAX_DEVICES];
