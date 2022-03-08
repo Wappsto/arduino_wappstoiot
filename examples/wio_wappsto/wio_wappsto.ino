@@ -1,5 +1,7 @@
 /** Getting started with Wio terminal
-Important step for new hardware - wifi firmware upgrade:
+
+!!!! Important step for new hardware - First time use of WiFi !!!!
+WiFi on the Wio terminal needs to be upgraded before it can be used, follow the guide on:
 https://wiki.seeedstudio.com/Wio-Terminal-Network-Overview/
 
 
