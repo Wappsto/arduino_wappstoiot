@@ -75,7 +75,7 @@ void setup()
 
     initializeNtp();
 
-    wappsto.config(network_uuid, ca, client_crt, client_key);
+    wappsto.config(network_uuid, ca, client_crt, client_key, 5, NO_LOGS);
     if(wappsto.connect()) {
         Serial.println("Connected to Wappsto");
     } else {
