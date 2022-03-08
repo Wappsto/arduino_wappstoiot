@@ -25,13 +25,39 @@ For your physical device to identify itself towards Wappsto it needs a network i
 As a help to generate this you can use the python script included in this repository in the folder generate_config_header.
 For a first time run, you may need to install the required libraries
 ```
+cd <path to downloaded arduino_wappstoiot>
+cd generate_config_header
+pip install -r requirements.txt
+```
+To generate a header file:
+
+1. Go to the `generate_config_header` folder:
+```
+cd generate_config_header
+```
+2. Use the command:
+```
+python main.py --type arduino
+```
+3. Then you will be asked to login using email and password for your user on Wappsto.
+4. Copy the newly generated file `wappsto_config.h` to your Arduino sketch folder. Note if generated correctly it should have a valid UUID (a string similar, but different, to this `"d7fafe76-b020-4594-8f2a-aae11c6b6589"` defined for the `const char* network_uuid =` line.
+
+
+Note, if you have both pyhton2 and python3 installed you may need to use
+```
 pip3 install -r requirements.txt
-```
-To generate a header file, use the following command - and copy the file wappsto_config.h to your Arduino sketch folder. For other commands check the --help parameter.
-```
 python3 main.py --type arduino
 ```
-Then you will be asked to login using email and password for your user on Wappsto.
+
+If you get the error
+```
+ImportError: cannot import name 'soft_unicode' from 'markupsafe' 
+```
+It is due to a change in dependency for another library, it can be fixed using this command.
+```
+pip install -U MarkupSafe==0.20
+```
+
 
 #### Claiming and ownership - Not allowed to access values
 
