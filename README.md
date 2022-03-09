@@ -98,14 +98,14 @@ If you change a name a new will be created, but but the old will not be delete. 
 
 ## Initialize Wappsto:
 Wappsto needs a reference to WiFiClientSecure when created, example.
-```
+```c
 WiFiClientSecure client;
 Wappsto wappsto(&client);
 ```
 
 ### Set the config and connect
 
-```
+```c
 #include "wappsto_config.h"
 ...
 wappsto.config(network_uuid, ca, client_crt, client_key);
@@ -118,7 +118,7 @@ if(wappsto.connect()) {
 
 ## Optional config parameters, log and ping
 Besides the mandatory commands you can also set ping interval and log level:
-```
+```c
 wappsto.config(network_uuid, ca, client_crt, client_key, ping interval in minutes, log level);
 ```
 * The ping interval will send a short package from the device to wappsto to keep the connection alive. If your device rarely sends data, it might be a good idea to add this to avoid timeout on the connection.
@@ -132,12 +132,12 @@ wappsto.config(network_uuid, ca, client_crt, client_key, ping interval in minute
 ```
 
 ## Create your network:
-```
+```c
 myNetwork = wappsto.createNetwork("Network Name");
 ```
 
 ## Create a device:
-```
+```c
 DeviceDescription_t myDeviceDescription = {
     .name = "Device name",
     .product = "Product name",
@@ -187,7 +187,7 @@ The first time a value is created a number will have the value NA, and the strin
 If the value exist, the data of the value will not change. If you want to value to update when the device reboots, you have to call report/control.
 
 ### Create a number value:
-```
+```c
 ValueNumber_t myNumberValueParameters = {   .name = "Living room",
                                             .type = "temperature", // value type
                                             .permission = READ_WRITE,
@@ -201,7 +201,7 @@ myNumberValue = myDevice->createValueNumber(&myNumberValueParameters);
 ```
 
 ### Create a string value:
-```
+```c
 ValueString_t myStringValueParameters = { .name = "Value String Name",
                                           .type = "value type",
                                           .permission = READ_WRITE,
@@ -212,7 +212,7 @@ myStringValue = myDevice->createValueString("Value String Name", "value type", R
 ```
 
 ### Create a blob value:
-```
+```c
 ValueBlob_t myBlobValueParameters =  { .name = "Value Blob Name",
                                        .type = "value type",
                                        .permission = READ_WRITE,
@@ -223,7 +223,7 @@ myBlobValue = myDevice->createValueBlob(&myBlobValueParameters);
 ```
 
 ### Create a xml value:
-```
+```c
 ValueXml_t myXmlValueParameters =  { .name = "Value Xml Name",
                                      .type = "value type",
                                      .permission = READ_WRITE,
@@ -235,7 +235,7 @@ myXmlValue = myDevice->createValueXml(&myXmlValueParameters);
 
 
 ## Send a value report:
-```
+```c
 int myInt = 123;
 double myDouble = 42.7;
 
@@ -253,7 +253,7 @@ myBlobValue.report("A5FF2C");
 ## Set a control value:
 Normally the control value will only be updated from wappsto.com, but you may need to set a current value when booting or in other situations.
 Setting this is similar to report:
-```
+```c
 int myInt = 123;
 double myDouble = 42.7;
 
@@ -278,7 +278,7 @@ wappsto.dataAvailable();
 ## Receive a value control request:
 You can choose if you want the control data translated to a double, or if you want the string directly.
 
-```
+```c
 // Receive control with a number (double)
 void controlNumberCallback(Value *value, double data, String timestamp)
 {
@@ -297,7 +297,7 @@ myStringValue->onControl(&controlStringCallback);
 ```
 
 ## Receive a value refresh request (report value only):
-```
+```c
 void refreshNumberCallback(Value *value)
 {
     // handle refresh request
@@ -313,7 +313,7 @@ For instance after a new boot, the last controlled state set in Wappsto.com will
 
 _Note_ retriveing numberData from an empty value will return a 0;
 
-```
+```c
 String ctrlData = myNumberValue.getControlData();
 
 double ctrlDataNumber = myNumberValue.getControlNumberData();
