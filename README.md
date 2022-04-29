@@ -32,7 +32,15 @@ Then choose "Sketch"->"Include Library"->"Add .Zip Library..." See https://docs.
 ### Generate certificates and id for a new device
 For your physical device to identify itself towards Wappsto it needs a network id, the server CA certificate, and the client certificate/key - all these has to be generated on Wappsto.com and placed in (if matching the examples) called wappsto_config.h.
 
-#### wappsto_config.h
+#### Make wappsto_config.h
+The easiest way is to download the header file from a Wapp.
+
+On https://wappsto.com/ go to the store (https://store.wappsto.com/) and install the Wapp "IoT Certificate Manager".
+
+Open the Wapp and select: "Header file (used in WappstoIoT for Arduino)" and click download.
+
+#### Using python script (deprecated, old way) 
+
 As a help to generate this you can use the python script included in this repository in the folder generate_config_header.
 For a first time run, you may need to install the required libraries
 ```
