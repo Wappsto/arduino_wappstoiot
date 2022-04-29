@@ -2,6 +2,16 @@
 
 _This is an early version of the library, so the interface may still change at certain points. We will try to keep the changes to a minimum, if possible._
 
+# HW target setup
+
+The library currently has examples for two HW targets:
+* ESP32 - see examples/esp32_wappsto/esp32_wappsto.ino for setup details
+    * arduino_wappstoiot support ESP32 library version 1.0.x
+* Wio Terminal - see examples/wio_wappsto/wio_wappsto.ino or wio_tft_wappsto.ino
+    * This board requires multiple libraries and an WiFi firmware upgrade to work
+
+If you want to use your own hardware, use these examples as reference. Note that UTC time is required, so NTP or an alternative time implementation is required.
+
 ## Prerequisites
 
 ### An account on Wappsto
