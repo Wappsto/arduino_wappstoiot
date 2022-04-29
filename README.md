@@ -1,4 +1,6 @@
-# HW target setup
+_This is an early version of the library, so the interface may still change at certain points. We will try to keep the changes to a minimum, if possible._
+
+## HW target setup
 
 The library currently has examples for two HW targets:
 * ESP32 - see examples/esp32_wappsto/esp32_wappsto.ino for setup details
@@ -9,9 +11,7 @@ The library currently has examples for two HW targets:
 If you want to use your own hardware, use these examples as reference. Note that UTC time is required, so NTP or an alternative time implementation is required.
 
 
-# arduino_wappstoiot
-
-_This is an early version of the library, so the interface may still change at certain points. We will try to keep the changes to a minimum, if possible._
+# arduino_wappstoiot - library description
 
 ## Prerequisites
 
