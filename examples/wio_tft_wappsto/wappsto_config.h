@@ -1,4 +1,4 @@
-// Generate this file using the python script https://github.com/Wappsto/arduino_wappstoiot/tree/main/generate_config_header
+// Generate this file using the Wapp "IoT Certificate Manager" found in https://store.wappsto.com/
 const char* network_uuid = "...";
 
 const char* ca = "-----BEGIN CERTIFICATE-----\n    \n-----END CERTIFICATE-----\n";
