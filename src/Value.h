@@ -100,6 +100,7 @@ public:
     bool report(const String &data);
     bool report(double data);
     bool report(int data);
+    bool report(const char* data);
     bool control(const String &data);
     bool control(double data);
     bool control(int data);

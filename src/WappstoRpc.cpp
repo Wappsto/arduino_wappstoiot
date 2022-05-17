@@ -26,6 +26,19 @@ int WappstoRpc::_getNextMsgId(void)
     return ++this->_msgId;
 }
 
+#define PUT_REPORT_STATE "{\"jsonrpc\":\"2.0\",\"id\":%d,\"method\":\"PUT\",\"params\":{\"url\":\"%s\",\"meta\":{\"fast\":true},\"data\":{\"timestamp\":\"%s\",\"data\":\""
+bool WappstoRpc::sendRaw(const char *url, const char *data, Timestamp_t timestamp)
+{
+    char header[500] = {0,};
+    char footer[25] = "\",\"type\":\"Report\"}}}";
+    sprintf(header, PUT_REPORT_STATE, this->_getNextMsgId(), url, timestamp);
+
+    this->_client->print(header);
+    this->_client->print(data);
+    this->_client->print(footer);
+    return true;
+}
+
 bool WappstoRpc::send(JsonDocument *doc, bool waitForResponse)
 {
     if(!_client->connected()) {
@@ -140,7 +153,6 @@ bool WappstoRpc::sendPing(void)
     this->generateRPCRequest("HEAD", "/services/2.0/network", false);
     return this->send();
 }
-
 
 RequestType_e WappstoRpc::readData(char* uuid, JsonDocument& doc)
 {

@@ -36,6 +36,17 @@ void State::toJSON(JsonObject data)
     data["type"] = this->typeToString();
 }
 
+bool State::updateRaw(const char *data)
+{
+    char url[200] = {0,};
+    if(strlen(data) < 200) {
+        this->data = String(data);
+    }
+    strcpy(this->timestamp, getUtcTime());
+    this->getUrl(url);
+    return this->_wappstoRpc->sendRaw(url, data, this->timestamp);
+}
+
 void State::getFindQuery(char *url) {
     sprintf(url, "?this_type==%s", this->typeToString());
 }

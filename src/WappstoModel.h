@@ -36,7 +36,7 @@ protected:
     UUID_t uuid;
     WappstoModel *parent;
     bool newModel;
+    void getUrl(char *url);
 
 private:
-    void getUrl(char *url);
 };

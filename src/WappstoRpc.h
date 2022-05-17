@@ -21,6 +21,7 @@ public:
     bool send();
     bool send(JsonDocument *doc);
     bool send(JsonDocument *doc, bool waitForResponse);
+    bool sendRaw(const char *url, const char *data, Timestamp_t timestamp);
     JsonObject generateRPCRequest(const char* method, const char* url, bool data);
     bool sendPing(void);
     RequestType_e readData(char* uuid, JsonDocument &root);

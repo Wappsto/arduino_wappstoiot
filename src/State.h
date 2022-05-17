@@ -18,6 +18,7 @@ class State: public WappstoModel
 public:
     State(WappstoModel *parent, StateType_e stateType, bool forceCreate);
 
+    bool updateRaw(const char *data);
     StateType_e stateType;
     String data;
     Timestamp_t timestamp;

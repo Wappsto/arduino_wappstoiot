@@ -166,6 +166,11 @@ bool Value::report(double data)
     return this->report(String(data));
 }
 
+bool Value::report(const char* data)
+{
+    return this->reportState->updateRaw(data);
+}
+
 bool Value::control(const String &data)
 {
     if(this->controlState) {
