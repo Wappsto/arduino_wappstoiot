@@ -43,9 +43,9 @@ bin/arduino-lint:
 setup: bin/arduino-cli bin/arduino-lint EpoxyDuino
 	./bin/arduino-cli config set library.enable_unsafe_install true
 	# ESP32 core version 2
-	./bin/arduino-cli config add board_manager.additional_urls https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
+	#./bin/arduino-cli config add board_manager.additional_urls https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
 	# ESP32 core version 1
-	#./bin/arduino-cli config add board_manager.additional_urls https://dl.espressif.com/dl/package_esp32_index.json
+	./bin/arduino-cli config add board_manager.additional_urls https://dl.espressif.com/dl/package_esp32_index.json
 	./bin/arduino-cli config set directories.user ./extras
 
 	./bin/arduino-cli core update-index
