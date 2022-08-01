@@ -36,6 +36,7 @@ void Device::getFindQuery(char *url)
 Value* Device::sendValue(Value* value)
 {
     value->loadFromWappsto();
+    value->updatePeriodDelta();
     if(value->create()) {
         value->createStates();
         return value;

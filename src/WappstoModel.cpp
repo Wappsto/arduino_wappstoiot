@@ -131,6 +131,10 @@ bool WappstoModel::fetch()
         if(doc["result"] && doc["result"]["value"]) {
             this->handleUpdate(doc["result"]["value"]);
             return true;
+        } else if(doc["params"] && doc["params"]["data"]) {
+             this->_wappstoLog->info("Testing value update!!!!!!");
+            this->handleUpdate(doc["params"]["data"]);
+            return true;
         }
     }
     return false;

@@ -54,6 +54,8 @@ typedef struct
     bool ordered_map;
     bool meaningful_zero;
     const NUMBER_MAPPING_t *mapping;
+    String period;
+    String delta;
 } ValueNumberFull_t;
 
 typedef struct
@@ -109,6 +111,7 @@ public:
     void onControl(WappstoValueControlNumberCallback cb);
 
     void createStates(void);
+    void updatePeriodDelta(void);
     bool handleStateCb(const char* tmpUuid, RequestType_e req, const char *tmpData, const char *tmpTimestamp);
 
     String name;
@@ -121,6 +124,8 @@ public:
     ValueBlob_t *valBlob;
     ValueXml_t *valXml;
     bool valueCreated;
+    int period;
+    double delta;
 
     String getControlData(void);
     double getControlNumberData(void);
@@ -131,6 +136,7 @@ public:
 
     void onRefresh(WappstoValueCallback cb);
     void onDelete(WappstoValueCallback cb);
+
 
 private:
     WappstoValueCallback _onRefreshCb;

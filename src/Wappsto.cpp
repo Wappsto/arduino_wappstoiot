@@ -92,6 +92,9 @@ bool Wappsto::dataAvailable(void)
             this->_startPingMillis = currentMillis;
             this->_wappstoRpc->sendPing();
         }
+
+        //calulate and trigger period event             
+
         return false;
     }
 

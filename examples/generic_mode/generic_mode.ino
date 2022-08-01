@@ -56,7 +56,9 @@ ValueNumberFull_t myModeParameters = {  .name = "Mode Example",
                                         .si_conversion = "",
                                         .ordered_map = true,
                                         .meaningful_zero = false,
-                                        .mapping = &myMapping
+                                        .mapping = &myMapping,
+                                        .period = "0",
+                                        .delta = "0",
 };
 
 void controlModeCallback(Value *value, double data, String timestamp)

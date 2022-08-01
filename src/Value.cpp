@@ -1,3 +1,6 @@
+#include <time.h>
+#include <sys/time.h>
+
 #include "Value.h"
 
 
@@ -9,6 +12,8 @@ Value::Value(WappstoModel *device, ValueNumber_t *valNumber) : WappstoModel(devi
     this->permission = valNumber->permission;
     this->valueType = NUMBER_VALUE;
     this->valNumber = valNumber;
+    this->delta = 0;
+    this->period = 0;
 }
 
 Value::Value(WappstoModel *device, ValueNumberFull_t *valNumber) : WappstoModel(device, "value")
@@ -19,6 +24,8 @@ Value::Value(WappstoModel *device, ValueNumberFull_t *valNumber) : WappstoModel(
     this->permission = valNumber->permission;
     this->valueType = NUMBER_VALUE_FULL;
     this->valNumberFull = valNumber;
+    this->delta = valNumber->delta.toDouble();
+    this->period = valNumber->period.toInt();
 }
 
 Value::Value(WappstoModel *device, ValueString_t *valString) : WappstoModel(device, "value")
@@ -29,6 +36,8 @@ Value::Value(WappstoModel *device, ValueString_t *valString) : WappstoModel(devi
     this->permission = valString->permission;
     this->valueType = STRING_VALUE;
     this->valString = valString;
+    this->delta = 0;
+    this->period = 0;
 }
 
 Value::Value(WappstoModel *device, ValueBlob_t *valBlob) : WappstoModel(device, "value")
@@ -39,6 +48,8 @@ Value::Value(WappstoModel *device, ValueBlob_t *valBlob) : WappstoModel(device, 
     this->permission = valBlob->permission;
     this->valueType = BLOB_VALUE;
     this->valBlob = valBlob;
+    this->delta = 0;
+    this->period = 0;
 }
 
 Value::Value(WappstoModel *device, ValueXml_t *valXml) : WappstoModel(device, "value")
@@ -49,6 +60,8 @@ Value::Value(WappstoModel *device, ValueXml_t *valXml) : WappstoModel(device, "v
     this->permission = valXml->permission;
     this->valueType = XML_VALUE;
     this->valXml = valXml;
+    this->delta = 0;
+    this->period = 0;
 }
 
 void Value::_init(void)
@@ -78,6 +91,8 @@ void Value::toJSON(JsonObject data)
     }
 
     data["type"] = this->type;
+    data["period"] = "0";
+    data["delta"] = "0";
 
     if(this->valueType == NUMBER_VALUE) {
         JsonObject number = data.createNestedObject("number");
@@ -111,6 +126,8 @@ void Value::toJSON(JsonObject data)
                 mapping[this->valNumberFull->mapping->map[i].key] = this->valNumberFull->mapping->map[i].value;
             }
         }
+        data["period"] = this->valNumberFull->period;
+        data["delta"] = this->valNumberFull->delta;
     }
 }
 
@@ -270,11 +287,58 @@ void Value::onControl(WappstoValueControlNumberCallback cb)
     this->_onControlNumberCb = cb;
 }
 
+void Value::updatePeriodDelta(void)
+{
+    /*
+    if(!this->newModel && strlen(this->uuid)) {
+        this->fetch();
+    }
+    */
+}
+
 bool Value::handleUpdate(JsonObject obj)
 {
-    (void)obj;
-    this->_wappstoLog->error("Update of value is not implemeted");
-    return false;
+    this->_wappstoLog->verbose("State update");
+#if 0
+    if(obj["delta"]) {
+        this->delta = atof((const char*)obj["delta"]);
+    }
+    if(obj["period"]) {
+        //testPeriod = String((const char*)obj["period"]);
+        this->period = atoi((const char*)obj["period"]);
+    }
+
+    /// extra debug    Remove this before final commit             
+    this->_wappstoLog->verbose("Value update delta: ");
+    Serial.println(this->delta);
+    this->_wappstoLog->verbose("Value update period: ", this->period);
+    /// extra debug     
+
+    struct tm loc_time = { };
+    struct tm midnight = { };
+    time_t time_now = time(NULL);
+
+    localtime_r(&time_now, &loc_time);
+
+    midnight.tm_year = loc_time.tm_year;
+    midnight.tm_mon = loc_time.tm_mon;
+    midnight.tm_mday = loc_time.tm_mday;
+    midnight.tm_hour = 0;
+    midnight.tm_min = 0;
+    midnight.tm_sec = 0;
+    midnight.tm_isdst = loc_time.tm_isdst;
+
+    time_t time_midnight;
+    time_midnight = mktime(&midnight);
+
+    int seconds_since_midnight = (int)difftime(time_now, time_midnight);
+
+    int seconds_to_next_period = ((seconds_since_midnight / this->period) + 1) * this->period;
+    int next_trigger_in_seconds = seconds_to_next_period - seconds_since_midnight;
+    time_t next_trigger_unix_time = time_now + next_trigger_in_seconds;
+
+#endif
+    return true;
 }
 
 bool Value::handleChildren(const char* tmpUuid, RequestType_e req, JsonObject obj)
