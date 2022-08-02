@@ -36,7 +36,7 @@ void Device::getFindQuery(char *url)
 Value* Device::sendValue(Value* value)
 {
     value->loadFromWappsto();
-    value->updatePeriodDelta();
+    value->fetch();
     if(value->create()) {
         value->createStates();
         return value;
@@ -109,6 +109,15 @@ Value** Device::getFreeValue()
     }
 
     return &this->values[this->currentNumberOfValues++];
+}
+
+void Device::handlePeriod(void) {
+    for(int vals=0; vals < this->currentNumberOfValues; vals++) {
+        if(this->values[vals] == NULL) {
+            continue;
+        }
+        this->values[vals]->handlePeriod();
+    }
 }
 
 bool Device::handleUpdate(JsonObject obj) {

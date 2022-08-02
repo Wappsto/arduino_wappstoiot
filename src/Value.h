@@ -85,6 +85,12 @@ typedef struct
     String xsd;
 } ValueXml_t;
 
+typedef enum {
+    USER_REPORT,
+    REFRESH_REPORT,
+    PERIOD_REPORT,
+} ReportTriggerType_e;
+
 class Value;
 
 typedef void (*WappstoValueCallback)(Value *value);
@@ -111,7 +117,6 @@ public:
     void onControl(WappstoValueControlNumberCallback cb);
 
     void createStates(void);
-    void updatePeriodDelta(void);
     bool handleStateCb(const char* tmpUuid, RequestType_e req, const char *tmpData, const char *tmpTimestamp);
 
     String name;
@@ -126,6 +131,7 @@ public:
     bool valueCreated;
     int period;
     double delta;
+    time_t nextTriggerUnixTime;
 
     String getControlData(void);
     double getControlNumberData(void);
@@ -137,6 +143,7 @@ public:
     void onRefresh(WappstoValueCallback cb);
     void onDelete(WappstoValueCallback cb);
 
+    void handlePeriod(void);
 
 private:
     WappstoValueCallback _onRefreshCb;
@@ -145,6 +152,11 @@ private:
     State* controlState;
     WappstoValueControlStringCallback _onControlStringCb;
     WappstoValueControlNumberCallback _onControlNumberCb;
+    ReportTriggerType_e reportTriggerType;
+
+    String jitterData;
+    Timestamp_t jitterTimestamp;
+    time_t jitterTriggerUnixTime;
 
     void _init(void);
 
@@ -154,4 +166,5 @@ private:
     bool handleUpdate(JsonObject obj);
     bool handleChildren(const char* tmpUuid, RequestType_e req, JsonObject obj);
     void getFindQuery(char *url);
+    void calculateNextPeriodTrigger(void);
 };

@@ -22,6 +22,11 @@ void WappstoLog::error(const char* text, int data)
     _print(ERROR, text, data);
 }
 
+void WappstoLog::error(const char* text, double data)
+{
+    _print(ERROR, text, data);
+}
+
 void WappstoLog::error(const char* text, const char* data)
 {
     _print(ERROR, text, data);
@@ -38,6 +43,11 @@ void WappstoLog::warning(const char* text)
 }
 
 void WappstoLog::warning(const char* text, int data)
+{
+    _print(WARNING, text, data);
+}
+
+void WappstoLog::warning(const char* text, double data)
 {
     _print(WARNING, text, data);
 }
@@ -62,6 +72,11 @@ void WappstoLog::info(const char* text, int data)
     _print(INFO, text, data);
 }
 
+void WappstoLog::info(const char* text, double data)
+{
+    _print(INFO, text, data);
+}
+
 void WappstoLog::info(const char* text, const char* data)
 {
     _print(INFO, text, data);
@@ -78,6 +93,11 @@ void WappstoLog::verbose(const char* text)
 }
 
 void WappstoLog::verbose(const char* text, int data)
+{
+    _print(VERBOSE, text, data);
+}
+
+void WappstoLog::verbose(const char* text, double data)
 {
     _print(VERBOSE, text, data);
 }
@@ -116,6 +136,14 @@ void WappstoLog::_print(LOG_LEVELS_e level, const char* text, const char* data)
 }
 
 void WappstoLog::_print(LOG_LEVELS_e level, const char* text, int data)
+{
+    if(shouldPrintLevel(level)) {
+        Serial.print(text);
+        Serial.println(data);
+    }
+}
+
+void WappstoLog::_print(LOG_LEVELS_e level, const char* text, double data)
 {
     if(shouldPrintLevel(level)) {
         Serial.print(text);

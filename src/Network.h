@@ -25,6 +25,7 @@ public:
 
     void onRefresh(WappstoNetworkCallback cb);
     void onDelete(WappstoNetworkCallback cb);
+    void handlePeriod(void);
 
     String name;
     String description;

@@ -42,6 +42,8 @@ public:
     void onRefresh(WappstoDeviceCallback cb);
     void onDelete(WappstoDeviceCallback cb);
 
+    void handlePeriod(void);
+
 private:
     WappstoDeviceCallback _onRefreshCb;
     WappstoDeviceCallback _onDeleteCb;
