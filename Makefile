@@ -17,15 +17,23 @@ testcov:
 	$(MAKE) -C extras/tests runtests
 	(cd extras/tests/CreateTest; gcov ../../../src/*.cpp | grep 'arduino_wappstoiot/src/' -A 1)
 
+genhtml:
+	geninfo src/*.gcda
+	genhtml src/*.info --legend -t "Arduino Wappsto IoT test coverage" -q -o ./analyze
+
 clean-cov:
+	rm -rf analyze
 	find . -type f -name '*.gcda' -delete
+	find . -type f -name '*.gcda.info' -delete
 	find . -type f -name '*.gcno' -delete
 	find . -type f -name '*.gcov.*' -delete
 	find . -type f -name '*.*.gcov' -delete
 	find . -type f -name '*.gz' -delete
 
-clean-test: clean-cov
+clean-test:
 	$(MAKE) -C extras/tests clean
+
+clean: clean-cov clean-test
 
 EpoxyDuino:
 	git clone https://github.com/seluxit/EpoxyDuino.git extras/EpoxyDuino
