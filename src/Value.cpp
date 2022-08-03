@@ -185,8 +185,8 @@ bool Value::report(int data)
             return false;
         }
         if(this->delta > 0) {
-            if(abs(this->reportState->data.toDouble() - data) > this->delta) {
-                this->_wappstoLog->verbose("Rejected report due to delta, diff: ", (abs(this->reportState->data.toDouble() - data) > this->delta));
+            if(abs(this->reportState->data.toDouble() - data) < this->delta) {
+                this->_wappstoLog->verbose("Rejected report due to delta, diff: ", abs(this->reportState->data.toDouble() - data));
                 return false;
             }
         }
@@ -206,8 +206,8 @@ bool Value::report(double data)
             return false;
         }
         if(this->delta > 0) {
-            if(fabs(this->reportState->data.toDouble() - data) > this->delta) {
-                this->_wappstoLog->verbose("Rejected report due to delta, diff: ", (abs(this->reportState->data.toDouble() - data) > this->delta));
+            if(fabs(this->reportState->data.toDouble() - data) < this->delta) {
+                this->_wappstoLog->verbose("Rejected report due to delta, diff: ", abs(this->reportState->data.toDouble() - data));
                 return false;
             }
         }
