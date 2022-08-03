@@ -39,7 +39,7 @@ test(createValueBlobRaw) {
                                     .encoding = ""};
 
 
-    Value *myBlobValue = myDevice->createValueBlob(&blobParams);
+    Value *myBlobValue = myDevice->createBlobValue(&blobParams);
     assertNotEqual(myBlobValue, NULL);
     assertEqual("04FFEA", myBlobValue->getReportData());
     assertEqual("AEFF40", myBlobValue->getControlData());

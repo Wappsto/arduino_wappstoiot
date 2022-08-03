@@ -71,7 +71,7 @@ test(createValueNumberFullPeriod) {
                                         .delta = "0"};
 
 
-    Value *myNumberValue = myDevice->createValueNumber(&numberParams);
+    Value *myNumberValue = myDevice->createNumberValue(&numberParams);
     assertNotEqual(myNumberValue, NULL);
     assertEqual("42b7bb41-bf32-4648-1102-aea6fca55642", myNumberValue->getUUID());
     assertEqual("0", myNumberValue->getReportData());
@@ -142,7 +142,7 @@ test(createValueNumberFullIntDelta) {
                                         .delta = "50"};
 
 
-    Value *myNumberValue = myDevice->createValueNumber(&numberParams);
+    Value *myNumberValue = myDevice->createNumberValue(&numberParams);
     assertNotEqual(myNumberValue, NULL);
     assertEqual("42b7bb41-bf32-4648-1102-aea6fca55642", myNumberValue->getUUID());
     assertEqual("0", myNumberValue->getReportData());
@@ -207,7 +207,7 @@ test(createValueNumberFullDoubleDelta) {
                                         .delta = "50.5"};
 
 
-    Value *myNumberValue = myDevice->createValueNumber(&numberParams);
+    Value *myNumberValue = myDevice->createNumberValue(&numberParams);
     assertNotEqual(myNumberValue, NULL);
     assertEqual("42b7bb41-bf32-4648-1102-aea6fca55642", myNumberValue->getUUID());
     assertEqual("0", myNumberValue->getReportData());

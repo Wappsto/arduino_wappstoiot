@@ -88,11 +88,11 @@ test(callbackNumberTest) {
                                         .si_conversion = ""};
 
 
-    Value *myIntValue = myDevice->createValueNumber(&myIntParameters);
+    Value *myIntValue = myDevice->createNumberValue(&myIntParameters);
     myIntValue->onControl(&controlNumberCallback);
     myIntValue->onRefresh(&refreshCallback);
 
-    Value *myDoubleValue = myDevice->createValueNumber(&myDoubleParam);
+    Value *myDoubleValue = myDevice->createNumberValue(&myDoubleParam);
 
     // Test refresh
     client.testRefresh("42b7bb41-bf32-4648-1102-aea6fca55643", "/network/4906c6be-cc7f-4c4d-8806-60a38c5fcef5/device/42b7bb41-bf32-4648-1102-aea6fca55641/value/42b7bb41-bf32-4648-1102-aea6fca55642/state/");
@@ -181,7 +181,7 @@ test(callbackStringTest) {
                                         .max = 1,
                                         .encoding = "text"};
 
-    Value *myStringValue = myDevice->createValueString(&stringParameters);
+    Value *myStringValue = myDevice->createStringValue(&stringParameters);
     myStringValue->onControl(&controlStringCallback);
     myStringValue->onRefresh(&refreshCallback);
 

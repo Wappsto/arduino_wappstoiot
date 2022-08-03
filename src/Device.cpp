@@ -101,6 +101,31 @@ Value* Device::createValueXml(ValueXml_t *valXml)
     return this->sendValue(*value);
 }
 
+Value* Device::createNumberValue(ValueNumber_t *valNumber)
+{
+    return this->createValueNumber(valNumber);
+}
+
+Value* Device::createNumberValue(ValueNumberFull_t *valNumber)
+{
+    return this->createValueNumber(valNumber);
+}
+
+Value* Device::createStringValue(ValueString_t *valString)
+{
+    return this->createValueString(valString);
+}
+
+Value* Device::createBlobValue(ValueBlob_t *valBlob)
+{
+    return this->createValueBlob(valBlob);
+}
+
+Value* Device::createXmlValue(ValueXml_t *valXml)
+{
+    return this->createValueXml(valXml);
+}
+
 Value** Device::getFreeValue()
 {
     if(this->currentNumberOfValues >= MAX_VALUES) {

@@ -29,12 +29,21 @@ class Device: public WappstoModel
 {
 public:
     Device(WappstoModel *network, DeviceDescription_t *deviceInfo);
+
     Value* createValueNumber(ValueNumber_t *valNumber);
     Value* createValueNumber(ValueNumberFull_t *valNumber);
     Value* createValueString(ValueString_t *valString);
     Value* createValueBlob(ValueBlob_t *valBlob);
     Value* createValueXml(ValueXml_t *valXml);
+
+    Value* createNumberValue(ValueNumber_t *valNumber);
+    Value* createNumberValue(ValueNumberFull_t *valNumber);
+    Value* createStringValue(ValueString_t *valString);
+    Value* createBlobValue(ValueBlob_t *valBlob);
+    Value* createXmlValue(ValueXml_t *valXml);
+
     void post(void);
+    void handlePeriod(void);
 
     String name;
     DeviceDescription_t deviceInfo;
@@ -42,7 +51,6 @@ public:
     void onRefresh(WappstoDeviceCallback cb);
     void onDelete(WappstoDeviceCallback cb);
 
-    void handlePeriod(void);
 
 private:
     WappstoDeviceCallback _onRefreshCb;

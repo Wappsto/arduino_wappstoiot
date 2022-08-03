@@ -84,7 +84,7 @@ test(createFirstConnect) {
                                     .si_conversion = ""};
 
 
-    Value *myNumberValue = myDevice->createValueNumber(&numberParams);
+    Value *myNumberValue = myDevice->createNumberValue(&numberParams);
     assertNotEqual(myNumberValue, NULL);
 
     //client.testPrintAllReceivedData();
@@ -168,7 +168,7 @@ test(createValueNumber) {
                                     .si_conversion = ""};
 
 
-    Value *myNumberValue = myDevice->createValueNumber(&numberParams);
+    Value *myNumberValue = myDevice->createNumberValue(&numberParams);
     assertNotEqual(myNumberValue, NULL);
     assertEqual("42b7bb41-bf32-4648-1102-aea6fca55642", myNumberValue->getUUID());
     assertEqual("0", myNumberValue->getReportData());
@@ -247,7 +247,7 @@ test(createValueNumberFull) {
                                         .delta = "0"};
 
 
-    Value *myNumberValue = myDevice->createValueNumber(&numberParams);
+    Value *myNumberValue = myDevice->createNumberValue(&numberParams);
     assertNotEqual(myNumberValue, NULL);
     assertEqual("42b7bb41-bf32-4648-1102-aea6fca55642", myNumberValue->getUUID());
     assertEqual("0", myNumberValue->getReportData());
@@ -295,7 +295,7 @@ test(createValueString) {
                                     .max = 25,
                                     .encoding = ""};
 
-    Value *myStringValue = myDevice->createValueString(&stringParams);
+    Value *myStringValue = myDevice->createStringValue(&stringParams);
     assertNotEqual(myStringValue, NULL);
     assertEqual("Test data Report", myStringValue->getReportData());
     assertEqual("Test data Control", myStringValue->getControlData());
@@ -343,7 +343,7 @@ test(createValueBlob) {
                                     .encoding = ""};
 
 
-    Value *myBlobValue = myDevice->createValueBlob(&blobParams);
+    Value *myBlobValue = myDevice->createBlobValue(&blobParams);
     assertNotEqual(myBlobValue, NULL);
     assertEqual("04FFEA", myBlobValue->getReportData());
     assertEqual("AEFF40", myBlobValue->getControlData());
@@ -391,7 +391,7 @@ test(createValueXml) {
                                     .xsd = "xsd"};
 
 
-    Value *myXmlValue = myDevice->createValueXml(&xmlParams);
+    Value *myXmlValue = myDevice->createXmlValue(&xmlParams);
     assertNotEqual(myXmlValue, NULL);
     assertEqual("04FFEA", myXmlValue->getReportData());
     assertEqual("AEFF40", myXmlValue->getControlData());
@@ -443,7 +443,7 @@ test(createValueReadOnly) {
                                     .si_conversion = ""};
 
 
-    Value *myNumberValue = myDevice->createValueNumber(&numberParams);
+    Value *myNumberValue = myDevice->createNumberValue(&numberParams);
     assertNotEqual(myNumberValue, NULL);
     assertEqual("42b7bb41-bf32-4648-1102-aea6fca55642", myNumberValue->getUUID());
     assertEqual("0", myNumberValue->getReportData());
@@ -502,7 +502,7 @@ test(createValueWriteOnly) {
                                     .unit = "",
                                     .si_conversion = ""};
 
-    Value *myNumberValue = myDevice->createValueNumber(&numberParams);
+    Value *myNumberValue = myDevice->createNumberValue(&numberParams);
     assertNotEqual(myNumberValue, NULL);
     assertEqual("42b7bb41-bf32-4648-1102-aea6fca55642", myNumberValue->getUUID());
     assertEqual("0", myNumberValue->getControlData());
@@ -601,7 +601,7 @@ test(createManyValues) {
     int counter = 0;
     Value *myValue;
     for(int i=0; i<15; i++) {
-        myValue = myDevice->createValueNumber(&numberParams);
+        myValue = myDevice->createNumberValue(&numberParams);
         if(myValue) {
             counter++;
         } else {
