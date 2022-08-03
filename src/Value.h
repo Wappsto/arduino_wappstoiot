@@ -54,6 +54,8 @@ typedef struct
     bool ordered_map;
     bool meaningful_zero;
     const NUMBER_MAPPING_t *mapping;
+    String period;
+    String delta;
 } ValueNumberFull_t;
 
 typedef struct
@@ -82,6 +84,12 @@ typedef struct
     String xml_namespace;
     String xsd;
 } ValueXml_t;
+
+typedef enum {
+    USER_REPORT,
+    REFRESH_REPORT,
+    PERIOD_REPORT,
+} ReportTriggerType_e;
 
 class Value;
 
@@ -121,6 +129,9 @@ public:
     ValueBlob_t *valBlob;
     ValueXml_t *valXml;
     bool valueCreated;
+    int period;
+    double delta;
+    time_t nextTriggerUnixTime;
 
     String getControlData(void);
     double getControlNumberData(void);
@@ -132,6 +143,8 @@ public:
     void onRefresh(WappstoValueCallback cb);
     void onDelete(WappstoValueCallback cb);
 
+    void handlePeriod(void);
+
 private:
     WappstoValueCallback _onRefreshCb;
     WappstoValueCallback _onDeleteCb;
@@ -139,6 +152,11 @@ private:
     State* controlState;
     WappstoValueControlStringCallback _onControlStringCb;
     WappstoValueControlNumberCallback _onControlNumberCb;
+    ReportTriggerType_e reportTriggerType;
+
+    String jitterData;
+    Timestamp_t jitterTimestamp;
+    time_t jitterTriggerUnixTime;
 
     void _init(void);
 
@@ -148,4 +166,5 @@ private:
     bool handleUpdate(JsonObject obj);
     bool handleChildren(const char* tmpUuid, RequestType_e req, JsonObject obj);
     void getFindQuery(char *url);
+    void calculateNextPeriodTrigger(void);
 };

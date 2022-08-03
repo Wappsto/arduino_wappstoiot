@@ -1,5 +1,9 @@
+#include <time.h>
+#include <sys/time.h>
+
 #include "Value.h"
 
+#define MINIMUM_PERIOD_JITTER_SEC 10
 
 Value::Value(WappstoModel *device, ValueNumber_t *valNumber) : WappstoModel(device, "value")
 {
@@ -9,6 +13,8 @@ Value::Value(WappstoModel *device, ValueNumber_t *valNumber) : WappstoModel(devi
     this->permission = valNumber->permission;
     this->valueType = NUMBER_VALUE;
     this->valNumber = valNumber;
+    this->delta = 0;
+    this->period = 0;
 }
 
 Value::Value(WappstoModel *device, ValueNumberFull_t *valNumber) : WappstoModel(device, "value")
@@ -19,6 +25,8 @@ Value::Value(WappstoModel *device, ValueNumberFull_t *valNumber) : WappstoModel(
     this->permission = valNumber->permission;
     this->valueType = NUMBER_VALUE_FULL;
     this->valNumberFull = valNumber;
+    this->delta = valNumber->delta.toDouble();
+    this->period = valNumber->period.toInt();
 }
 
 Value::Value(WappstoModel *device, ValueString_t *valString) : WappstoModel(device, "value")
@@ -29,6 +37,8 @@ Value::Value(WappstoModel *device, ValueString_t *valString) : WappstoModel(devi
     this->permission = valString->permission;
     this->valueType = STRING_VALUE;
     this->valString = valString;
+    this->delta = 0;
+    this->period = 0;
 }
 
 Value::Value(WappstoModel *device, ValueBlob_t *valBlob) : WappstoModel(device, "value")
@@ -39,6 +49,8 @@ Value::Value(WappstoModel *device, ValueBlob_t *valBlob) : WappstoModel(device, 
     this->permission = valBlob->permission;
     this->valueType = BLOB_VALUE;
     this->valBlob = valBlob;
+    this->delta = 0;
+    this->period = 0;
 }
 
 Value::Value(WappstoModel *device, ValueXml_t *valXml) : WappstoModel(device, "value")
@@ -49,6 +61,8 @@ Value::Value(WappstoModel *device, ValueXml_t *valXml) : WappstoModel(device, "v
     this->permission = valXml->permission;
     this->valueType = XML_VALUE;
     this->valXml = valXml;
+    this->delta = 0;
+    this->period = 0;
 }
 
 void Value::_init(void)
@@ -64,6 +78,10 @@ void Value::_init(void)
     this->valXml = NULL;
     this->_onDeleteCb = NULL;
     this->_onRefreshCb = NULL;
+    this->reportTriggerType = USER_REPORT;
+    this->jitterTriggerUnixTime = 0;
+    this->jitterData = "";
+    memset(this->jitterTimestamp, 0, TIMESTAMP_LENGTH);
 }
 
 void Value::toJSON(JsonObject data)
@@ -78,6 +96,8 @@ void Value::toJSON(JsonObject data)
     }
 
     data["type"] = this->type;
+    data["period"] = "0";
+    data["delta"] = "0";
 
     if(this->valueType == NUMBER_VALUE) {
         JsonObject number = data.createNestedObject("number");
@@ -111,6 +131,8 @@ void Value::toJSON(JsonObject data)
                 mapping[this->valNumberFull->mapping->map[i].key] = this->valNumberFull->mapping->map[i].value;
             }
         }
+        data["period"] = this->valNumberFull->period;
+        data["delta"] = this->valNumberFull->delta;
     }
 }
 
@@ -134,31 +156,73 @@ void Value::createStates(void)
 bool Value::report(const String &data)
 {
     if(this->reportState) {
-        strcpy(this->reportState->timestamp, getUtcTime());
-        this->reportState->data = data;
-        this->reportState->update();
-        return true;
+        if((this->reportTriggerType == PERIOD_REPORT) && (this->period > MINIMUM_PERIOD_JITTER_SEC)) {
+            time_t time_now = time(NULL);
+            this->_wappstoLog->warning("STORINTG JITTER: ", (int)time_now);
+            strcpy(this->jitterTimestamp, getUtcTime());
+            this->jitterData = data;
+            this->jitterTriggerUnixTime = time_now + (int)(random(MINIMUM_PERIOD_JITTER_SEC));
+            this->reportTriggerType = USER_REPORT;
+        } else {
+            this->reportTriggerType = USER_REPORT;
+            strcpy(this->reportState->timestamp, getUtcTime());
+            this->reportState->data = data;
+            this->reportState->update();
+            return true;
+        }
     }
     return false;
 }
 
 bool Value::report(int data)
 {
+    if(!this->reportState) {
+        return false;
+    }
+    if(this->reportTriggerType == USER_REPORT) {
+        if(isinf(this->delta)) {
+            this->_wappstoLog->verbose("Delta (int) is infinite, ignore report: ", this->delta);
+            return false;
+        }
+        if(this->delta > 0) {
+            if(abs(this->reportState->data.toDouble() - data) < this->delta) {
+                this->_wappstoLog->verbose("Rejected report due to delta, diff: ", abs(this->reportState->data.toDouble() - data));
+                return false;
+            }
+        }
+    }
     return this->report(String(data));
 }
 
 bool Value::report(double data)
 {
     uint8_t count = 0;
+    if(!this->reportState) {
+        return false;
+    }
+    if(this->reportTriggerType == USER_REPORT) {
+        if(isinf(this->delta)) {
+            this->_wappstoLog->verbose("Delta (double) is infinite, ignore report: ", this->delta);
+            return false;
+        }
+        if(this->delta > 0) {
+            if(fabs(this->reportState->data.toDouble() - data) < this->delta) {
+                this->_wappstoLog->verbose("Rejected report due to delta, diff: ", abs(this->reportState->data.toDouble() - data));
+                return false;
+            }
+        }
+    }
+
     if(this->valueType == NUMBER_VALUE) {
         double num = this->valNumber->step;
-        num = abs(num);
+        num = fabs(num);
         num = num - (int)num;
-        while (abs(num) >= 0.0000001) {
+        while (fabs(num) >= 0.0000001) {
             num = num * 10;
             count = count + 1;
             num = num - int(num);
         }
+
         if(count > 0) {
             return this->report(String(data, count));
         }
@@ -168,7 +232,11 @@ bool Value::report(double data)
 
 bool Value::report(const char* data)
 {
-    return this->reportState->updateRaw(data);
+    if(this->reportState) {
+        return this->reportState->updateRaw(data);
+    } else {
+        return false;
+    }
 }
 
 bool Value::control(const String &data)
@@ -192,9 +260,9 @@ bool Value::control(double data)
     uint8_t count = 0;
     if(this->valueType == NUMBER_VALUE) {
         double num = this->valNumber->step;
-        num = abs(num);
+        num = fabs(num);
         num = num - (int)num;
-        while (abs(num) >= 0.0000001) {
+        while (fabs(num) >= 0.0000001) {
             num = num * 10;
             count = count + 1;
             num = num - int(num);
@@ -270,11 +338,72 @@ void Value::onControl(WappstoValueControlNumberCallback cb)
     this->_onControlNumberCb = cb;
 }
 
+void Value::calculateNextPeriodTrigger(void)
+{
+    struct tm loc_time = { };
+    struct tm midnight = { };
+    time_t time_now = time(NULL);
+
+    if(this->period == 0) {
+        this->nextTriggerUnixTime = 0;
+        return;
+    }
+
+    localtime_r(&time_now, &loc_time);
+
+    midnight.tm_year = loc_time.tm_year;
+    midnight.tm_mon = loc_time.tm_mon;
+    midnight.tm_mday = loc_time.tm_mday;
+    midnight.tm_hour = 0;
+    midnight.tm_min = 0;
+    midnight.tm_sec = 0;
+    midnight.tm_isdst = loc_time.tm_isdst;
+
+    time_t time_midnight;
+    time_midnight = mktime(&midnight);
+    int seconds_since_midnight = (int)difftime(time_now, time_midnight);
+
+    int seconds_to_next_period = ((seconds_since_midnight / this->period) + 1) * this->period;
+    int next_trigger_in_seconds = seconds_to_next_period - seconds_since_midnight;
+    this->nextTriggerUnixTime = time_now + next_trigger_in_seconds;
+}
+
+void Value::handlePeriod(void)
+{
+    time_t time_now = time(NULL);
+
+    if(this->period == 0) {
+        this->nextTriggerUnixTime = 0;
+        return;
+    }
+    if(!this->reportState) {
+        return;
+    }
+
+    if(this->jitterTriggerUnixTime > 0 && this->jitterTriggerUnixTime < time_now) {
+        strcpy(this->reportState->timestamp, this->jitterTimestamp);
+        this->reportState->data = this->jitterData;
+        this->reportState->update();
+        this->jitterTriggerUnixTime = 0;
+    }
+
+    if(this->nextTriggerUnixTime <= time_now) {
+        this->reportTriggerType = PERIOD_REPORT;
+        this->handleRefresh();
+        this->calculateNextPeriodTrigger();
+    }
+}
+
 bool Value::handleUpdate(JsonObject obj)
 {
-    (void)obj;
-    this->_wappstoLog->error("Update of value is not implemeted");
-    return false;
+    if(obj["delta"]) {
+        this->delta = atof((const char*)obj["delta"]);
+    }
+    if(obj["period"]) {
+        this->period = atoi((const char*)obj["period"]);
+    }
+    this->calculateNextPeriodTrigger();
+    return true;
 }
 
 bool Value::handleChildren(const char* tmpUuid, RequestType_e req, JsonObject obj)
@@ -317,6 +446,9 @@ void Value::onDelete(WappstoValueCallback cb)
 bool Value::handleRefresh()
 {
     if(this->_onRefreshCb) {
+        if(this->reportTriggerType != PERIOD_REPORT) {
+            this->reportTriggerType = REFRESH_REPORT;
+        }
         this->_onRefreshCb(this);
         return true;
     }

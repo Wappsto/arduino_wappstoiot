@@ -38,6 +38,15 @@ Device* Network::createDevice(DeviceDescription_t *deviceInfo)
 
 }
 
+void Network::handlePeriod(void) {
+    for(int devs=0; devs < this->currentNumberOfDevices; devs++) {
+        if(this->devices[devs] == NULL) {
+            continue;
+        }
+        this->devices[devs]->handlePeriod();
+    }
+}
+
 bool Network::handleUpdate(JsonObject obj) {
     (void)obj;
     this->_wappstoLog->error("Update on network not supported");

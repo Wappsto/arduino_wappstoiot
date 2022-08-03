@@ -36,6 +36,7 @@ void Device::getFindQuery(char *url)
 Value* Device::sendValue(Value* value)
 {
     value->loadFromWappsto();
+    value->fetch();
     if(value->create()) {
         value->createStates();
         return value;
@@ -100,6 +101,31 @@ Value* Device::createValueXml(ValueXml_t *valXml)
     return this->sendValue(*value);
 }
 
+Value* Device::createNumberValue(ValueNumber_t *valNumber)
+{
+    return this->createValueNumber(valNumber);
+}
+
+Value* Device::createNumberValue(ValueNumberFull_t *valNumber)
+{
+    return this->createValueNumber(valNumber);
+}
+
+Value* Device::createStringValue(ValueString_t *valString)
+{
+    return this->createValueString(valString);
+}
+
+Value* Device::createBlobValue(ValueBlob_t *valBlob)
+{
+    return this->createValueBlob(valBlob);
+}
+
+Value* Device::createXmlValue(ValueXml_t *valXml)
+{
+    return this->createValueXml(valXml);
+}
+
 Value** Device::getFreeValue()
 {
     if(this->currentNumberOfValues >= MAX_VALUES) {
@@ -108,6 +134,15 @@ Value** Device::getFreeValue()
     }
 
     return &this->values[this->currentNumberOfValues++];
+}
+
+void Device::handlePeriod(void) {
+    for(int vals=0; vals < this->currentNumberOfValues; vals++) {
+        if(this->values[vals] == NULL) {
+            continue;
+        }
+        this->values[vals]->handlePeriod();
+    }
 }
 
 bool Device::handleUpdate(JsonObject obj) {
