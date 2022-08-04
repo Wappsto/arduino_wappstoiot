@@ -208,7 +208,7 @@ If the value exist, the data of the value will not change. If you want to value 
 ### Create a number value:
 ```c
 ValueNumber_t myNumberValueParameters = {   .name = "Living room",
-                                            .type = "temperature", // value type
+                                            .type = "temperature",
                                             .permission = READ_WRITE,
                                             .min = -20,
                                             .max = 100,
