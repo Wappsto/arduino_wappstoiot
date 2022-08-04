@@ -77,7 +77,7 @@ void setup()
     myDevice = myNetwork->createDevice(&myDeviceDescription);
 
     // Create echo string value
-    myEchoStringValue = myDevice->createValueString(&echoStringValue);
+    myEchoStringValue = myDevice->createStringValue(&echoStringValue);
     myEchoStringValue->onControl(&controlEchoCallback);
     myEchoStringValue->report("");
 }

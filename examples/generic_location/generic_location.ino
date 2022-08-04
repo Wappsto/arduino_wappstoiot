@@ -84,8 +84,8 @@ void setup()
     myDevice = myNetwork->createDevice(&myDeviceDescription);
 
     // Create a default temperature value
-    myLatitudeValue = myDevice->createValueNumber(&defaultLatitudeParameter);
-    myLongitudeValue = myDevice->createValueNumber(&defaultLongitudeParameter);
+    myLatitudeValue = myDevice->createNumberValue(&defaultLatitudeParameter);
+    myLongitudeValue = myDevice->createNumberValue(&defaultLongitudeParameter);
     myLatitudeValue->onRefresh(&refreshLocationCallback);
     myLongitudeValue->onRefresh(&refreshLocationCallback);
     updateLocation();

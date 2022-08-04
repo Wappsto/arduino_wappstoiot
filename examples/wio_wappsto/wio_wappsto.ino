@@ -138,12 +138,12 @@ void setup()
     myDevice = myNetwork->createDevice(&myDeviceDescription);
 
     // Create r/w number to play tone
-    myNumberValue = myDevice->createValueNumber(&myNumberValueParameters);
+    myNumberValue = myDevice->createNumberValue(&myNumberValueParameters);
     myNumberValue->onControl(&controlNumberCallback);
     myNumberValue->onRefresh(&refreshNumberCallback);
 
     // Create r value for button output
-    buttonValue = myDevice->createValueString(&buttonStringParameters);
+    buttonValue = myDevice->createStringValue(&buttonStringParameters);
     buttonValue->onRefresh(&buttonRefresh);
 }
 

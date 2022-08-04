@@ -102,7 +102,7 @@ void setup()
     myDevice = myNetwork->createDevice(&myDeviceDescription);
 
     // Create LED value
-    myModeValue = myDevice->createValueNumber(&myModeParameters);
+    myModeValue = myDevice->createNumberValue(&myModeParameters);
     myModeValue->onControl(&controlModeCallback);
 }
 

@@ -89,7 +89,7 @@ void setup()
     myDevice = myNetwork->createDevice(&myDeviceDescription);
 
     // Create LED value
-    myLedValue = myDevice->createValueNumber(&myLedParameters);
+    myLedValue = myDevice->createNumberValue(&myLedParameters);
     myLedValue->onControl(&controlLedCallback);
 
     // Get the last control request, and set the led to this value

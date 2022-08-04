@@ -46,7 +46,23 @@ Value* Device::sendValue(Value* value)
     }
 }
 
+Value* Device::createNumberValue(ValueNumber_t *valNumber)
+{
+    Value** value = this->getFreeValue();
+    if(value == NULL) {
+        return NULL;
+    }
+
+    *value = new Value(this, valNumber);
+    return this->sendValue(*value);
+}
+
 Value* Device::createValueNumber(ValueNumber_t *valNumber)
+{
+    return this->createNumberValue(valNumber);
+}
+
+Value* Device::createNumberValue(ValueNumberFull_t *valNumber)
 {
     Value** value = this->getFreeValue();
     if(value == NULL) {
@@ -59,16 +75,10 @@ Value* Device::createValueNumber(ValueNumber_t *valNumber)
 
 Value* Device::createValueNumber(ValueNumberFull_t *valNumber)
 {
-    Value** value = this->getFreeValue();
-    if(value == NULL) {
-        return NULL;
-    }
-
-    *value = new Value(this, valNumber);
-    return this->sendValue(*value);
+    return this->createNumberValue(valNumber);
 }
 
-Value* Device::createValueString(ValueString_t *valString)
+Value* Device::createStringValue(ValueString_t *valString)
 {
     Value** value = this->getFreeValue();
     if(value == NULL) {
@@ -79,7 +89,12 @@ Value* Device::createValueString(ValueString_t *valString)
     return this->sendValue(*value);
 }
 
-Value* Device::createValueBlob(ValueBlob_t *valBlob)
+Value* Device::createValueString(ValueString_t *valString)
+{
+    return this->createStringValue(valString);
+}
+
+Value* Device::createBlobValue(ValueBlob_t *valBlob)
 {
     Value** value = this->getFreeValue();
     if(value == NULL) {
@@ -90,7 +105,12 @@ Value* Device::createValueBlob(ValueBlob_t *valBlob)
     return this->sendValue(*value);
 }
 
-Value* Device::createValueXml(ValueXml_t *valXml)
+Value* Device::createValueBlob(ValueBlob_t *valBlob)
+{
+    return this->createBlobValue(valBlob);
+}
+
+Value* Device::createXmlValue(ValueXml_t *valXml)
 {
     Value** value = this->getFreeValue();
     if(value == NULL) {
@@ -101,29 +121,9 @@ Value* Device::createValueXml(ValueXml_t *valXml)
     return this->sendValue(*value);
 }
 
-Value* Device::createNumberValue(ValueNumber_t *valNumber)
+Value* Device::createValueXml(ValueXml_t *valXml)
 {
-    return this->createValueNumber(valNumber);
-}
-
-Value* Device::createNumberValue(ValueNumberFull_t *valNumber)
-{
-    return this->createValueNumber(valNumber);
-}
-
-Value* Device::createStringValue(ValueString_t *valString)
-{
-    return this->createValueString(valString);
-}
-
-Value* Device::createBlobValue(ValueBlob_t *valBlob)
-{
-    return this->createValueBlob(valBlob);
-}
-
-Value* Device::createXmlValue(ValueXml_t *valXml)
-{
-    return this->createValueXml(valXml);
+    return this->createXmlValue(valXml);
 }
 
 Value** Device::getFreeValue()

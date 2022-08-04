@@ -216,7 +216,7 @@ ValueNumber_t myNumberValueParameters = {   .name = "Living room",
                                             .unit = "°C",
                                             .si_conversion = ""};
 
-myNumberValue = myDevice->createValueNumber(&myNumberValueParameters);
+myNumberValue = myDevice->createNumberValue(&myNumberValueParameters);
 ```
 
 ### Create a string value:
@@ -227,7 +227,7 @@ ValueString_t myStringValueParameters = { .name = "Value String Name",
                                           .max = 200,
                                           .encoding = ""};
 
-myStringValue = myDevice->createValueString("Value String Name", "value type", READ_WRITE, &myStringValueParameters);
+myStringValue = myDevice->createStringValue("Value String Name", "value type", READ_WRITE, &myStringValueParameters);
 ```
 
 ### Create a blob value:
@@ -238,7 +238,7 @@ ValueBlob_t myBlobValueParameters =  { .name = "Value Blob Name",
                                        .max = 200,
                                        .encoding = ""};
 
-myBlobValue = myDevice->createValueBlob(&myBlobValueParameters);
+myBlobValue = myDevice->createBlobValue(&myBlobValueParameters);
 ```
 
 ### Create a xml value:
@@ -249,7 +249,7 @@ ValueXml_t myXmlValueParameters =  { .name = "Value Xml Name",
                                      .xsd = "test",
                                      .namespace = "test"};
 
-myXmlValue = myDevice->createValueXml(&myXmlValueParameters);
+myXmlValue = myDevice->createXmlValue(&myXmlValueParameters);
 ```
 
 

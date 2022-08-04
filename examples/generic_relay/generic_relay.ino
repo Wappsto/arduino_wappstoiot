@@ -87,7 +87,7 @@ void setup()
     myDevice = myNetwork->createDevice(&myDeviceDescription);
 
     // Create LED value
-    myRelayValue = myDevice->createValueNumber(&myRelayParameters);
+    myRelayValue = myDevice->createNumberValue(&myRelayParameters);
     myRelayValue->onControl(&controlRelayCallback);
 
     // Get the last control request, and set the led to this value

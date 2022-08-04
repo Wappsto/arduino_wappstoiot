@@ -88,7 +88,7 @@ void setup()
     myDevice = myNetwork->createDevice(&myDeviceDescription);
 
     // Create echo string value
-    myTemperatureValue = myDevice->createValueNumber(&defaultTemperatureParameter);
+    myTemperatureValue = myDevice->createNumberValue(&defaultTemperatureParameter);
     myTemperatureValue->onRefresh(&refreshTemperatureCallback);
     myTemperatureValue->report(myTemperatureReading);
 }

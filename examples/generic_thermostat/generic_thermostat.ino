@@ -69,7 +69,7 @@ void createThermostat(void)
     thermostatDevice = network->createDevice(&thermostatParameters);
 
     // Create temperature value
-    temperatureValue = thermostatDevice->createValueNumber(&temperatureParameters);
+    temperatureValue = thermostatDevice->createNumberValue(&temperatureParameters);
     temperatureValue->onRefresh(&refreshTemperatureCallback);
     temperatureValue->onControl(&controlTemperatureCallback);
     temperatureTarget = temperatureValue->getControlData().toDouble();

@@ -171,13 +171,13 @@ void setup()
     myDevice = myNetwork->createDevice(&myDeviceDescription);
 
     // Create r/w value for display string
-    displayStrValue = myDevice->createValueString(&displayStrValueParameters);
+    displayStrValue = myDevice->createStringValue(&displayStrValueParameters);
     displayStrValue->onControl(&controlStringCallback);
     displayStrValue->onRefresh(&refreshStringCallback);
     textString = "Connected";
     displayStrValue->report(textString);
 
-    backgroundColorValue = myDevice->createValueBlob(&defaultColorParameter);
+    backgroundColorValue = myDevice->createBlobValue(&defaultColorParameter);
     backgroundColorValue->onRefresh(&backgroundColorRefresh);
     backgroundColorValue->onControl(&backgroundColorControl);
     backgroundColorValue->report(backgroundColor);
