@@ -25,6 +25,7 @@ public:
     JsonObject generateRPCRequest(const char* method, const char* url, bool data);
     bool sendPing(void);
     RequestType_e readData(char* uuid, JsonDocument &root);
+    bool rpcAvailable(void);
 
 private:
     WappstoRpc() = default;
@@ -45,4 +46,5 @@ private:
     uint8_t _readBuffer[JSON_STATIC_BUFFER_SIZE];
     uint8_t _rspBuffer[JSON_STATIC_BUFFER_SIZE];
     char _jsonTxBufferChar[JSON_TX_BUFFER_SIZE];
+    uint8_t _tempBuffer[JSON_TX_BUFFER_SIZE];
 };

@@ -118,6 +118,7 @@ bool WappstoRpc::_readJsonAwait(JsonDocument& root)
             if(msgId != this->_msgId) {
                 this->_wappstoLog->warning("Msg id incorrect: ", msgId);
                 this->_wappstoLog->warning("Expected: ", this->_msgId);
+                serializeJson(root, this->_tempBuffer);
                 continue;
             }
 
@@ -154,14 +155,28 @@ bool WappstoRpc::sendPing(void)
     return this->send();
 }
 
+bool WappstoRpc::rpcAvailable(void)
+{
+    if(strlen((const char*)this->_tempBuffer) > 0) {
+        return true;
+    }
+    return false;
+}
+
 RequestType_e WappstoRpc::readData(char* uuid, JsonDocument& doc)
 {
     int ret;
     memset(this->_readBuffer, 0x00, sizeof(this->_readBuffer));
-    ret = this->_client->read(this->_readBuffer, sizeof(this->_readBuffer));
-    if(ret <= 0) {
-        this->_wappstoLog->warning("No data read");
-        return REQUEST_UNKNOWN;
+
+    if(strlen((const char*)this->_tempBuffer) > 0) {
+        memcpy(this->_readBuffer, this->_tempBuffer, sizeof(this->_readBuffer));
+        memset(this->_tempBuffer, 0x00, sizeof(this->_tempBuffer));
+    } else {
+        ret = this->_client->read(this->_readBuffer, sizeof(this->_readBuffer));
+        if(ret <= 0) {
+            this->_wappstoLog->warning("No data read");
+            return REQUEST_UNKNOWN;
+        }
     }
     this->_wappstoLog->verbose("Reading received:");
     this->_wappstoLog->verbose((const char*)this->_readBuffer);

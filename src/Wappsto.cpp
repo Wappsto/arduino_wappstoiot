@@ -86,7 +86,7 @@ bool Wappsto::dataAvailable(void)
         this->connect();
     }
 
-    if(!this->_client->available()) {
+    if(!this->_client->available() && !this->_wappstoRpc->rpcAvailable()) {
         this->_network->handlePeriod();
 
         unsigned long currentMillis = millis();
