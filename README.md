@@ -35,7 +35,7 @@ For your physical device to identify itself towards Wappsto it needs a network i
 #### Generate wappsto_config.h
 The easiest way is to download the header file from a Wapp.
 
-On https://wappsto.com/ go to the store (https://store.wappsto.com/) and install the Wapp "IoT Certificate Manager".
+On https://wappsto.com/ go to the store (https://store.wappsto.com/) and install the Wapp "IoT Certificate Manager" (https://wappsto.com/store/application/iot_certificate_manager).
 
 Open the Wapp and select: "Header file (used in WappstoIoT for Arduino)" and click download.
 
