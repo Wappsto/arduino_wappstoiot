@@ -33,7 +33,7 @@ Then choose "Sketch"->"Include Library"->"Add .Zip Library..." See https://docs.
 For your physical device to identify itself towards Wappsto it needs a network id, the server CA certificate, and the client certificate/key - all these has to be generated on Wappsto.com and placed in (if matching the examples) called wappsto_config.h.
 
 #### Generate wappsto_config.h
-The easiest way is to download the header file from a Wapp.
+The easiest way is to download the header file from a Wapp.https://store.wappsto.com
 
 On https://wappsto.com go to the store (https://store.wappsto.com) and install the Wapp "IoT Certificate Manager" (https://wappsto.com/store/application/iot_certificate_manager).
 
