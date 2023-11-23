@@ -196,7 +196,7 @@ bool Value::report(int data)
 
 bool Value::report(double data)
 {
-    uint8_t count = 0;
+    unsigned int count = 0;
     if(!this->reportState) {
         return false;
     }
@@ -257,7 +257,7 @@ bool Value::control(int data)
 
 bool Value::control(double data)
 {
-    uint8_t count = 0;
+    unsigned int count = 0;
     if(this->valueType == NUMBER_VALUE) {
         double num = this->valNumber->step;
         num = fabs(num);
