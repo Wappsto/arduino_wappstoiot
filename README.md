@@ -8,6 +8,7 @@ _This is an early version of the library, so the interface may still change at c
 The library currently has examples for two HW targets:
 * ESP32 - see examples/esp32_wappsto/esp32_wappsto.ino for setup details
     * arduino_wappstoiot support ESP32 library version 1.0.x
+    * Latest tested version: 1.0.6
 * Wio Terminal - see examples/wio_wappsto/wio_wappsto.ino or wio_tft_wappsto.ino
     * This board requires multiple libraries and an WiFi firmware upgrade to work
 
@@ -26,6 +27,7 @@ If you do not have this, see https://www.arduino.cc/en/Guide
 
 #### Install ArduinoJson library
 From the library manager you need to install ArduinoJson library - see https://arduinojson.org/v6/doc/installation/ for more details.
+Latest tested version: 6.17.3
 
 #### Install this wappsto library
 To install this library in Arduino Ide, download this project as a zip-file, click "Code" and choose "Download ZIP".
@@ -42,7 +44,7 @@ On https://wappsto.com go to the store and install the Wapp "IoT Certificate Man
 
 Open the Wapp and select: "Header file (used in WappstoIoT for Arduino)" and click download.
 
-#### Using python script (deprecated, old way) 
+#### Using python script (deprecated, old way)
 
 As a help to generate this you can use the python script included in this repository in the folder generate_config_header.
 For a first time run, you may need to install the required libraries

@@ -59,6 +59,6 @@ setup: bin/arduino-cli bin/arduino-lint EpoxyDuino
 	./bin/arduino-cli core update-index
 	./bin/arduino-cli core install esp32:esp32@1.0.6
 
-	./bin/arduino-cli lib install ArduinoJson
+	./bin/arduino-cli lib install ArduinoJson@6.17.3
 	./bin/arduino-cli lib install AUnit
 	./bin/arduino-cli lib update-index
