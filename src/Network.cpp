@@ -13,9 +13,9 @@ Network::Network(const char* uuid, String name, String description): WappstoMode
 
 void Network::toJSON(JsonObject data)
 {
-    data["name"] = this->name;
+    data["name"] = this->name.c_str();
     if(this->description) {
-        data["description"] = this->description;
+        data["description"] = this->description.c_str();
     }
 }
 

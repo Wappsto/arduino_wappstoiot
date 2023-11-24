@@ -32,7 +32,7 @@ const char* State::typeToString() {
 void State::toJSON(JsonObject data)
 {
     data["timestamp"] = this->timestamp;
-    data["data"] = this->data;
+    data["data"] = this->data.c_str();
     data["type"] = this->typeToString();
 }
 

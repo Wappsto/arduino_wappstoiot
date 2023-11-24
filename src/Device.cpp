@@ -18,14 +18,14 @@ Device::Device(WappstoModel *network, DeviceDescription_t *deviceInfo): WappstoM
 
 void Device::toJSON(JsonObject data)
 {
-    data["name"] = this->name;
-    data["manufacturer"] = this->deviceInfo.manufacturer;
-    data["product"] = this->deviceInfo.product;
-    data["version"] = this->deviceInfo.version;
-    data["serial"] = this->deviceInfo.serial;
-    data["description"] = this->deviceInfo.description;
-    data["protocol"] = this->deviceInfo.protocol;
-    data["communication"] = this->deviceInfo.communication;
+    data["name"] = this->name.c_str();
+    data["manufacturer"] = this->deviceInfo.manufacturer.c_str();
+    data["product"] = this->deviceInfo.product.c_str();
+    data["version"] = this->deviceInfo.version.c_str();
+    data["serial"] = this->deviceInfo.serial.c_str();
+    data["description"] = this->deviceInfo.description.c_str();
+    data["protocol"] = this->deviceInfo.protocol.c_str();
+    data["communication"] = this->deviceInfo.communication.c_str();
 }
 
 void Device::getFindQuery(char *url)

@@ -86,7 +86,7 @@ void Value::_init(void)
 
 void Value::toJSON(JsonObject data)
 {
-    data["name"] = this->name;
+    data["name"] = this->name.c_str();
     if(this->permission == READ_WRITE) {
         data["permission"] = "rw";
     } else if(this->permission == READ) {
@@ -95,7 +95,7 @@ void Value::toJSON(JsonObject data)
         data["permission"] = "w";
     }
 
-    data["type"] = this->type;
+    data["type"] = this->type.c_str();
     data["period"] = "0";
     data["delta"] = "0";
 
@@ -104,25 +104,25 @@ void Value::toJSON(JsonObject data)
         number["min"] = this->valNumber->min;
         number["max"] = this->valNumber->max;
         number["step"] = this->valNumber->step;
-        number["unit"] = this->valNumber->unit;
+        number["unit"] = this->valNumber->unit.c_str();
     } else if(this->valueType == STRING_VALUE) {
         JsonObject str = data.createNestedObject("string");
         str["max"] = this->valString->max;
-        str["encoding"] = this->valString->encoding;
+        str["encoding"] = this->valString->encoding.c_str();
     } else if(this->valueType == BLOB_VALUE) {
         JsonObject blob = data.createNestedObject("blob");
         blob["max"] = this->valBlob->max;
-        blob["encoding"] = this->valBlob->encoding;
+        blob["encoding"] = this->valBlob->encoding.c_str();
     } else if(this->valueType == XML_VALUE) {
         JsonObject xml = data.createNestedObject("xml");
-        xml["xsd"] = this->valXml->xsd;
-        xml["namespace"] = this->valXml->xml_namespace;
+        xml["xsd"] = this->valXml->xsd.c_str();
+        xml["namespace"] = this->valXml->xml_namespace.c_str();
     } else if(this->valueType == NUMBER_VALUE_FULL) {
         JsonObject number = data.createNestedObject("number");
         number["min"] = this->valNumberFull->min;
         number["max"] = this->valNumberFull->max;
         number["step"] = this->valNumberFull->step;
-        number["unit"] = this->valNumberFull->unit;
+        number["unit"] = this->valNumberFull->unit.c_str();
         //number["meaningful_zero"] = this->valNumberFull->meaningful_zero;
         number["ordered_mapping"] = this->valNumberFull->ordered_map;
         if(this->valNumberFull->mapping) {
@@ -131,8 +131,8 @@ void Value::toJSON(JsonObject data)
                 mapping[this->valNumberFull->mapping->map[i].key] = this->valNumberFull->mapping->map[i].value;
             }
         }
-        data["period"] = this->valNumberFull->period;
-        data["delta"] = this->valNumberFull->delta;
+        data["period"] = this->valNumberFull->period.c_str();
+        data["delta"] = this->valNumberFull->delta.c_str();
     }
 }
 
