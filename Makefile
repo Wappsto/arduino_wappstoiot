@@ -53,11 +53,11 @@ setup: bin/arduino-cli bin/arduino-lint EpoxyDuino
 	# ESP32 core version 2
 	#./bin/arduino-cli config add board_manager.additional_urls https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
 	# ESP32 core version 1
-	./bin/arduino-cli config add board_manager.additional_urls https://dl.espressif.com/dl/package_esp32_index.json
+	./bin/arduino-cli config add board_manager.additional_urls https://espressif.github.io/arduino-esp32/package_esp32_index.json
 	./bin/arduino-cli config set directories.user ./extras
 
 	./bin/arduino-cli core update-index
-	./bin/arduino-cli core install esp32:esp32@1.0.6
+	./bin/arduino-cli core install esp32:esp32@2.0.14
 
 	./bin/arduino-cli lib install ArduinoJson@6.17.3
 	./bin/arduino-cli lib install AUnit
