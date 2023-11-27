@@ -26,7 +26,7 @@ If you do not have this, see https://www.arduino.cc/en/Guide
 
 #### Install ArduinoJson library
 From the library manager you need to install ArduinoJson library - see https://arduinojson.org/v6/doc/installation/ for more details.
-Latest tested version: 6.17.3
+Latest tested version: 6.21.3
 
 #### Install this wappsto library
 To install this library in Arduino Ide, download this project as a zip-file, click "Code" and choose "Download ZIP".
