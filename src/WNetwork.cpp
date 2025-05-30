@@ -1,6 +1,6 @@
 #include "WNetwork.h"
 
-WNetwork::WNetwork(const char* uuid, String name, String description): WappstoModel{NULL, "WNetwork"}
+WNetwork::WNetwork(const char* uuid, String name, String description): WappstoModel{NULL, "network"}
 {
     strcpy(this->uuid, uuid);
     this->name = name;
