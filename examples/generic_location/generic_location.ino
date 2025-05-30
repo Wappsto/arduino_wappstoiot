@@ -19,7 +19,7 @@ Wappsto wappsto(&client);
 const char* ssid = "";
 const char* password = "";
 
-Network *myNetwork;
+WNetwork *myNetwork;
 Device *myDevice;
 Value *myLatitudeValue;
 Value *myLongitudeValue;

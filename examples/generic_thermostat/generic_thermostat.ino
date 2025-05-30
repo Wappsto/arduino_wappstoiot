@@ -24,7 +24,7 @@ unsigned long currentMillis = 0;
 #define UPDATE_INTERVAL_MS 1000 // 1 second
 
 Wappsto wappsto(&client);
-Network *network;
+WNetwork *network;
 Device *thermostatDevice;
 Value *temperatureValue;
 
